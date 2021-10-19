@@ -14,13 +14,15 @@ FLAGS     = -O3 -march=native -std=c++11 -fopenmp -fPIC
 LIBS = -lopenblas -lgsl -lz
 #LIBS = -lblas -lgsl -lz
 
+# Disable Python
+PYTHON = off
+
 # I assume we're running on linux
 OS = LINUX
 # But in case we're crazy enough to run on MacOS, might as well check...
 ifneq (,$(findstring arwin,$(shell uname)))
   OS = MACOS
 endif
-
 
 # Tag the build with the current version from git, so we know where all the awesome answers came from.
 BUILDVERSION = $(shell git branch -v | grep '*' | awk '{printf "%s_%s",$$2,$$3}' )
