@@ -8,4 +8,8 @@ tmp*
 ../doc/*
 ../work/*
 ../old_armadillo/*
+# Built external libraries
 ext_lib_build/*
+# Generated build files
+imsrg++
+version.hh
