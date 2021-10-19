@@ -278,7 +278,10 @@ splashscreen:
 	@printf "                                                                                               \n"
 
 # Build rules for external libs
-ext_lib: $(EXTLIBS)
+ext_lib: ext_lib_include
+
+ext_lib_include: $(EXTLIBS)
+	cp -r $(EXTLIBBUILDDIR)/include $(EXTLIBBUILDDIR)/../include
 
 $(EXTLIBBOOST):
 	@mkdir -p $(@D)
