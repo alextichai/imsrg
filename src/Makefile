@@ -43,6 +43,8 @@ EXTLIBOPENBLAS = $(EXTLIBBUILDDIR)/lib/libopenblas.a
 
 EXTLIBS = $(EXTLIBBOOST) $(EXTLIBOPENBLAS)
 
+LIBS += -Wl,-rpath=$(EXTLIBBUILDDIR)/lib -L$(EXTLIBBUILDDIR)/lib
+
 ifeq ($(DEBUG),on)
  FLAGS     = -march=native -std=c++11 -fopenmp -fPIC -g
 endif
@@ -100,7 +102,8 @@ endif
 
 
 ifeq ($(THEHOST),other)  # default options. assumes boost and python are set up nicely.
- LIBS += -llapack
+	# Do not actually need this because OpenBLAS has lapack functions
+ # LIBS += -llapack
 # FLAGS += -DOPENBLAS_NOUSEOMP=1
 # ifneq ($(PYTHON),off)
 #  ALL += pyIMSRG.so
@@ -188,16 +191,19 @@ OBJ = ModelSpace.o TwoBodyME.o ThreeBodyME.o Operator.o  ReadWrite.o\
 #      ThreeBodyMEpn.o ThreeLegME.o ThreeBodyMENO2B.o \
 
 
-boost_src/%.o: boost_src/%.cpp
-	$(CXX) -c $^ -o $@ $(INCLUDE) $(FLAGS)
+boost_src/%.o: boost_src/%.cpp ext_lib
+	$(CXX) -c $< -o $@ $(INCLUDE) $(FLAGS)
 
 
-%.o: %.cc %.hh
+%.o: %.cc %.hh ext_lib
 	$(CXX) -c $*.cc -o $@ $(INCLUDE) $(FLAGS)
 
-%.o: %.cc
+%.o: %.cc ext_lib
 	$(CXX) -c $*.cc -o $@ $(INCLUDE) $(FLAGS)
 
+$(EXTLIBBUILDDIR)/lib/libIMSRG.so: libIMSRG.so
+	@mkdir -p $(@D)
+	cp $^ $@
 
 libIMSRG.so: $(OBJ)
 	$(CXX) $^ -shared -o $@ $(SOFLAGS) $(LIBS)
@@ -210,7 +216,7 @@ pyIMSRG.so: $(OBJ)  pyIMSRG.o version.hh
 pyIMSRG.o: pyIMSRG.cc
 	$(CXX) -c  $(FLAGS) $(INCLUDE) $(PYTHON_INCLUDE) $(PYTHONFLAGS)  $^ -o $@
 
-imsrg++: imsrg++.cc libIMSRG.so Parameters.hh version.hh
+imsrg++: imsrg++.cc $(EXTLIBBUILDDIR)/lib/libIMSRG.so Parameters.hh version.hh
 	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) -lIMSRG $(LIBS)
 
 version.hh:
