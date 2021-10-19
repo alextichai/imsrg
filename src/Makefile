@@ -37,6 +37,7 @@ PWD := $(shell pwd)
 
 # Build external libraries in a local directory
 EXTLIBBUILDDIR = $(PWD)/ext_lib_build/$(HOSTNAME)
+INCLUDE += -I$(EXTLIBBUILDDIR)/include
 EXTLIBBOOST = $(EXTLIBBUILDDIR)/lib/libboost_iostreams.a
 
 EXTLIBS = $(EXTLIBBOOST)
