@@ -40,8 +40,9 @@ EXTLIBBUILDDIR = $(PWD)/ext_lib_build/$(HOSTNAME)
 INCLUDE += -I$(EXTLIBBUILDDIR)/include
 EXTLIBBOOST = $(EXTLIBBUILDDIR)/lib/libboost_iostreams.a
 EXTLIBOPENBLAS = $(EXTLIBBUILDDIR)/lib/libopenblas.a
+EXTLIBGSL = $(EXTLIBBUILDDIR)/lib/libgsl.a
 
-EXTLIBS = $(EXTLIBBOOST) $(EXTLIBOPENBLAS)
+EXTLIBS = $(EXTLIBBOOST) $(EXTLIBOPENBLAS) $(EXTLIBGSL)
 
 LIBS += -Wl,-rpath=$(EXTLIBBUILDDIR)/lib -L$(EXTLIBBUILDDIR)/lib
 
@@ -286,3 +287,7 @@ $(EXTLIBBOOST):
 $(EXTLIBOPENBLAS):
 	@mkdir -p $(@D)
 	cd lib/openblas && make clean && make -j8 && make install PREFIX=$(EXTLIBBUILDDIR) && make clean && cd ../../
+
+$(EXTLIBGSL):
+	@mkdir -p $(@D)
+	cd lib && tar xvf gsl-2.7.tar.gz && cd gsl-2.7 && ./configure --prefix=$(EXTLIBBUILDDIR) && make -j8 && make install && cd ../.. && rm -rf lib/gsl-2.7

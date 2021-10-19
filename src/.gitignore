@@ -10,6 +10,8 @@ tmp*
 ../old_armadillo/*
 # Built external libraries
 ext_lib_build/*
+# Temporary GSL source
+lib/gsl-2.7
 # Generated build files
 imsrg++
 version.hh
