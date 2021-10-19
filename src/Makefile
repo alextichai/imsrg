@@ -192,14 +192,14 @@ OBJ = ModelSpace.o TwoBodyME.o ThreeBodyME.o Operator.o  ReadWrite.o\
 #      ThreeBodyMEpn.o ThreeLegME.o ThreeBodyMENO2B.o \
 
 
-boost_src/%.o: boost_src/%.cpp ext_lib
+boost_src/%.o: boost_src/%.cpp $(EXTLIBS)
 	$(CXX) -c $< -o $@ $(INCLUDE) $(FLAGS)
 
 
-%.o: %.cc %.hh ext_lib
+%.o: %.cc %.hh $(EXTLIBS)
 	$(CXX) -c $*.cc -o $@ $(INCLUDE) $(FLAGS)
 
-%.o: %.cc ext_lib
+%.o: %.cc $(EXTLIBS)
 	$(CXX) -c $*.cc -o $@ $(INCLUDE) $(FLAGS)
 
 $(EXTLIBBUILDDIR)/lib/libIMSRG.so: libIMSRG.so
