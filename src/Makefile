@@ -39,8 +39,9 @@ PWD := $(shell pwd)
 EXTLIBBUILDDIR = $(PWD)/ext_lib_build/$(HOSTNAME)
 INCLUDE += -I$(EXTLIBBUILDDIR)/include
 EXTLIBBOOST = $(EXTLIBBUILDDIR)/lib/libboost_iostreams.a
+EXTLIBOPENBLAS = $(EXTLIBBUILDDIR)/lib/libopenblas.a
 
-EXTLIBS = $(EXTLIBBOOST)
+EXTLIBS = $(EXTLIBBOOST) $(EXTLIBOPENBLAS)
 
 ifeq ($(DEBUG),on)
  FLAGS     = -march=native -std=c++11 -fopenmp -fPIC -g
@@ -275,3 +276,7 @@ ext_lib: $(EXTLIBS)
 $(EXTLIBBOOST):
 	@mkdir -p $(@D)
 	cd lib/boost && rm -rf build && mkdir build && bash bootstrap.sh --prefix=$(EXTLIBBUILDDIR) && ./b2 --with-iostreams link=static install && rm -rf build && cd ../../
+
+$(EXTLIBOPENBLAS):
+	@mkdir -p $(@D)
+	cd lib/openblas && make clean && make -j8 && make install PREFIX=$(EXTLIBBUILDDIR) && make clean && cd ../../
