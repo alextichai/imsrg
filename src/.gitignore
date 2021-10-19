@@ -8,3 +8,4 @@ tmp*
 ../doc/*
 ../work/*
 ../old_armadillo/*
+ext_lib_build/*

@@ -30,7 +30,16 @@ ifneq (,$(findstring detached,$(BUILDVERSION)))
   BUILDVERSION = $(shell git branch -v | grep '*' | awk '{printf "HEAD_%s",$$6}'  )
 endif
 
+HOSTNAME := $(shell hostname)
+PWD := $(shell pwd)
+
 #FLAGS += -DBUILDVERSION=\"$(BUILDVERSION)\"
+
+# Build external libraries in a local directory
+EXTLIBBUILDDIR = $(PWD)/ext_lib_build/$(HOSTNAME)
+EXTLIBBOOST = $(EXTLIBBUILDDIR)/lib/libboost_iostreams.a
+
+EXTLIBS = $(EXTLIBBOOST)
 
 ifeq ($(DEBUG),on)
  FLAGS     = -march=native -std=c++11 -fopenmp -fPIC -g
@@ -258,3 +267,10 @@ splashscreen:
 	@printf "        |_____|_____|_____|/        |_____|_____|/\   \  /            |_____|_____|_____|/     \n"
 	@printf "                                                   \___\/                                      \n"
 	@printf "                                                                                               \n"
+
+# Build rules for external libs
+ext_lib: $(EXTLIBS)
+
+$(EXTLIBBOOST):
+	@mkdir -p $(@D)
+	cd lib/boost && rm -rf build && mkdir build && bash bootstrap.sh --prefix=$(EXTLIBBUILDDIR) && ./b2 --with-iostreams link=static install && rm -rf build && cd ../../
