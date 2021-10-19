@@ -1,3 +1,6 @@
 [submodule "src/lib/boost"]
 	path = src/lib/boost
 	url = https://github.com/boostorg/boost
+[submodule "src/lib/openblas"]
+	path = src/lib/openblas
+	url = https://github.com/xianyi/OpenBLAS
