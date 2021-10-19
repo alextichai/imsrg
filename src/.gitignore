@@ -15,3 +15,5 @@ lib/gsl-2.7
 # Generated build files
 imsrg++
 version.hh
+# VS Code settings
+.vscode/*
