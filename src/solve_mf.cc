@@ -81,67 +81,41 @@ int main(int argc, char** argv)
   std::string valence_space = parameters.s("valence_space");
   std::string custom_valence_space = parameters.s("custom_valence_space");
   std::string basis = parameters.s("basis");
-  std::string method = parameters.s("method");
   std::string flowfile = parameters.s("flowfile");
   std::string intfile = parameters.s("intfile");
-  std::string core_generator = parameters.s("core_generator");
-  std::string valence_generator = parameters.s("valence_generator");
   std::string fmt2 = parameters.s("fmt2");
   std::string fmt3 = parameters.s("fmt3");
-  std::string input_op_fmt = parameters.s("input_op_fmt");
-  std::string denominator_delta_orbit = parameters.s("denominator_delta_orbit");
   std::string LECs = parameters.s("LECs");
-  std::string scratch = parameters.s("scratch");
-  std::string valence_file_format = parameters.s("valence_file_format");
-  std::string occ_file = parameters.s("occ_file");
-  std::string physical_system = parameters.s("physical_system");
-  std::string denominator_partitioning = parameters.s("denominator_partitioning");
   std::string NAT_order = parameters.s("NAT_order");
 
-  bool use_brueckner_bch = parameters.s("use_brueckner_bch") == "true";
   bool nucleon_mass_correction = parameters.s("nucleon_mass_correction") == "true";
   bool relativistic_correction = parameters.s("relativistic_correction") == "true";
-  bool IMSRG3 = parameters.s("IMSRG3") == "true";
-  bool imsrg3_n7 = parameters.s("imsrg3_n7") == "true";
-  bool imsrg3_at_end = parameters.s("imsrg3_at_end") == "true";
-  bool write_omega = parameters.s("write_omega") == "true";
+  // ??? what do these options do?
   bool freeze_occupations = parameters.s("freeze_occupations")=="true";
   bool discard_no2b_from_3n = parameters.s("discard_no2b_from_3n")=="true";
-  bool hunter_gatherer = parameters.s("hunter_gatherer") == "true";
-  bool goose_tank = parameters.s("goose_tank") == "true";
-  bool discard_residual_input3N = parameters.s("discard_residual_input3N")=="true";
   bool use_NAT_occupations = (parameters.s("use_NAT_occupations")=="true") ? true : false;
+
+  // Orders orbitals by energy rather than NAT occupation number
   bool order_NAT_by_energy = (parameters.s("order_NAT_by_energy")=="true") ? true : false;
-  bool store_3bme_pn = (parameters.s("store_3bme_pn")=="true");
-  bool only_2b_eta = (parameters.s("only_2b_eta")=="true");
-  bool only_2b_omega = (parameters.s("only_2b_omega")=="true");
-  bool perturbative_triples = (parameters.s("perturbative_triples")=="true");
-  bool brueckner_restart = false;
 
   int eMax = parameters.i("emax");
   int lmax = parameters.i("lmax"); // so far I only use this with atomic systems.
   int E3max = parameters.i("e3max");
   int lmax3 = parameters.i("lmax3");
   int targetMass = parameters.i("A");
-  int nsteps = parameters.i("nsteps");
   int file2e1max = parameters.i("file2e1max");
   int file2e2max = parameters.i("file2e2max");
   int file2lmax = parameters.i("file2lmax");
   int file3e1max = parameters.i("file3e1max");
   int file3e2max = parameters.i("file3e2max");
   int file3e3max = parameters.i("file3e3max");
-  int atomicZ = parameters.i("atomicZ");
+  // ???
   int emax_unocc = parameters.i("emax_unocc");
-  int eMax_imsrg = parameters.i("emax_imsrg");
-  int e2Max_imsrg = parameters.i("e2max_imsrg");
-  int e3Max_imsrg = parameters.i("e3max_imsrg");
-  if (e2Max_imsrg==-1 and eMax_imsrg != -1) e2Max_imsrg = 2*eMax_imsrg;
-  if (e3Max_imsrg==-1 and eMax_imsrg != -1) e3Max_imsrg = std::min(E3max, 3*eMax_imsrg);
 
   double hw = parameters.d("hw");
+  // ???
   double BetaCM = parameters.d("BetaCM");
   double hwBetaCM = parameters.d("hwBetaCM");
-  double OccNat3Cut = parameters.d("OccNat3Cut");
 
 
 
@@ -319,15 +293,11 @@ int main(int argc, char** argv)
 
   // decide what to keep after normal ordering
   int hno_particle_rank = 2;
-  if ((IMSRG3) and (Hbare.ThreeBodyNorm() > 1e-5))  hno_particle_rank = 3;
-  if (discard_residual_input3N) hno_particle_rank = 2;
-  if (input3bme_type=="no2b") hno_particle_rank = 2;
 
   Operator& HNO = Hbare; // The reference & means we overwrite Hbare and save some memory
   if (basis == "HF")
   {
     HNO = hf.GetNormalOrderedH( hno_particle_rank );
-    if ((IMSRG3 or perturbative_triples) and OccNat3Cut>0 ) hf.GetNaturalOrbitals();
   }
   else if (basis == "NAT") // we want to use the natural orbital basis
   {
