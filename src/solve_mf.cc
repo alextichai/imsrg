@@ -139,29 +139,11 @@ int main(int argc, char** argv)
   if (e3Max_imsrg==-1 and eMax_imsrg != -1) e3Max_imsrg = std::min(E3max, 3*eMax_imsrg);
 
   double hw = parameters.d("hw");
-  double smax = parameters.d("smax");
-  double ode_tolerance = parameters.d("ode_tolerance");
-  double dsmax = parameters.d("dsmax");
-  double ds_0 = parameters.d("ds_0");
-  double domega = parameters.d("domega");
-  double omega_norm_max = parameters.d("omega_norm_max");
-  double denominator_delta = parameters.d("denominator_delta");
   double BetaCM = parameters.d("BetaCM");
   double hwBetaCM = parameters.d("hwBetaCM");
-  double eta_criterion = parameters.d("eta_criterion");
-  double hw_trap = parameters.d("hw_trap");
-  double dE3max = parameters.d("dE3max");
   double OccNat3Cut = parameters.d("OccNat3Cut");
-  double threebody_threshold = parameters.d("threebody_threshold");
 
-  std::vector<std::string> opnames = parameters.v("Operators");
-  std::vector<std::string> opsfromfile = parameters.v("OperatorsFromFile");
-  std::vector<std::string> opnamesPT1 = parameters.v("OperatorsPT1");
-  std::vector<std::string> opnamesRPA = parameters.v("OperatorsRPA");
-  std::vector<std::string> opnamesTDA = parameters.v("OperatorsTDA");
 
-  std::vector<Operator> ops;
-  std::vector<std::string> spwf = parameters.v("SPWF");
 
 
 
