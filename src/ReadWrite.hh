@@ -61,7 +61,10 @@ class ReadWrite
    void ReadDarmstadt_2bodyRel( std::string filename, Operator& Op );
    void Read2bCurrent_Navratil( std::string filename, Operator& Op);
    void Write_me2j( std::string filename, Operator& op, int emax, int e2max, int lmax);
+   void Write_me2j_np( std::string filename, Operator& op, int emax, int e2max, int lmax);
    void Write_me3j( std::string filename, Operator& op, int E1max, int E2max, int E3max);
+   void Write_me2jp(std::string filename, Operator &op, int emax, int e2max, int lmax);
+   void Write_me1j(std::string filename, Operator &op, int emax, int lmax);
    void WriteTBME_Navratil( std::string filename, Operator& Hbare);
    void WriteNuShellX_sps( Operator& op, std::string filename);
    void WriteNuShellX_int( Operator& op, std::string filename);
