@@ -66,9 +66,9 @@ ARGS['core_generator'] = 'imaginary-time'
 #ARGS['valence_generator'] = 'shell-model-imaginary-time'
 
 ### Solution method
-ARGS['method'] = 'magnus'
+# ARGS['method'] = 'magnus'
 #ARGS['method'] = 'brueckner'
-#ARGS['method'] = 'flow'
+ARGS['method'] = 'flow'
 #ARGS['method'] = 'HF'
 #ARGS['method'] = 'MP3'
 
