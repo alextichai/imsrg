@@ -7,7 +7,7 @@ CXX = g++
 #  -DOPENBLAS_NOUSEOMP=1 removes parallel blocks which take threads away from OPENBLAS
 #                        to be used if OpenBlas was compiled without the USE_OMP flag
 
-ALL = version.hh libIMSRG.so imsrg++
+ALL = version.hh libIMSRG.so imsrg++ solve_mf
 INSTDIR = $(HOME)
 INCLUDE   = -I./armadillo
 FLAGS     = -O3 -march=native -std=c++11 -fopenmp -fPIC
@@ -218,6 +218,9 @@ pyIMSRG.o: pyIMSRG.cc
 	$(CXX) -c  $(FLAGS) $(INCLUDE) $(PYTHON_INCLUDE) $(PYTHONFLAGS)  $^ -o $@
 
 imsrg++: imsrg++.cc $(EXTLIBBUILDDIR)/lib/libIMSRG.so Parameters.hh version.hh
+	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) -lIMSRG $(LIBS)
+
+solve_mf: solve_mf.cc $(EXTLIBBUILDDIR)/lib/libIMSRG.so Parameters.hh version.hh
 	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) -lIMSRG $(LIBS)
 
 version.hh:
