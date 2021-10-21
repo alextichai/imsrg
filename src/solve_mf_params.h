@@ -53,6 +53,38 @@ struct MFSolverArgs {
 
 inline MFSolverArgs DefaultMFSolverArgs() { return MFSolverArgs(); }
 
+inline void HandleDefaultMFSolverArgs(MFSolverArgs& args) {
+  MFSolverArgs defaults;
+
+  if (args.input_2bme_e2max == defaults.input_2bme_e2max) {
+    args.input_2bme_e2max = 2 * args.input_2bme_emax;
+  }
+  if (args.input_2bme_lmax == defaults.input_2bme_lmax) {
+    args.input_2bme_lmax = args.input_2bme_emax;
+  }
+
+  if (args.input_3bme_e2max == defaults.input_3bme_e2max) {
+    args.input_3bme_e2max = 2 * args.input_3bme_emax;
+  }
+
+  if (args.mass == defaults.mass) {
+    std::size_t last_index =
+        args.reference_state.find_last_not_of("0123456789");
+    args.mass = std::stoi(args.reference_state.substr(last_index + 1));
+  }
+
+  if (args.calc_lmax == defaults.calc_lmax) {
+    args.calc_lmax = args.calc_emax;
+  }
+  if (args.calc_lmax3 == defaults.calc_lmax3) {
+    args.calc_lmax3 = args.calc_emax;
+  }
+
+  if (args.valence_space == defaults.valence_space) {
+    args.valence_space = args.reference_state;
+  }
+}
+
 inline MFSolverArgs ParseMFSolverArgs(int argc, char** argv) {
   MFSolverArgs args;
 
@@ -205,6 +237,8 @@ inline MFSolverArgs ParseMFSolverArgs(int argc, char** argv) {
     app.exit(e);
     exit(EXIT_FAILURE);
   }
+
+  HandleDefaultMFSolverArgs(args);
 
   return args;
 }
