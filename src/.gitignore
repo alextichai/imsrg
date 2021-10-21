@@ -14,6 +14,7 @@ ext_lib_build/*
 lib/gsl-2.7
 # Generated build files
 imsrg++
+solve_mf
 version.hh
 # VS Code settings
 .vscode/*
