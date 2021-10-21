@@ -57,6 +57,7 @@
 #include "Parameters.hh"
 #include "PhysicalConstants.hh"
 #include "version.hh"
+#include "solve_mf_params.h"
 
 struct OpFromFile {
    std::string file2name,file3name,opname;
@@ -69,6 +70,10 @@ int main(int argc, char** argv)
 #ifdef BUILDVERSION
   std::cout << "######  imsrg++ build version: " << BUILDVERSION << std::endl;
 #endif
+
+  auto args = ParseMFSolverArgs(argc, argv);
+
+  std::cout << PrettyPrintMFSolverArgs(args);
 
   Parameters parameters(argc,argv);
   if (parameters.help_mode) return 0;
