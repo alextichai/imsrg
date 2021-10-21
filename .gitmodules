@@ -4,3 +4,6 @@
 [submodule "src/lib/openblas"]
 	path = src/lib/openblas
 	url = https://github.com/xianyi/OpenBLAS
+[submodule "src/lib/fmt"]
+	path = src/lib/fmt
+	url = https://github.com/fmtlib/fmt
