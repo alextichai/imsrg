@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "fmt/core.h"
 #include "lib/cli11/CLI11.hpp"
 
 struct MFSolverArgs {
@@ -208,6 +209,64 @@ inline MFSolverArgs ParseMFSolverArgs(int argc, char** argv) {
   return args;
 }
 
-inline std::string PrettyPrintMFSolverArgs(const MFSolverArgs& args) {}
+inline std::string PrettyPrintMFSolverArgs(const MFSolverArgs& args) {
+  std::string ret_val = "";
+
+  ret_val += "Input 2-body matrix elements:\n";
+  ret_val += fmt::format("path = {}\n", args.path_to_input_2bme);
+  ret_val += fmt::format("fmt = {}\n", args.input_2bme_fmt);
+  ret_val +=
+      fmt::format("emax, e2max, lmax = {}, {}, {}\n\n", args.input_2bme_emax,
+                  args.input_2bme_e2max, args.input_2bme_lmax);
+
+  ret_val += "Input 3-body matrix elements:\n";
+  ret_val += fmt::format("path = {}\n", args.path_to_input_3bme);
+  ret_val += fmt::format("type = {}\n", args.input_3bme_type);
+  ret_val += fmt::format("fmt = {}\n", args.input_3bme_fmt);
+  ret_val +=
+      fmt::format("emax, e2max, e3max = {}, {}, {}\n\n", args.input_3bme_emax,
+                  args.input_3bme_e2max, args.input_3bme_e3max);
+
+  ret_val += fmt::format("hbar omega = {}\n\n", args.hbar_omega);
+
+  ret_val += "Output NO2B matrix elements:\n";
+  ret_val += fmt::format("emax = {}\n", args.output_me_emax);
+  ret_val += fmt::format("path to 1B MEs = {}\n", args.path_to_output_1bme);
+  ret_val += fmt::format("path to 2B MEs = {}\n\n", args.path_to_output_2bme);
+
+  ret_val += "Mean-field calculation:\n";
+  ret_val += fmt::format("Reference state: {}, A = {}\n", args.reference_state,
+                         args.mass);
+  ret_val += fmt::format("basis = {}\n", args.basis);
+  ret_val += fmt::format("emax, lmax, e3max, lmax3 = {}, {}, {}, {}\n\n",
+                         args.calc_emax, args.calc_lmax, args.calc_e3max,
+                         args.calc_lmax3);
+
+  ret_val += "Meta-data specifications:\n";
+  ret_val +=
+      fmt::format("path to metadata file = {}\n", args.path_to_metadata_file);
+  ret_val += fmt::format("LEC specifier = {}\n\n", args.lec_string);
+
+  ret_val += "Additional details:\n";
+  ret_val += fmt::format("Nucleon mass correction: {}\n",
+                         args.nucleon_mass_correction);
+  ret_val += fmt::format("Relativistic correction: {}\n",
+                         args.relativistic_correction);
+  ret_val += fmt::format("Lawson term coefficient = {}\n", args.beta_cm);
+  ret_val +=
+      fmt::format("Lawson term frequency = {}\n\n", args.hbar_omega_beta_cm);
+
+  ret_val += "Advanced parameters:\n";
+  ret_val += fmt::format("no2b_precision: {}\n", args.no2b_precision);
+  ret_val += fmt::format("valence_space: {}\n", args.valence_space);
+  ret_val += fmt::format("nat_order: {}\n", args.nat_order);
+  ret_val += fmt::format("freeze_occupations: {}\n", args.freeze_occupations);
+  ret_val +=
+      fmt::format("discard_no2b_from_3n: {}\n", args.discard_no2b_from_3n);
+  ret_val += fmt::format("use_nat_occupations: {}\n", args.use_nat_occupations);
+  ret_val += fmt::format("emax_unoccupied: {}\n", args.emax_unoccupied);
+
+  return ret_val;
+}
 
 #endif  // SOLVE_MF_PARAMS_H_
