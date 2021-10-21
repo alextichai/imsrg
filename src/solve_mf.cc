@@ -79,9 +79,9 @@ int main(int argc, char** argv)
   std::string no2b_precision = parameters.s("no2b_precision");
   std::string reference = parameters.s("reference");
   std::string valence_space = parameters.s("valence_space");
-  std::string custom_valence_space = parameters.s("custom_valence_space");
+  std::string custom_valence_space = parameters.s("custom_valence_space"); // Can remove
   std::string basis = parameters.s("basis");
-  std::string flowfile = parameters.s("flowfile");
+  std::string flowfile = parameters.s("flowfile"); // Can remove
   std::string intfile = parameters.s("intfile");
   std::string fmt2 = parameters.s("fmt2");
   std::string fmt3 = parameters.s("fmt3");
