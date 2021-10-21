@@ -11,7 +11,7 @@ ALL = version.hh libIMSRG.so imsrg++ solve_mf
 INSTDIR = $(HOME)
 INCLUDE   = -I./armadillo
 FLAGS     = -O3 -march=native -std=c++11 -fopenmp -fPIC
-LIBS = -lopenblas -lgsl -lz
+LIBS = -lopenblas -lgsl -lz -lfmt
 #LIBS = -lblas -lgsl -lz
 
 # Disable Python
@@ -41,8 +41,9 @@ INCLUDE += -I$(EXTLIBBUILDDIR)/include
 EXTLIBBOOST = $(EXTLIBBUILDDIR)/lib/libboost_iostreams.a
 EXTLIBOPENBLAS = $(EXTLIBBUILDDIR)/lib/libopenblas.a
 EXTLIBGSL = $(EXTLIBBUILDDIR)/lib/libgsl.a
+EXTLIBFMT = $(EXTLIBBUILDDIR)/lib/libfmt.a
 
-EXTLIBS = $(EXTLIBBOOST) $(EXTLIBOPENBLAS) $(EXTLIBGSL)
+EXTLIBS = $(EXTLIBBOOST) $(EXTLIBOPENBLAS) $(EXTLIBGSL) $(EXTLIBFMT)
 
 LIBS += -Wl,-rpath=$(EXTLIBBUILDDIR)/lib -L$(EXTLIBBUILDDIR)/lib
 
@@ -297,3 +298,7 @@ $(EXTLIBOPENBLAS):
 $(EXTLIBGSL):
 	@mkdir -p $(@D)
 	cd lib && tar xvf gsl-2.7.tar.gz && cd gsl-2.7 && ./configure --prefix=$(EXTLIBBUILDDIR) && make -j8 && make install && cd ../.. && rm -rf lib/gsl-2.7
+
+$(EXTLIBFMT):
+	@mkdir -p $(@D)
+	cd lib/fmt && rm -rf build && mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX:PATH=$(EXTLIBBUILDDIR) -DFMT_TEST=OFF .. && cmake --build . --target install --config Release && cd .. && rm -rf build
