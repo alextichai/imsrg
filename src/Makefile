@@ -220,7 +220,7 @@ pyIMSRG.o: pyIMSRG.cc
 imsrg++: imsrg++.cc $(EXTLIBBUILDDIR)/lib/libIMSRG.so Parameters.hh version.hh
 	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) -lIMSRG $(LIBS)
 
-solve_mf: solve_mf.cc $(EXTLIBBUILDDIR)/lib/libIMSRG.so Parameters.hh version.hh
+solve_mf: solve_mf.cc $(EXTLIBBUILDDIR)/lib/libIMSRG.so Parameters.hh version.hh solve_mf_params.h
 	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) -lIMSRG $(LIBS)
 
 version.hh:
