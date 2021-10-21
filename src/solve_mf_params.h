@@ -114,6 +114,9 @@ inline MFSolverArgs ParseMFSolverArgs(int argc, char** argv) {
 
   auto existing_path_validator = CLI::Validator(
       [](const std::string& s) {
+        if (s.find_last_of("/\\") == s.npos) {
+          return std::string("");
+        }
         auto parent = s.substr(0, s.find_last_of("/\\"));
         auto path_type = CLI::detail::check_path(parent.c_str());
         if (path_type == CLI::detail::path_type::directory) {
