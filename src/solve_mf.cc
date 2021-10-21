@@ -75,52 +75,47 @@ int main(int argc, char** argv)
 
   std::cout << PrettyPrintMFSolverArgs(args);
 
-  Parameters parameters(argc,argv);
-  if (parameters.help_mode) return 0;
+  // Parameters parameters(argc,argv);
+  // if (parameters.help_mode) return 0;
 
-  std::string inputtbme = parameters.s("2bme");
-  std::string input3bme = parameters.s("3bme");
-  std::string input3bme_type = parameters.s("3bme_type");
-  std::string no2b_precision = parameters.s("no2b_precision");
-  std::string reference = parameters.s("reference");
-  std::string valence_space = parameters.s("valence_space");
-  std::string custom_valence_space = parameters.s("custom_valence_space"); // Can remove
-  std::string basis = parameters.s("basis");
-  std::string flowfile = parameters.s("flowfile"); // Can remove
-  std::string intfile = parameters.s("intfile");
-  std::string fmt2 = parameters.s("fmt2");
-  std::string fmt3 = parameters.s("fmt3");
-  std::string LECs = parameters.s("LECs");
-  std::string NAT_order = parameters.s("NAT_order");
+  std::string inputtbme = args.path_to_input_2bme;
+  std::string input3bme = args.path_to_input_3bme;
+  std::string input3bme_type = args.input_3bme_type;
+  std::string no2b_precision = args.no2b_precision;
+  std::string reference = args.reference_state;
+  std::string valence_space = args.valence_space;
+  std::string basis = args.basis;
+  std::string intfile = args.path_to_metadata_file;
+  std::string fmt2 = args.input_2bme_fmt;
+  std::string fmt3 = args.input_3bme_fmt;
+  std::string LECs = args.lec_string;
+  std::string NAT_order = args.nat_order;
 
-  bool nucleon_mass_correction = parameters.s("nucleon_mass_correction") == "true";
-  bool relativistic_correction = parameters.s("relativistic_correction") == "true";
+  bool nucleon_mass_correction = args.nucleon_mass_correction;
+  bool relativistic_correction = args.relativistic_correction;
   // ??? what do these options do?
-  bool freeze_occupations = parameters.s("freeze_occupations")=="true";
-  bool discard_no2b_from_3n = parameters.s("discard_no2b_from_3n")=="true";
-  bool use_NAT_occupations = (parameters.s("use_NAT_occupations")=="true") ? true : false;
+  bool freeze_occupations = args.freeze_occupations;
+  bool discard_no2b_from_3n = args.discard_no2b_from_3n;
+  bool use_NAT_occupations = args.use_nat_occupations;
 
-  // Orders orbitals by energy rather than NAT occupation number
-  bool order_NAT_by_energy = (parameters.s("order_NAT_by_energy")=="true") ? true : false;
-
-  int eMax = parameters.i("emax");
-  int lmax = parameters.i("lmax"); // so far I only use this with atomic systems.
-  int E3max = parameters.i("e3max");
-  int lmax3 = parameters.i("lmax3");
-  int targetMass = parameters.i("A");
-  int file2e1max = parameters.i("file2e1max");
-  int file2e2max = parameters.i("file2e2max");
-  int file2lmax = parameters.i("file2lmax");
-  int file3e1max = parameters.i("file3e1max");
-  int file3e2max = parameters.i("file3e2max");
-  int file3e3max = parameters.i("file3e3max");
+  int eMax = args.calc_emax;
+  int lmax = args.calc_lmax; // so far I only use this with atomic systems.
+  int E3max = args.calc_e3max;
+  int lmax3 = args.calc_lmax3;
+  int targetMass = args.mass;
+  int file2e1max = args.input_2bme_emax;
+  int file2e2max = args.input_2bme_e2max;
+  int file2lmax = args.input_2bme_lmax;
+  int file3e1max = args.input_3bme_emax;
+  int file3e2max = args.input_3bme_e2max;
+  int file3e3max = args.input_3bme_e3max;
   // ???
-  int emax_unocc = parameters.i("emax_unocc");
+  int emax_unocc = args.emax_unoccupied;
 
-  double hw = parameters.d("hw");
+  double hw = args.hbar_omega;
   // ???
-  double BetaCM = parameters.d("BetaCM");
-  double hwBetaCM = parameters.d("hwBetaCM");
+  double BetaCM = args.beta_cm;
+  double hwBetaCM = args.hbar_omega_beta_cm;
 
 
 
@@ -151,19 +146,6 @@ int main(int argc, char** argv)
 
 
 //  ModelSpace modelspace;
-
-  // Not sure if needed
-  if (custom_valence_space!="") // if a custom space is defined, the input valence_space is just used as a name
-  {
-    if (valence_space=="") // if no name is given, then just name it "custom"
-    {
-      parameters.string_par["valence_space"] = "custom";
-      flowfile = parameters.DefaultFlowFile();
-      intfile = parameters.DefaultIntFile();
-    }
-    valence_space = custom_valence_space;
-  }
-
 
   ModelSpace modelspace = ( reference=="default" ? ModelSpace(eMax,valence_space) : ModelSpace(eMax,reference,valence_space) );
 
@@ -306,8 +288,6 @@ int main(int argc, char** argv)
   }
   else if (basis == "NAT") // we want to use the natural orbital basis
   {
-    // for backwards compatibility: order_NAT_by_energy overrides NAT_order
-    if (order_NAT_by_energy) NAT_order = "energy";
 
     hf.UseNATOccupations( use_NAT_occupations );
     hf.OrderNATBy( NAT_order );
@@ -321,10 +301,10 @@ int main(int argc, char** argv)
     HNO = Hbare.DoNormalOrdering();
   }
 
-  rw.Write_me1j("O16_EM500_1.8_new.me1j", HNO, eMax, eMax);
+  rw.Write_me1j("mod_O16_EM500_1.8_new.me1j", HNO, eMax, eMax);
 
-  rw.Write_me2j_np("O16_EM500_1.8_new.me2j_np", HNO, eMax, 2 * eMax, eMax);
-  rw.Write_me2jp("O16_EM500_1.8_new.me2jp", HNO, eMax, 2 * eMax, eMax);
+  rw.Write_me2j_np("mod_O16_EM500_1.8_new.me2j_np", HNO, eMax, 2 * eMax, eMax);
+  rw.Write_me2jp("mod_O16_EM500_1.8_new.me2jp", HNO, eMax, 2 * eMax, eMax);
 
   return 0;
 }
