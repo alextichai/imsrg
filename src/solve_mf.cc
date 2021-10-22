@@ -79,46 +79,58 @@ int main(int argc, char** argv)
   // if (parameters.help_mode) return 0;
 
   std::string inputtbme = args.path_to_input_2bme;
+  std::string fmt2 = args.input_2bme_fmt;
+  int file2e1max = args.input_2bme_emax;
+  int file2e2max = args.input_2bme_e2max;
+  int file2lmax = args.input_2bme_lmax;
+
   std::string input3bme = args.path_to_input_3bme;
   std::string input3bme_type = args.input_3bme_type;
-  std::string no2b_precision = args.no2b_precision;
-  std::string reference = args.reference_state;
-  std::string valence_space = args.valence_space;
-  std::string basis = args.basis;
-  std::string intfile = args.path_to_metadata_file;
-  std::string fmt2 = args.input_2bme_fmt;
   std::string fmt3 = args.input_3bme_fmt;
-  std::string LECs = args.lec_string;
-  std::string NAT_order = args.nat_order;
+  int file3e1max = args.input_3bme_emax;
+  int file3e2max = args.input_3bme_e2max;
+  int file3e3max = args.input_3bme_e3max;
 
-  bool nucleon_mass_correction = args.nucleon_mass_correction;
-  bool relativistic_correction = args.relativistic_correction;
-  // ??? what do these options do?
-  bool freeze_occupations = args.freeze_occupations;
-  bool discard_no2b_from_3n = args.discard_no2b_from_3n;
-  bool use_NAT_occupations = args.use_nat_occupations;
+  double hw = args.hbar_omega;
 
+  std::string outfile_1b = args.path_to_output_1bme;
+  std::string outfile_2b = args.path_to_output_2bme;
+  int outemax = args.output_me_emax;
+
+  std::string reference = args.reference_state;
+  int targetMass = args.mass;
+  std::string basis = args.basis;
   int eMax = args.calc_emax;
   int lmax = args.calc_lmax; // so far I only use this with atomic systems.
   int E3max = args.calc_e3max;
   int lmax3 = args.calc_lmax3;
-  int targetMass = args.mass;
-  int file2e1max = args.input_2bme_emax;
-  int file2e2max = args.input_2bme_e2max;
-  int file2lmax = args.input_2bme_lmax;
-  int file3e1max = args.input_3bme_emax;
-  int file3e2max = args.input_3bme_e2max;
-  int file3e3max = args.input_3bme_e3max;
-  // ???
-  int emax_unocc = args.emax_unoccupied;
 
-  double hw = args.hbar_omega;
-  // ???
+  std::string intfile = args.path_to_metadata_file;
+  std::string LECs = args.lec_string;
+
+  bool nucleon_mass_correction = args.nucleon_mass_correction;
+  bool relativistic_correction = args.relativistic_correction;
+
   double BetaCM = args.beta_cm;
   double hwBetaCM = args.hbar_omega_beta_cm;
 
+  std::string no2b_precision = args.no2b_precision;
+  std::string valence_space = args.valence_space;
+  std::string NAT_order = args.nat_order;
+  bool freeze_occupations = args.freeze_occupations;
+  bool discard_no2b_from_3n = args.discard_no2b_from_3n;
+  bool use_NAT_occupations = args.use_nat_occupations;
+  int emax_unocc = args.emax_unoccupied;
 
-
+  std::ofstream meta_file(intfile);
+  if (!meta_file.good()) {
+    std::cout << "Could not open metadata file: " << intfile << "\n";
+    exit(EXIT_FAILURE);
+  }
+  time_t time_now =
+      std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  meta_file << "SOLVE_MF run at " << ctime(&time_now) << "\n";
+  meta_file << PrettyPrintMFSolverArgs(args) << "\n";
 
 
   // Test 2bme file
@@ -301,10 +313,10 @@ int main(int argc, char** argv)
     HNO = Hbare.DoNormalOrdering();
   }
 
-  rw.Write_me1j("mod_O16_EM500_1.8_new.me1j", HNO, eMax, eMax);
-
-  rw.Write_me2j_np("mod_O16_EM500_1.8_new.me2j_np", HNO, eMax, 2 * eMax, eMax);
-  rw.Write_me2jp("mod_O16_EM500_1.8_new.me2jp", HNO, eMax, 2 * eMax, eMax);
+  rw.Write_me1j(outfile_1b, HNO, outemax, outemax);
+  auto no_ext_filename = outfile_2b.substr(0, outfile_2b.find_last_of("."));
+  rw.Write_me2jp(no_ext_filename + ".me2jp", HNO, outemax, 2 * outemax, outemax);
+  rw.Write_me2j_np(no_ext_filename + ".me2j_np", HNO, outemax, 2 * outemax, outemax);
 
   return 0;
 }
