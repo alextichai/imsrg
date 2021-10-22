@@ -24,6 +24,10 @@ struct MFSolverArgs {
   std::string path_to_output_1bme = "";
   std::string path_to_output_2bme = "";
   int output_me_emax = 0;
+  bool with_generator = false;
+  std::string generator = "imaginary-time";
+  std::string denominator = "Moller_Plesset";
+  bool with_commutators = false;
   // Mean-field calculation
   std::string reference_state = "";
   int mass = -1;
@@ -172,6 +176,21 @@ inline MFSolverArgs ParseMFSolverArgs(int argc, char** argv) {
                  "emax of output matrix element files.")
       ->required()
       ->check(CLI::NonNegativeNumber);
+  app.add_flag("--with-generator", args.with_generator,
+               "Compute and save matrix elements for generator "
+               "(default: false).");
+  app.add_option("--generator", args.generator,
+                 "Type of generator to be used for commutators (default: "
+                 "imaginary-time).")
+      ->check(CLI::IsMember({"white", "atan", "imaginary-time"}));
+  app.add_option(
+         "--denominator", args.denominator,
+         "Type of energy denominator for generator construction(default: "
+         "Moller_Plesset).")
+      ->check(CLI::IsMember({"Moller_Plesset", "Epstein_Nesbet"}));
+  app.add_flag("--with-commutators", args.with_commutators,
+               "Compute IMSRG(2) commutators and saved output "
+               "(default: false).");
 
   // Mean-field calculation details
   app.add_option("--reference-state", args.reference_state,
@@ -267,6 +286,12 @@ inline std::string PrettyPrintMFSolverArgs(const MFSolverArgs& args) {
   ret_val += fmt::format("emax = {}\n", args.output_me_emax);
   ret_val += fmt::format("path to 1B MEs = {}\n", args.path_to_output_1bme);
   ret_val += fmt::format("path to 2B MEs = {}\n\n", args.path_to_output_2bme);
+
+  ret_val += "Extra output matrix elements:\n";
+  ret_val += fmt::format("save generator = {}\n", args.with_generator);
+  ret_val += fmt::format("save commutators = {}\n", args.with_commutators);
+  ret_val += fmt::format("generator type = {}, denominator type = {}",
+                         args.generator, args.denominator);
 
   ret_val += "Mean-field calculation:\n";
   ret_val += fmt::format("Reference state: {}, A = {}\n", args.reference_state,
