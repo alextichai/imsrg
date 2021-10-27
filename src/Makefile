@@ -45,7 +45,7 @@ EXTLIBFMT = $(EXTLIBBUILDDIR)/lib/libfmt.a
 
 EXTLIBS = $(EXTLIBBOOST) $(EXTLIBOPENBLAS) $(EXTLIBGSL) $(EXTLIBFMT)
 
-LIBS += -Wl,-rpath=$(EXTLIBBUILDDIR)/lib -L$(EXTLIBBUILDDIR)/lib
+LIBFLAGS = -static-libstdc++ -Wl,-rpath=$(EXTLIBBUILDDIR)/lib -L$(EXTLIBBUILDDIR)/lib
 
 ifeq ($(DEBUG),on)
  FLAGS     = -march=native -std=c++11 -fopenmp -fPIC -g
@@ -208,7 +208,7 @@ $(EXTLIBBUILDDIR)/lib/libIMSRG.so: libIMSRG.so
 	cp $^ $@
 
 libIMSRG.so: $(OBJ)
-	$(CXX) $^ -shared -o $@ $(SOFLAGS) $(LIBS)
+	$(CXX) $^ -shared -o $@ $(SOFLAGS) $(LIBFLAGS) $(LIBS)
 
 python: pyIMSRG.so
 
@@ -219,10 +219,10 @@ pyIMSRG.o: pyIMSRG.cc
 	$(CXX) -c  $(FLAGS) $(INCLUDE) $(PYTHON_INCLUDE) $(PYTHONFLAGS)  $^ -o $@
 
 imsrg++: imsrg++.cc $(EXTLIBBUILDDIR)/lib/libIMSRG.so Parameters.hh version.hh
-	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) -lIMSRG $(LIBS)
+	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) $(LIBFLAGS) -lIMSRG $(LIBS)
 
 solve_mf: solve_mf.cc $(EXTLIBBUILDDIR)/lib/libIMSRG.so Parameters.hh version.hh solve_mf_params.h
-	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) -lIMSRG $(LIBS)
+	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) $(LIBFLAGS) -lIMSRG $(LIBS)
 
 version.hh:
 	echo "#define BUILDVERSION \"$(BUILDVERSION)\"" > version.hh
@@ -293,7 +293,7 @@ $(EXTLIBBOOST):
 
 $(EXTLIBOPENBLAS):
 	@mkdir -p $(@D)
-	cd lib/openblas && make clean && make -j8 && make install PREFIX=$(EXTLIBBUILDDIR) && make clean && cd ../../
+	cd lib/openblas && make clean && make -j8 && make install USE_OPENMP=0 PREFIX=$(EXTLIBBUILDDIR) && make clean && cd ../../
 
 $(EXTLIBGSL):
 	@mkdir -p $(@D)
@@ -302,3 +302,4 @@ $(EXTLIBGSL):
 $(EXTLIBFMT):
 	@mkdir -p $(@D)
 	cd lib/fmt && rm -rf build && mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX:PATH=$(EXTLIBBUILDDIR) -DFMT_TEST=OFF .. && cmake --build . --target install --config Release && cd .. && rm -rf build
+	mv $(EXTLIBBUILDDIR)/lib64/*.a $(EXTLIBBUILDDIR)/lib/
