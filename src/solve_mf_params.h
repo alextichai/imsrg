@@ -57,7 +57,7 @@ struct MFSolverArgs {
 
 inline MFSolverArgs DefaultMFSolverArgs() { return MFSolverArgs(); }
 
-inline void HandleDefaultMFSolverArgs(MFSolverArgs& args) {
+inline void HandleDefaultMFSolverArgs(MFSolverArgs &args) {
   MFSolverArgs defaults;
 
   if (args.input_2bme_e2max == defaults.input_2bme_e2max) {
@@ -89,7 +89,7 @@ inline void HandleDefaultMFSolverArgs(MFSolverArgs& args) {
   }
 }
 
-inline MFSolverArgs ParseMFSolverArgs(int argc, char** argv) {
+inline MFSolverArgs ParseMFSolverArgs(int argc, char **argv) {
   MFSolverArgs args;
 
   CLI::App app(
@@ -150,7 +150,7 @@ inline MFSolverArgs ParseMFSolverArgs(int argc, char** argv) {
       ->required();
 
   auto existing_path_validator = CLI::Validator(
-      [](const std::string& s) {
+      [](const std::string &s) {
         if (s.find_last_of("/\\") == s.npos) {
           return std::string("");
         }
@@ -252,7 +252,7 @@ inline MFSolverArgs ParseMFSolverArgs(int argc, char** argv) {
 
   try {
     app.parse(argc, argv);
-  } catch (const CLI::ParseError& e) {
+  } catch (const CLI::ParseError &e) {
     app.exit(e);
     exit(EXIT_FAILURE);
   }
@@ -262,7 +262,7 @@ inline MFSolverArgs ParseMFSolverArgs(int argc, char** argv) {
   return args;
 }
 
-inline std::string PrettyPrintMFSolverArgs(const MFSolverArgs& args) {
+inline std::string PrettyPrintMFSolverArgs(const MFSolverArgs &args) {
   std::string ret_val = "";
 
   ret_val += "Input 2-body matrix elements:\n";
@@ -290,7 +290,7 @@ inline std::string PrettyPrintMFSolverArgs(const MFSolverArgs& args) {
   ret_val += "Extra output matrix elements:\n";
   ret_val += fmt::format("save generator = {}\n", args.with_generator);
   ret_val += fmt::format("save commutators = {}\n", args.with_commutators);
-  ret_val += fmt::format("generator type = {}, denominator type = {}",
+  ret_val += fmt::format("generator type = {}, denominator type = {}\n\n",
                          args.generator, args.denominator);
 
   ret_val += "Mean-field calculation:\n";
@@ -328,4 +328,4 @@ inline std::string PrettyPrintMFSolverArgs(const MFSolverArgs& args) {
   return ret_val;
 }
 
-#endif  // SOLVE_MF_PARAMS_H_
+#endif // SOLVE_MF_PARAMS_H_
