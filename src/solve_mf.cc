@@ -313,6 +313,10 @@ int main(int argc, char** argv) {
   rw.Write_me2j_np(no_ext_filename + ".me2j_np", HNO, outemax, 2 * outemax,
                    outemax);
 
+  if (basis == "NAT") {
+    rw.Write_nat_occs_to_me1j(no_ext_filename + "_nat_occs.me1j", HNO, outemax, outemax);
+  }
+
   if (with_generator || with_commutators) {
     // Create generator
     Operator eta(HNO);
@@ -325,10 +329,6 @@ int main(int argc, char** argv) {
     gen.Update(&HNO, &eta);
 
     std::string gp_str = "_" + generator + "_" + denominator;
-
-    if (basis == "NAT") {
-      rw.Write_nat_occs_to_me1j(no_ext_filename + gp_str + "_nat_occs.me1j", HNO, outemax, outemax);
-    }
 
     if (with_generator) {
       // Write generator
