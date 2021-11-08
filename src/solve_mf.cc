@@ -326,6 +326,10 @@ int main(int argc, char** argv) {
 
     std::string gp_str = "_" + generator + "_" + denominator;
 
+    if (basis == "NAT") {
+      rw.Write_nat_occs_to_me1j(no_ext_filename + gp_str + "_nat_occs.me1j", HNO, outemax, outemax);
+    }
+
     if (with_generator) {
       // Write generator
       rw.Write_me1j(no_ext_filename + gp_str + "_gen1.me1j", eta, outemax,

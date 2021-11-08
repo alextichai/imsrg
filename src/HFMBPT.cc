@@ -52,7 +52,11 @@ void HFMBPT::GetNaturalOrbitals()
   for ( auto i : modelspace->all_orbits)
   {
     Orbit& oi = modelspace->GetOrbit(i);
-    oi.occ_nat = std::abs(Occ(i));  // it's possible that Occ(i) is negative, and for occ_nat, we don't want that.
+    if (Occ(i) < 0.0) {
+      std::cout << "Warning: Not flipping sign of negative NAT occ at index " << i << " with value " << Occ(i) << "\n";
+    }
+    // oi.occ_nat = std::abs(Occ(i));  // it's possible that Occ(i) is negative, and for occ_nat, we don't want that.
+    oi.occ_nat = Occ(i);
   }
 
   if (use_NAT_occupations) // use fractional occupation
