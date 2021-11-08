@@ -313,6 +313,8 @@ int main(int argc, char** argv) {
   rw.Write_me2j_np(no_ext_filename + ".me2j_np", HNO, outemax, 2 * outemax,
                    outemax);
 
+  rw.Write_ref_occs_to_me1j(no_ext_filename + "_ref_occs.me1j", HNO, outemax, outemax);
+
   if (basis == "NAT") {
     rw.Write_nat_occs_to_me1j(no_ext_filename + "_nat_occs.me1j", HNO, outemax, outemax);
   }

@@ -66,6 +66,7 @@ class ReadWrite
    void Write_me2jp(std::string filename, Operator &op, int emax, int e2max, int lmax);
    void Write_me1j(std::string filename, Operator &op, int emax, int lmax);
    void Write_nat_occs_to_me1j(std::string filename, Operator &op, int emax, int lmax);
+   void Write_ref_occs_to_me1j(std::string filename, Operator &op, int emax, int lmax);
    void WriteTBME_Navratil( std::string filename, Operator& Hbare);
    void WriteNuShellX_sps( Operator& op, std::string filename);
    void WriteNuShellX_int( Operator& op, std::string filename);
