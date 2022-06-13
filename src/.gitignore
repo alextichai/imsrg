@@ -8,3 +8,5 @@ tmp*
 ../doc/*
 ../work/*
 ../old_armadillo/*
+version.hh
+imsrg++
