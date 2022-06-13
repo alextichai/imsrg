@@ -1,4 +1,4 @@
-CXX = g++
+CXX = g++-11
 #CXX = clang++
 
 # Compiler flags:
@@ -204,7 +204,7 @@ pyIMSRG.o: pyIMSRG.cc
 	$(CXX) -c  $(FLAGS) $(INCLUDE) $(PYTHON_INCLUDE) $(PYTHONFLAGS)  $^ -o $@
 
 imsrg++: imsrg++.cc libIMSRG.so Parameters.hh version.hh
-	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) -lIMSRG $(LIBS)
+	$(CXX) $(INCLUDE) $< -o $@ $(FLAGS) -L$(PWD) -Wl,-rpath=$(PWD) -lIMSRG $(LIBS)
 
 
 version:
