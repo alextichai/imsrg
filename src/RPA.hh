@@ -25,23 +25,20 @@
 #include "ModelSpace.hh"
 #include "Operator.hh"
 
-
-class RPA
-{
+class RPA {
  public:
   // Fields
-  ModelSpace * modelspace; ///< Pointer to the associated modelspace
+  ModelSpace* modelspace;  ///< Pointer to the associated modelspace
 
   Operator H;
-  arma::mat A;  
-  arma::mat B;  
+  arma::mat A;
+  arma::mat B;
   arma::mat X;
   arma::mat Y;
   arma::vec Energies;
 
-
   // Methods
-  RPA(); ///< Default constructor
+  RPA();  ///< Default constructor
   RPA(ModelSpace& ms);
   RPA(Operator& H);
 
@@ -50,22 +47,17 @@ class RPA
 
   void ConstructAMatrix_byIndex(size_t ich_CC);
   void ConstructBMatrix_byIndex(size_t ich_CC);
-//  void SolveTDA();
-  void SolveCP(); // core polarization, i.e. 1st order approximation of TDA
+  //  void SolveTDA();
+  void SolveCP();  // core polarization, i.e. 1st order approximation of TDA
   void SolveTDA();
   void SolveRPA();
 
-  double TransitionToGroundState( Operator& OpIn, size_t mu );
-  double PVCouplingEffectiveCharge( Operator& OpIn, size_t k, size_t l);
+  double TransitionToGroundState(Operator& OpIn, size_t mu);
+  double PVCouplingEffectiveCharge(Operator& OpIn, size_t k, size_t l);
 
   arma::vec GetX(size_t i);
   arma::vec GetY(size_t i);
   arma::vec GetEnergies();
-
 };
-
-
-
-
 
 #endif

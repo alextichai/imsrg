@@ -17,7 +17,6 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ///////////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef IMSRGProfiler_h
 #define IMSRGProfiler_h 1
 
@@ -33,19 +32,20 @@
 /// This is for keeping track of timing and memory usage, etc.
 /// IMSRGProfiler methods should probably not be called inside parallel blocks.
 
-//using namespace std;
+// using namespace std;
 
-class IMSRGProfiler
-{
+class IMSRGProfiler {
  public:
-  // timer and counter are declaired as static so that there's only one copy of each of them
-  static std::map<std::string, double> timer; ///< For keeping timing information for various method calls
+  // timer and counter are declaired as static so that there's only one copy of
+  // each of them
+  static std::map<std::string, double>
+      timer;  ///< For keeping timing information for various method calls
   static std::map<std::string, int> counter;
   static double start_time;
 
   IMSRGProfiler();
-  std::map<std::string,size_t> CheckMem(); // Kbytes  RSS  DIRTY
-  std::map<std::string,float> GetTimes(); // real  user  sys
+  std::map<std::string, size_t> CheckMem();  // Kbytes  RSS  DIRTY
+  std::map<std::string, float> GetTimes();   // real  user  sys
   void PrintTimes();
   void PrintCounters();
   void PrintMemory();
