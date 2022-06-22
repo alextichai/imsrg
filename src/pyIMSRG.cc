@@ -427,6 +427,8 @@ PYBIND11_MODULE(pyIMSRG, m) {
       .def("Read3bodyHDF5", &ReadWrite::Read3bodyHDF5)
 #endif
       .def("Write_me2j", &ReadWrite::Write_me2j)
+      .def("Write_me2jp", &ReadWrite::Write_me2jp, py::arg("outfilename"),
+           py::arg("Hbare"), py::arg("emax"), py::arg("Emax"), py::arg("lmax"))
       .def("Write_me3j", &ReadWrite::Write_me3j)
       .def("WriteTBME_Navratil", &ReadWrite::WriteTBME_Navratil)
       .def("WriteNuShellX_sps", &ReadWrite::WriteNuShellX_sps, py::arg("op"),

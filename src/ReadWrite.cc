@@ -904,11 +904,11 @@ void ReadWrite::ReadBareTBME_Darmstadt_from_stream(T& infile, Operator& Hbare,
 }
 
 ///// Read me3j format three-body matrix elements. Pass in E1max, E2max, E3max
-///for the file, so that it can be properly interpreted.
+/// for the file, so that it can be properly interpreted.
 ///// The modelspace truncation doesn't need to coincide with the file
-///truncation. For example, you could have an emax=10 modelspace
+/// truncation. For example, you could have an emax=10 modelspace
 ///// and read from an emax=14 file, and the matrix elements with emax>10 would
-///be ignored.
+/// be ignored.
 // template <class T>
 // void ReadWrite::Read_Darmstadt_3body_from_stream( T& infile, Operator& Hbare,
 // int E1max, int E2max, int E3max)
@@ -966,8 +966,8 @@ void ReadWrite::ReadBareTBME_Darmstadt_from_stream(T& infile, Operator& Hbare,
 //   infile.getline(line,LINESIZE);
 //
 ////  std::cout << "In read3body nthreads = " << omp_get_num_threads() <<
-///std::endl; /  omp_set_num_threads(std::min(2,omp_get_max_threads())); // it's
-///not clear that this is actually helping...
+/// std::endl; /  omp_set_num_threads(std::min(2,omp_get_max_threads())); //
+/// it's not clear that this is actually helping...
 //
 //  // begin giant nested loops
 //  int nread = 0;
@@ -981,8 +981,8 @@ void ReadWrite::ReadBareTBME_Darmstadt_from_stream(T& infile, Operator& Hbare,
 //    if (ea > e1max) break;
 //    if (ea > e3max) break;
 ////    std::cout << std::setw(5) << std::setprecision(2) <<
-///nlj1*(nlj1+1.)/(nljmax*(nljmax+1))*100 << " % done" << '\r'; /
-///std::cout.flush();
+/// nlj1*(nlj1+1.)/(nljmax*(nljmax+1))*100 << " % done" << '\r'; /
+/// std::cout.flush();
 //
 //    for(int nlj2=0; nlj2<=nlj1; ++nlj2)
 //    {
@@ -1078,7 +1078,7 @@ void ReadWrite::ReadBareTBME_Darmstadt_from_stream(T& infile, Operator& Hbare,
 //                beginning of the nested loops double t_start_loop =
 //                omp_get_wtime();
 ////                #pragma omp parallel for schedule(dynamic,1) // parallelize
-///in the J loop because they can't interfere with each other
+/// in the J loop because they can't interfere with each other
 //                for(int JTind = 0; JTind <= (twoJCMax-twoJCMin)+1; JTind++)
 //                {
 // //                std::cout << "   Read 3body threadnum = " <<
@@ -1126,8 +1126,8 @@ void ReadWrite::ReadBareTBME_Darmstadt_from_stream(T& infile, Operator& Hbare,
 //                    if (not autozero and std::abs(V)>1e-5)
 //                    {
 ////                       double V0 =
-///Hbare.ThreeBody.GetME(Jab,JJab,twoJC,tab,ttab,twoT,a,b,c,d,e,f); / V0 =
-///Hbare.ThreeBody.GetME(Jab,JJab,twoJC,tab,ttab,twoT,a,b,c,d,e,f);
+/// Hbare.ThreeBody.GetME(Jab,JJab,twoJC,tab,ttab,twoT,a,b,c,d,e,f); / V0 =
+/// Hbare.ThreeBody.GetME(Jab,JJab,twoJC,tab,ttab,twoT,a,b,c,d,e,f);
 //                       if(ea<=e1max and eb<=e1max and ec<=e1max and ed<=e1max
 //                       and ee<=e1max and ef<=e1max
 //                          and (ea+eb+ec<=e3max) and (ed+ee+ef<=e3max) )
@@ -1699,10 +1699,10 @@ void ReadWrite::Store_Darmstadt_3body(const std::vector<float>& ThreeBME,
                                   //                            {
                                   ////                             double vread
                                   ///=
-                                  ///Hbare.ThreeBody.GetME_pn(0,0,3,10,10,3,11,11,3);
+                                  /// Hbare.ThreeBody.GetME_pn(0,0,3,10,10,3,11,11,3);
                                   ////                             double vflip
                                   ///=
-                                  ///Hbare.ThreeBody.GetME_iso(1,1,1,1,1,3,a,b,c,d,e,f);
+                                  /// Hbare.ThreeBody.GetME_iso(1,1,1,1,1,3,a,b,c,d,e,f);
                                   //                             double vflip =
                                   //                             Hbare.ThreeBody.GetME_iso(1,1,1,1,1,3,0,2,4,0,2,2);
                                   //                             double viso =
@@ -1792,7 +1792,7 @@ void ReadWrite::Store_Darmstadt_3body(const std::vector<float>& ThreeBME,
   //                             double vflip =
   //                             Hbare.ThreeBody.GetME_iso(1,1,1,1,1,3,3,0,2,4,0,2,2);
   ////                             double vflip =
-  ///Hbare.ThreeBody.GetME_iso(1,1,1,1,1,3,0,2,4,0,2,2);
+  /// Hbare.ThreeBody.GetME_iso(1,1,1,1,1,3,0,2,4,0,2,2);
   //                            std::cout << "  just checking again: vflip = "
   //                            << vflip << std::endl;
 
@@ -2852,6 +2852,103 @@ void ReadWrite::Write_me2j(std::string outfilename, Operator& Hbare, int emax,
               outfile << std::endl;
             }
             outfile << std::setprecision(7) << std::setw(12) << tbme_pp << " ";
+            if ((icount++) % 10 == 9) {
+              outfile << std::endl;
+            }
+          }
+        }
+      }
+    }
+  }
+  if (icount % 10 != 9) outfile << std::endl;
+}
+
+void ReadWrite::Write_me2jp(std::string outfilename, Operator& Hbare, int emax,
+                            int Emax, int lmax) {
+  std::ofstream outfile(outfilename);
+  if (!outfile.good()) {
+    std::cerr << "************************************" << std::endl
+              << "**    Trouble opening file  !!!   **" << std::endl
+              << "************************************" << std::endl;
+    goodstate = false;
+    return;
+  }
+  ModelSpace* modelspace = Hbare.GetModelSpace();
+  std::vector<int> orbits_remap;
+
+  if (emax < 0) emax = modelspace->GetEmax();
+  if (lmax < 0) lmax = emax;
+
+  for (int e = 0; e <= std::min(emax, modelspace->GetEmax()); ++e) {
+    int lmin = e % 2;
+    for (int l = lmin; l <= std::min(e, lmax); l += 2) {
+      int n = (e - l) / 2;
+      int twojMin = std::abs(2 * l - 1);
+      int twojMax = 2 * l + 1;
+      for (int twoj = twojMin; twoj <= twojMax; twoj += 2) {
+        for (int tz = 1; tz >= -1; tz -= 2) {
+          orbits_remap.push_back(modelspace->GetOrbitIndex(n, l, twoj, tz));
+        }
+      }
+    }
+  }
+  int nljtmax = orbits_remap.size() - 1;
+
+  // skip the first line
+  time_t time_now =
+      std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  //  outfile << "    generated by IMSRG code on " << ctime(&time_now)<<
+  //  std::endl;
+  outfile << "    me2jp-f2 -- generated by IMSRG code on " << ctime(&time_now);
+  int icount = 0;
+
+  outfile << std::setiosflags(std::ios::fixed);
+  std::cout << "Writing file " << outfilename << "  emax =  " << emax
+            << "  e2max = " << Emax << "  lmax = " << lmax
+            << "  nljtmax = " << nljtmax << std::endl;
+
+  for (int nlj1 = 0; nlj1 <= nljtmax; ++nlj1) {
+    int a = orbits_remap[nlj1];
+    Orbit& o1 = modelspace->GetOrbit(a);
+    int e1 = 2 * o1.n + o1.l;
+    if (e1 > emax) break;
+
+    for (int nlj2 = 0; nlj2 <= nlj1; ++nlj2) {
+      int b = orbits_remap[nlj2];
+      Orbit& o2 = modelspace->GetOrbit(b);
+      int e2 = 2 * o2.n + o2.l;
+      if (e1 + e2 > Emax) break;
+      int parity = (o1.l + o2.l) % 2;
+
+      for (int nlj3 = 0; nlj3 <= nlj1; ++nlj3) {
+        int c = orbits_remap[nlj3];
+        Orbit& o3 = modelspace->GetOrbit(c);
+        int e3 = 2 * o3.n + o3.l;
+
+        for (int nlj4 = 0; nlj4 <= (nlj3 == nlj1 ? nlj2 : nlj3); ++nlj4) {
+          int d = orbits_remap[nlj4];
+          Orbit& o4 = modelspace->GetOrbit(d);
+          int e4 = 2 * o4.n + o4.l;
+          if (e3 + e4 > Emax) break;
+          if ((o1.l + o2.l + o3.l + o4.l) % 2 != 0) continue;
+          if (o1.tz2 + o2.tz2 - o3.tz2 - o4.tz2 != 0) {
+            continue;
+          }
+          int Tz = (o1.tz2 + o2.tz2) / 2;
+          int Jmin =
+              std::max(std::abs(o1.j2 - o2.j2), std::abs(o3.j2 - o4.j2)) / 2;
+          int Jmax = std::min(o1.j2 + o2.j2, o3.j2 + o4.j2) / 2;
+          if (Jmin > Jmax) continue;
+          for (int J = Jmin; J <= Jmax; ++J) {
+            // me2j format is unnormalized
+            double norm_factor = 1;
+            if (a == b) norm_factor *= PhysConst::SQRT2;
+            if (c == d) norm_factor *= PhysConst::SQRT2;
+
+            // Matrix elements are written in the file with (T,Tz) = (0,0) (1,1)
+            // (1,0) (1,-1)
+            double tbme = Hbare.TwoBody.GetTBME(J, parity, Tz, a, b, c, d);
+            outfile << std::setprecision(12) << std::setw(14) << tbme << " ";
             if ((icount++) % 10 == 9) {
               outfile << std::endl;
             }

@@ -74,6 +74,8 @@ class ReadWrite {
   void Read2bCurrent_Navratil(std::string filename, Operator& Op);
   void Write_me2j(std::string filename, Operator& op, int emax, int e2max,
                   int lmax);
+  void Write_me2jp(std::string filename, Operator& op, int emax, int e2max,
+                   int lmax);
   void Write_me3j(std::string filename, Operator& op, int E1max, int E2max,
                   int E3max);
   void WriteTBME_Navratil(std::string filename, Operator& Hbare);
