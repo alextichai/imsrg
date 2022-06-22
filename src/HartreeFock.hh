@@ -25,11 +25,11 @@
 #include <deque>
 #include <vector>
 #include "IMSRGProfiler.hh"
-#include "Jacobi3BME.hh"
 #include "ModelSpace.hh"
 #include "Operator.hh"
 #include "ThreeBodyME.hh"
 
+// No need for include if using forward declaration
 class Jacobi3BME;  // Forward declaration
 
 class HartreeFock {
