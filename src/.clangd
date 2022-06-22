@@ -1,0 +1,4 @@
+CompileFlags: # Tweak the parse settings
+  Add: 
+    - "--include-directory=./armadillo"
+    - "--include-directory=./half/include"
