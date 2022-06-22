@@ -6,6 +6,7 @@
 #include <utility>  // for make_pair
 #include <vector>
 #include "AngMom.hh"
+#include "Jacobi3BME.hh"
 #include "ModelSpace.hh"
 #include "PhysicalConstants.hh"
 //#include "gsl/gsl_sf_gamma.h" // for radial wave function
