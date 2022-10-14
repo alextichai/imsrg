@@ -138,6 +138,13 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
           Print("3B_DIM", basis_2b_ab_hh.BasisSize() *
                               basis_1b_alpha.BasisSize() *
                               basis_cde.BasisSize());
+
+          const auto X_mat_3b =
+              internal::Generate3BMatrix(X, i_ch_3b, basis_abalpha, basis_cde,
+                                         basis_2b_ab_hh, basis_1b_alpha);
+          const auto Y_mat_3b =
+              internal::Generate3BMatrix(Y, i_ch_3b, basis_abalpha, basis_cde,
+                                         basis_2b_ab_hh, basis_1b_alpha);
         }
       }
     }
@@ -653,6 +660,56 @@ std::size_t ThreeBodyBasis::NumBytes() const {
     size += recouplings.size() * sizeof(double);
   }
   return size;
+}
+
+std::vector<double> Generate3BMatrix(const Operator &Z, std::size_t i_ch_3b,
+                                     const ThreeBodyBasis &basis_abalpha,
+                                     const ThreeBodyBasis &basis_cde,
+                                     const TwoBodyBasis &basis_ab,
+                                     const OneBodyBasis &basis_alpha) {
+  const std::size_t dim_alpha = basis_alpha.BasisSize();
+  const std::size_t dim_ab = basis_ab.BasisSize();
+  const std::size_t dim_abalpha = basis_abalpha.BasisSize();
+  const std::size_t dim_cde = basis_cde.BasisSize();
+
+  const auto &a_vals = basis_abalpha.GetPVals();
+  const auto &b_vals = basis_abalpha.GetQVals();
+  const auto &alpha_vals = basis_abalpha.GetRVals();
+
+  std::vector<double> mat_3b(dim_alpha * dim_ab * dim_cde, 0.0);
+  for (std::size_t i_abalpha = 0; i_abalpha < dim_abalpha; i_abalpha += 1) {
+    for (std::size_t i_cde = 0; i_cde < dim_cde; i_cde += 1) {
+      const std::size_t a = a_vals[i_abalpha];
+      const std::size_t b = b_vals[i_abalpha];
+      const std::size_t alpha = alpha_vals[i_abalpha];
+      const std::size_t i_ab = basis_ab.GetLocalIndexForPQ(a, b);
+      const std::size_t i_alpha = basis_alpha.GetLocalIndexForP(alpha);
+      const std::size_t i_abalphacde =
+          Index3D(i_alpha, i_ab, i_cde, dim_ab, dim_cde);
+
+      double me = 0.0;
+      const auto &abalpha_indices =
+          basis_abalpha.GetRecouplingIndices(i_abalpha);
+      const auto &abalpha_factor =
+          basis_abalpha.GetRecouplingFactors(i_abalpha);
+      const auto &cde_indices = basis_cde.GetRecouplingIndices(i_cde);
+      const auto &cde_factor = basis_cde.GetRecouplingFactors(i_cde);
+
+      for (std::size_t i_abalpha_rec = 0;
+           i_abalpha_rec < abalpha_indices.size(); i_abalpha_rec += 1) {
+        for (std::size_t i_cde_rec = 0; i_cde_rec < cde_indices.size();
+             i_cde_rec += 1) {
+          me += abalpha_factor[i_abalpha_rec] * cde_factor[i_cde_rec] *
+                Z.ThreeBody.GetME_pn_ch(i_ch_3b, i_ch_3b,
+                                        abalpha_indices[i_abalpha_rec],
+                                        cde_indices[i_cde_rec]);
+        }
+      }
+      mat_3b[i_abalphacde] = me;
+    }
+  }
+
+  return mat_3b;
 }
 
 } // namespace internal
