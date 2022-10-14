@@ -119,22 +119,25 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
           num_chans += 1;
 
-          Print("JJ_3B", ch_3b.twoJ);
-          Print("P_3B", ch_3b.parity);
-          Print("TTz_3B", ch_3b.twoTz);
-          Print("JJ_2B_AB", ch_2b_ab.J * 2);
-          Print("P_2B_AB", ch_2b_ab.parity);
-          Print("TTz_2B_AB", ch_2b_ab.Tz * 2);
-          Print("JJ_2B_CD", ch_2b_cd.J * 2);
-          Print("P_2b_CD", ch_2b_cd.parity);
-          Print("TTz_2b_CD", ch_2b_cd.Tz * 2);
+          // Print("JJ_3B", ch_3b.twoJ);
+          // Print("P_3B", ch_3b.parity);
+          // Print("TTz_3B", ch_3b.twoTz);
+          // Print("JJ_2B_AB", ch_2b_ab.J * 2);
+          // Print("P_2B_AB", ch_2b_ab.parity);
+          // Print("TTz_2B_AB", ch_2b_ab.Tz * 2);
+          // Print("JJ_2B_CD", ch_2b_cd.J * 2);
+          // Print("P_2b_CD", ch_2b_cd.parity);
+          // Print("TTz_2b_CD", ch_2b_cd.Tz * 2);
 
-          Print("DIM_AB_HH", basis_2b_ab_hh.BasisSize());
-          Print("DIM_CD_PP", basis_2b_cd_pp.BasisSize());
-          Print("DIM_E_P", basis_e_p.BasisSize());
-          Print("DIM_I/J", basis_1b_alpha.BasisSize());
-          Print("DIM_CDE_PPP", basis_cde.BasisSize());
-          Print("DIM_ABALPHA_HHX", basis_abalpha.BasisSize());
+          // Print("DIM_AB_HH", basis_2b_ab_hh.BasisSize());
+          // Print("DIM_CD_PP", basis_2b_cd_pp.BasisSize());
+          // Print("DIM_E_P", basis_e_p.BasisSize());
+          // Print("DIM_I/J", basis_1b_alpha.BasisSize());
+          // Print("DIM_CDE_PPP", basis_cde.BasisSize());
+          // Print("DIM_ABALPHA_HHX", basis_abalpha.BasisSize());
+          Print("3B_DIM", basis_2b_ab_hh.BasisSize() *
+                              basis_1b_alpha.BasisSize() *
+                              basis_cde.BasisSize());
         }
       }
     }
