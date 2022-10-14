@@ -196,7 +196,7 @@ public:
 
   // Get reference to the vector of factors for |pq> states in the basis.
   //
-  // This may simply be normalization factors or alternatively also 
+  // This may simply be normalization factors or alternatively also
   // occupation number factors.
   const std::vector<double> &GetPQFactors() const { return pq_factors; }
 
@@ -295,13 +295,24 @@ public:
                                          const OneBodyBasis &basis_r,
                                          int e3max);
 
+  // Create a minimal basis of states |pqr> from 2B basis |pq> and 1B basis |r>
+  // that is compatible with the given e3max truncation.
+  //
+  // Here p <= q <= r.
+  static ThreeBodyBasis
+  MinFrom2BAnd1BBasis(std::size_t i_ch_3b, std::size_t i_ch_2b,
+                      const Operator &Z, const TwoBodyBasis &basis_pq,
+                      const OneBodyBasis &basis_r, int e3max);
+
   // Construct 3B basis directly.
   //
   // Do not do this directly. Prefer using a factory method (see above).
   ThreeBodyBasis(std::size_t i_ch_3b, std::size_t i_ch_2b, const Operator &Z,
                  const std::vector<std::size_t> &pqr_states_,
-                 std::size_t wrap_factor_, const std::vector<double> &pqr_factors_)
-      : wrap_factor(wrap_factor_), pqr_states(pqr_states_), pqr_factors(pqr_factors_) {
+                 std::size_t wrap_factor_,
+                 const std::vector<double> &pqr_factors_)
+      : wrap_factor(wrap_factor_), pqr_states(pqr_states_),
+        pqr_factors(pqr_factors_) {
     GetRecoupling(i_ch_3b, i_ch_2b, Z, p_states, q_states, r_states,
                   pqr_me_indices, pqr_me_recoupling_factors);
   }
@@ -312,9 +323,11 @@ public:
   // Get reference to the vector of |pqr> states in the basis.
   const std::vector<std::size_t> &GetPQRVals() const { return pqr_states; }
 
-  // Get reference to the vector of normalization factors for  |pqr> states in the basis.
+  // Get reference to the vector of normalization factors for  |pqr> states in
+  // the basis.
   //
-  // This may simply be normalization factors or alternatively also 
+  // This may simply be normalization factors or alternatively also
+  // occupation number factors.
   const std::vector<double> &GetPQRFactors() const { return pqr_factors; }
 
   // Get reference to the vector of p states corresponding to |pqr> in the

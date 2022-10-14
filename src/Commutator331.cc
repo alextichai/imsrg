@@ -86,9 +86,12 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
           const int parity_e = (ch_3b.parity + ch_2b_cd.parity) % 2;
           const int jj_min_e = std::abs(ch_3b.twoJ - ch_2b_cd.J * 2);
           const int jj_max_e = std::min(ch_3b.twoJ + ch_2b_cd.J * 2, jj1max);
-          const internal::OneBodyBasis basis_1b_e =
+          const internal::OneBodyBasis basis_e_p =
               internal::OneBodyBasis::FromQuantumNumbers_P(
                   Z, jj_min_e, jj_max_e, parity_e, tz2_e);
+          const internal::ThreeBodyBasis basis_cde =
+              internal::ThreeBodyBasis::MinFrom2BAnd1BBasis(
+                  i_ch_3b, i_ch_2b_cd, Z, basis_2b_cd_pp, basis_e_p, e3max);
 
           // exterenal indices alpha constrained by being in state | (ab) J_ab
           // alpha>
@@ -103,8 +106,9 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
           if ((basis_2b_ab_hh.BasisSize() == 0) ||
               (basis_2b_cd_pp.BasisSize() == 0) ||
-              (basis_1b_e.BasisSize() == 0) ||
-              (basis_1b_alpha.BasisSize() == 0)) {
+              (basis_e_p.BasisSize() == 0) ||
+              (basis_1b_alpha.BasisSize() == 0) ||
+              (basis_cde.BasisSize() == 0)) {
             continue;
           }
 
@@ -122,8 +126,9 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
           Print("DIM_AB_HH", basis_2b_ab_hh.BasisSize());
           Print("DIM_CD_PP", basis_2b_cd_pp.BasisSize());
-          Print("DIM_E_P", basis_1b_e.BasisSize());
+          Print("DIM_E_P", basis_e_p.BasisSize());
           Print("DIM_I/J", basis_1b_alpha.BasisSize());
+          Print("DIM_CDE_PPP", basis_cde.BasisSize());
         }
       }
     }
@@ -548,7 +553,78 @@ ThreeBodyBasis ThreeBodyBasis::From2BAnd1BBasis(
     }
   }
 
-  return ThreeBodyBasis(i_ch_3b, i_ch_2b, Z, pqr_states, wrap_factor, pqr_factors);
+  return ThreeBodyBasis(i_ch_3b, i_ch_2b, Z, pqr_states, wrap_factor,
+                        pqr_factors);
+}
+
+ThreeBodyBasis ThreeBodyBasis::MinFrom2BAnd1BBasis(
+    std::size_t i_ch_3b, std::size_t i_ch_2b, const Operator &Z,
+    const TwoBodyBasis &basis_pq, const OneBodyBasis &basis_r, int e3max) {
+  const std::size_t wrap_factor = ExtractWrapFactor(Z);
+
+  std::size_t num_states = 0;
+  for (const std::size_t &pq : basis_pq.GetPQVals()) {
+    const std::size_t p = pq / wrap_factor;
+    const std::size_t q = pq % wrap_factor;
+    if (p > q) {
+      continue;
+    }
+    const Orbit &op = Z.modelspace->GetOrbit(p);
+    const Orbit &oq = Z.modelspace->GetOrbit(q);
+    const int ep = op.n * 2 + op.l;
+    const int eq = oq.n * 2 + oq.l;
+    for (const std::size_t &r : basis_r.GetPVals()) {
+      if (r > q) {
+        continue;
+      }
+      const Orbit &oR = Z.modelspace->GetOrbit(r);
+      const int er = oR.n * 2 + oR.l;
+
+      if (ep + eq + er <= e3max) {
+        num_states += 1;
+      }
+    }
+  }
+
+  std::vector<std::size_t> pqr_states;
+  std::vector<double> pqr_factors;
+  pqr_states.reserve(num_states);
+  pqr_factors.reserve(num_states);
+  for (std::size_t i_pq = 0; i_pq < basis_pq.BasisSize(); i_pq += 1) {
+    const std::size_t pq = basis_pq.GetPQFactors()[i_pq];
+    const std::size_t p = basis_pq.GetPVals()[i_pq];
+    const std::size_t q = basis_pq.GetQVals()[i_pq];
+    if (p > q) {
+      continue;
+    }
+    const Orbit &op = Z.modelspace->GetOrbit(p);
+    const Orbit &oq = Z.modelspace->GetOrbit(q);
+    const int ep = op.n * 2 + op.l;
+    const int eq = oq.n * 2 + oq.l;
+    for (const std::size_t &r : basis_r.GetPVals()) {
+      if (r > q) {
+        continue;
+      }
+      const Orbit &oR = Z.modelspace->GetOrbit(r);
+      const int er = oR.n * 2 + oR.l;
+      double factor = 1.0;
+      if ((p == q) && (q == r)) {
+        factor = 1.0 / 6.0;
+      } else {
+        if ((p == q) || (q == r)) {
+          factor = 1.0 / 2.0;
+        }
+      }
+
+      if (ep + eq + er <= e3max) {
+        pqr_states.push_back(pq * wrap_factor + r);
+        pqr_factors.push_back(factor);
+      }
+    }
+  }
+
+  return ThreeBodyBasis(i_ch_3b, i_ch_2b, Z, pqr_states, wrap_factor,
+                        pqr_factors);
 }
 
 std::size_t ThreeBodyBasis::NumBytes() const {
