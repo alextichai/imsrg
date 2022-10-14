@@ -313,6 +313,19 @@ target_link_libraries(
 )
 
 add_library(
+    Commutator331
+    Commutator331.hh Commutator331.cc
+)
+target_link_libraries(
+    Commutator331
+    PUBLIC
+    Operator
+    ModelSpace
+    PRIVATE
+    OpenMP::OpenMP_CXX
+)
+
+add_library(
     Commutator
     Commutator.hh Commutator.cc
 )
@@ -327,6 +340,7 @@ target_link_libraries(
     OpenMP::OpenMP_CXX
     PhysicalConstants
     Commutator232
+    Commutator331
     AngMom
 )
 
