@@ -184,14 +184,21 @@ public:
   //
   // Do not do this directly. Prefer using a factory method (see above).
   TwoBodyBasis(const std::vector<std::size_t> &pq_states_,
-               std::size_t wrap_factor_)
-      : wrap_factor(wrap_factor_), pq_states(pq_states_) {}
+               std::size_t wrap_factor_, const std::vector<double> &pq_factors_)
+      : wrap_factor(wrap_factor_), pq_states(pq_states_),
+        pq_factors(pq_factors_) {}
 
   // Get the basis size.
   std::size_t BasisSize() const { return pq_states.size(); }
 
   // Get reference to the vector of |pq> states in the basis.
   const std::vector<std::size_t> &GetPQVals() const { return pq_states; }
+
+  // Get reference to the vector of factors for |pq> states in the basis.
+  //
+  // This may simply be normalization factors or alternatively also 
+  // occupation number factors.
+  const std::vector<double> &GetPQFactors() const { return pq_factors; }
 
   // Get reference to the vector of p states corresponding to |pq> in the basis.
   const std::vector<std::size_t> &GetPVals() const { return p_states; }
@@ -216,6 +223,7 @@ public:
 private:
   std::size_t wrap_factor;
   std::vector<std::size_t> pq_states;
+  std::vector<double> pq_factors;
   // The following members are automatically constructed in the right way.
   // Please do not overwrite this initialization in the constructor.
   std::vector<std::size_t> p_states = Get2BPStates(pq_states, wrap_factor);

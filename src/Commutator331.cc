@@ -308,6 +308,7 @@ TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannel(std::size_t i_ch_2b,
   std::sort(states_1b.begin(), states_1b.end());
 
   std::vector<std::size_t> pq_states;
+  std::vector<double> pq_factors;
   for (const auto &p : states_1b) {
     const Orbit &op = Z.modelspace->GetOrbit(p);
     for (const auto &q : states_1b) {
@@ -318,11 +319,16 @@ TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannel(std::size_t i_ch_2b,
           (std::abs(op.j2 - oq.j2) <= ch_2b.J * 2) &&
           (std::abs(op.j2 + oq.j2) >= ch_2b.J * 2)) {
         pq_states.push_back(p * wrap_factor + q);
+        double norm_pq = 1.0;
+        if (p == q) {
+          norm_pq = 0.5;
+        }
+        pq_factors.push_back(norm_pq);
       }
     }
   }
 
-  return TwoBodyBasis(pq_states, wrap_factor);
+  return TwoBodyBasis(pq_states, wrap_factor, pq_factors);
 }
 
 TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max(std::size_t i_ch_2b,
@@ -336,6 +342,7 @@ TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max(std::size_t i_ch_2b,
   std::sort(states_1b.begin(), states_1b.end());
 
   std::vector<std::size_t> pq_states;
+  std::vector<double> pq_factors;
   for (const auto &p : states_1b) {
     const Orbit &op = Z.modelspace->GetOrbit(p);
     const int ep = op.n * 2 + op.l;
@@ -348,11 +355,16 @@ TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max(std::size_t i_ch_2b,
           (std::abs(op.j2 - oq.j2) <= ch_2b.J * 2) &&
           (std::abs(op.j2 + oq.j2) >= ch_2b.J * 2) && (ep + eq <= e3max)) {
         pq_states.push_back(p * wrap_factor + q);
+        double norm_pq = 1.0;
+        if (p == q) {
+          norm_pq = 0.5;
+        }
+        pq_factors.push_back(norm_pq);
       }
     }
   }
 
-  return TwoBodyBasis(pq_states, wrap_factor);
+  return TwoBodyBasis(pq_states, wrap_factor, pq_factors);
 }
 
 TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max_HH(std::size_t i_ch_2b,
@@ -366,6 +378,7 @@ TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max_HH(std::size_t i_ch_2b,
   std::sort(states_1b.begin(), states_1b.end());
 
   std::vector<std::size_t> pq_states;
+  std::vector<double> pq_factors;
   for (const auto &p : states_1b) {
     const Orbit &op = Z.modelspace->GetOrbit(p);
     const int ep = op.n * 2 + op.l;
@@ -379,11 +392,16 @@ TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max_HH(std::size_t i_ch_2b,
           (std::abs(op.j2 + oq.j2) >= ch_2b.J * 2) && (ep + eq <= e3max) &&
           (std::abs(op.occ * oq.occ) > 1e-12)) {
         pq_states.push_back(p * wrap_factor + q);
+        double norm_pq = op.occ * oq.occ;
+        if (p == q) {
+          norm_pq *= 0.5;
+        }
+        pq_factors.push_back(norm_pq);
       }
     }
   }
 
-  return TwoBodyBasis(pq_states, wrap_factor);
+  return TwoBodyBasis(pq_states, wrap_factor, pq_factors);
 }
 
 TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max_PP(std::size_t i_ch_2b,
@@ -397,6 +415,7 @@ TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max_PP(std::size_t i_ch_2b,
   std::sort(states_1b.begin(), states_1b.end());
 
   std::vector<std::size_t> pq_states;
+  std::vector<double> pq_factors;
   for (const auto &p : states_1b) {
     const Orbit &op = Z.modelspace->GetOrbit(p);
     const int ep = op.n * 2 + op.l;
@@ -410,11 +429,16 @@ TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max_PP(std::size_t i_ch_2b,
           (std::abs(op.j2 + oq.j2) >= ch_2b.J * 2) && (ep + eq <= e3max) &&
           (std::abs((1 - op.occ) * (1 - oq.occ)) > 1e-12)) {
         pq_states.push_back(p * wrap_factor + q);
+        double norm_pq = (1 - op.occ) * (1 - oq.occ);
+        if (p == q) {
+          norm_pq *= 0.5;
+        }
+        pq_factors.push_back(norm_pq);
       }
     }
   }
 
-  return TwoBodyBasis(pq_states, wrap_factor);
+  return TwoBodyBasis(pq_states, wrap_factor, pq_factors);
 }
 
 std::vector<std::size_t>
