@@ -1,6 +1,7 @@
 
 #include "Commutator.hh"
 #include "Commutator232.hh"
+#include "Commutator331.hh"
 #include "ModelSpace.hh"
 #include "Operator.hh"
 //#include "DaggerOperator.hh"
@@ -2286,7 +2287,13 @@ void comm330ss( const Operator& X, const Operator& Y, Operator& Z )
 //
 //  Verfied with UnitTest
 //
-void comm331ss( const Operator& X, const Operator& Y, Operator& Z )
+void comm331ss( const Operator& X, const Operator& Y, Operator& Z ) {
+  double tstart = omp_get_wtime();
+  comm331ss_srs(X, Y, Z);
+  Z.profiler.timer[__func__] += omp_get_wtime() - tstart;
+}
+
+void comm331ss_srs( const Operator& X, const Operator& Y, Operator& Z )
 {
   double tstart = omp_get_wtime();
   auto& X3 = X.ThreeBody;
@@ -2427,6 +2434,10 @@ void comm331ss( const Operator& X, const Operator& Y, Operator& Z )
   Z.profiler.timer[__func__] += omp_get_wtime() - tstart;
 }
 
+void comm331ss_expand( const Operator& X, const Operator& Y, Operator& Z )
+{
+  comm331::comm331ss_expand_impl(X, Y, Z);
+}
 
 
 

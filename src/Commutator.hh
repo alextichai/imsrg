@@ -115,6 +115,8 @@ namespace Commutator{
 // IMSRG(3) commutators. Still a work in progress...
   void comm330ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
   void comm331ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
+  void comm331ss_srs( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
+  void comm331ss_expand( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
   void comm231ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
   void comm231ss_slow( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
 
