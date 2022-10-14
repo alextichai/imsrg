@@ -103,12 +103,17 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
           const internal::OneBodyBasis basis_1b_alpha =
               internal::OneBodyBasis::FromQuantumNumbers(
                   Z, jj_min_alpha, jj_max_alpha, parity_alpha, tz2_alpha);
+          const internal::ThreeBodyBasis basis_abalpha =
+              internal::ThreeBodyBasis::From2BAnd1BBasis(i_ch_3b, i_ch_2b_ab, Z,
+                                                         basis_2b_ab_hh,
+                                                         basis_1b_alpha, e3max);
 
           if ((basis_2b_ab_hh.BasisSize() == 0) ||
               (basis_2b_cd_pp.BasisSize() == 0) ||
               (basis_e_p.BasisSize() == 0) ||
               (basis_1b_alpha.BasisSize() == 0) ||
-              (basis_cde.BasisSize() == 0)) {
+              (basis_cde.BasisSize() == 0) ||
+              (basis_abalpha.BasisSize() == 0)) {
             continue;
           }
 
@@ -129,6 +134,7 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
           Print("DIM_E_P", basis_e_p.BasisSize());
           Print("DIM_I/J", basis_1b_alpha.BasisSize());
           Print("DIM_CDE_PPP", basis_cde.BasisSize());
+          Print("DIM_ABALPHA_HHX", basis_abalpha.BasisSize());
         }
       }
     }
