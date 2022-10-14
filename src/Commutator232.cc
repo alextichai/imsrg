@@ -39,25 +39,6 @@ void Print(std::string prefix, const T &val, const T &val2) {
   std::cout << prefix << ": " << val << "," << val2 << "\n";
 }
 
-struct ChannelPair {
-  std::size_t i_ch_3b = 0;
-  std::size_t i_ch_2b = 0;
-
-  bool operator==(const ChannelPair &other) const {
-    return (i_ch_3b == other.i_ch_3b) && (i_ch_2b == other.i_ch_2b);
-  }
-};
-
-namespace std {
-template <> struct hash<ChannelPair> {
-  std::size_t operator()(const ChannelPair &x) const {
-    return ((hash<std::size_t>()(x.i_ch_3b) ^
-             (hash<std::size_t>()(x.i_ch_2b) << 1)) >>
-            1);
-  }
-};
-} // namespace std
-
 namespace comm232 {
 
 void comm232ss_expand_impl_red(const Operator &X, const Operator &Y,
