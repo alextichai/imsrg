@@ -41,8 +41,7 @@ void Print(std::string prefix, const T &val, const T &val2) {
 
 namespace comm331 {
 
-void comm331ss_expand_impl(const Operator &X, const Operator &Y,
-                               Operator &Z) {
+void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
   std::cout << "In comm331_expand\n";
   double tstart = omp_get_wtime();
   Z.modelspace->PreCalculateSixJ();
@@ -58,11 +57,77 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y,
   const int e3max = Z.modelspace->GetE3max();
   const int jj1max = internal::ExtractJJ1Max(Z);
 
-  for (std::size_t i_ch_3b = 0;
-       i_ch_3b < Y.modelspace->GetNumberThreeBodyChannels(); i_ch_3b += 1) {
-    const ThreeBodyChannel &ch_3b = Z.modelspace->GetThreeBodyChannel(i_ch_3b);
-    const std::vector<std::size_t> chans_2b =
-        internal::Extract2BChannelsValidIn3BChannel(jj1max, i_ch_3b, Z);
+  // Case 1: AB=HH, CDE=PPP
+  {
+    std::size_t num_chans = 0;
+    for (std::size_t i_ch_3b = 0;
+         i_ch_3b < Y.modelspace->GetNumberThreeBodyChannels(); i_ch_3b += 1) {
+      const ThreeBodyChannel &ch_3b =
+          Z.modelspace->GetThreeBodyChannel(i_ch_3b);
+      const std::vector<std::size_t> chans_2b =
+          internal::Extract2BChannelsValidIn3BChannel(jj1max, i_ch_3b, Z);
+
+      for (const auto &i_ch_2b_ab : chans_2b) {
+        for (const auto &i_ch_2b_cd : chans_2b) {
+          const TwoBodyChannel &ch_2b_ab =
+              Z.modelspace->GetTwoBodyChannel(i_ch_2b_ab);
+          const TwoBodyChannel &ch_2b_cd =
+              Z.modelspace->GetTwoBodyChannel(i_ch_2b_cd);
+          const internal::TwoBodyBasis basis_2b_ab_hh =
+              internal::TwoBodyBasis::PQInTwoBodyChannelWithE3Max_HH(i_ch_2b_ab,
+                                                                     Z, e3max);
+          const internal::TwoBodyBasis basis_2b_cd_pp =
+              internal::TwoBodyBasis::PQInTwoBodyChannelWithE3Max_PP(i_ch_2b_cd,
+                                                                     Z, e3max);
+
+          // final contracted index e constrained by being in state | (cd) J_cd
+          // e>
+          const int tz2_e = ch_3b.twoTz - 2 * ch_2b_cd.Tz;
+          const int parity_e = (ch_3b.parity + ch_2b_cd.parity) % 2;
+          const int jj_min_e = std::abs(ch_3b.twoJ - ch_2b_cd.J * 2);
+          const int jj_max_e = std::min(ch_3b.twoJ + ch_2b_cd.J * 2, jj1max);
+          const internal::OneBodyBasis basis_1b_e =
+              internal::OneBodyBasis::FromQuantumNumbers_P(
+                  Z, jj_min_e, jj_max_e, parity_e, tz2_e);
+
+          // exterenal indices alpha constrained by being in state | (ab) J_ab
+          // alpha>
+          const int tz2_alpha = ch_3b.twoTz - 2 * ch_2b_ab.Tz;
+          const int parity_alpha = (ch_3b.parity + ch_2b_ab.parity) % 2;
+          const int jj_min_alpha = std::abs(ch_3b.twoJ - ch_2b_ab.J * 2);
+          const int jj_max_alpha =
+              std::min(ch_3b.twoJ + ch_2b_ab.J * 2, jj1max);
+          const internal::OneBodyBasis basis_1b_alpha =
+              internal::OneBodyBasis::FromQuantumNumbers(
+                  Z, jj_min_alpha, jj_max_alpha, parity_alpha, tz2_alpha);
+
+          if ((basis_2b_ab_hh.BasisSize() == 0) ||
+              (basis_2b_cd_pp.BasisSize() == 0) ||
+              (basis_1b_e.BasisSize() == 0) ||
+              (basis_1b_alpha.BasisSize() == 0)) {
+            continue;
+          }
+
+          num_chans += 1;
+
+          Print("JJ_3B", ch_3b.twoJ);
+          Print("P_3B", ch_3b.parity);
+          Print("TTz_3B", ch_3b.twoTz);
+          Print("JJ_2B_AB", ch_2b_ab.J * 2);
+          Print("P_2B_AB", ch_2b_ab.parity);
+          Print("TTz_2B_AB", ch_2b_ab.Tz * 2);
+          Print("JJ_2B_CD", ch_2b_cd.J * 2);
+          Print("P_2b_CD", ch_2b_cd.parity);
+          Print("TTz_2b_CD", ch_2b_cd.Tz * 2);
+
+          Print("DIM_AB_HH", basis_2b_ab_hh.BasisSize());
+          Print("DIM_CD_PP", basis_2b_cd_pp.BasisSize());
+          Print("DIM_E_P", basis_1b_e.BasisSize());
+          Print("DIM_I/J", basis_1b_alpha.BasisSize());
+        }
+      }
+    }
+    Print("NUM_CHANS_HHPPP", num_chans);
   }
 
   Z.profiler.timer[__func__] += omp_get_wtime() - tstart;
@@ -121,8 +186,9 @@ GetLookupIndices(const std::vector<std::size_t> &states,
   return indices;
 }
 
-static std::vector<int> GetLookupValidities(const std::vector<std::size_t> &states,
-                                     std::size_t lookup_size) {
+static std::vector<int>
+GetLookupValidities(const std::vector<std::size_t> &states,
+                    std::size_t lookup_size) {
   std::vector<int> validities(lookup_size, 0);
   for (std::size_t i_p = 0; i_p < states.size(); i_p += 1) {
     const std::size_t p = states[i_p];
@@ -154,6 +220,48 @@ OneBodyBasis OneBodyBasis::FromQuantumNumbers(const Operator &Z, int j2min,
     const Orbit &op = Z.modelspace->GetOrbit(p);
     if ((op.tz2 == tz2) && (op.l % 2 == parity) && (op.j2 <= j2max) &&
         (op.j2 >= j2min)) {
+      p_states.push_back(p);
+    }
+  }
+
+  return OneBodyBasis(p_states, wrap_factor);
+}
+
+OneBodyBasis OneBodyBasis::FromQuantumNumbers_H(const Operator &Z, int j2min,
+                                                int j2max, int parity,
+                                                int tz2) {
+  const std::size_t wrap_factor = ExtractWrapFactor(Z);
+
+  std::vector<std::size_t> states_1b(Z.modelspace->orbits_3body_space_.begin(),
+                                     Z.modelspace->orbits_3body_space_.end());
+  std::sort(states_1b.begin(), states_1b.end());
+
+  std::vector<std::size_t> p_states;
+  for (const auto &p : states_1b) {
+    const Orbit &op = Z.modelspace->GetOrbit(p);
+    if ((op.tz2 == tz2) && (op.l % 2 == parity) && (op.j2 <= j2max) &&
+        (op.j2 >= j2min) && (std::abs(op.occ) > 1e-12)) {
+      p_states.push_back(p);
+    }
+  }
+
+  return OneBodyBasis(p_states, wrap_factor);
+}
+
+OneBodyBasis OneBodyBasis::FromQuantumNumbers_P(const Operator &Z, int j2min,
+                                                int j2max, int parity,
+                                                int tz2) {
+  const std::size_t wrap_factor = ExtractWrapFactor(Z);
+
+  std::vector<std::size_t> states_1b(Z.modelspace->orbits_3body_space_.begin(),
+                                     Z.modelspace->orbits_3body_space_.end());
+  std::sort(states_1b.begin(), states_1b.end());
+
+  std::vector<std::size_t> p_states;
+  for (const auto &p : states_1b) {
+    const Orbit &op = Z.modelspace->GetOrbit(p);
+    if ((op.tz2 == tz2) && (op.l % 2 == parity) && (op.j2 <= j2max) &&
+        (op.j2 >= j2min) && (std::abs(1 - op.occ) > 1e-12)) {
       p_states.push_back(p);
     }
   }
@@ -239,6 +347,68 @@ TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max(std::size_t i_ch_2b,
           ((op.l + oq.l) % 2 == ch_2b.parity) &&
           (std::abs(op.j2 - oq.j2) <= ch_2b.J * 2) &&
           (std::abs(op.j2 + oq.j2) >= ch_2b.J * 2) && (ep + eq <= e3max)) {
+        pq_states.push_back(p * wrap_factor + q);
+      }
+    }
+  }
+
+  return TwoBodyBasis(pq_states, wrap_factor);
+}
+
+TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max_HH(std::size_t i_ch_2b,
+                                                          const Operator &Z,
+                                                          int e3max) {
+  const std::size_t wrap_factor = ExtractWrapFactor(Z);
+  const TwoBodyChannel &ch_2b = Z.modelspace->GetTwoBodyChannel(i_ch_2b);
+
+  std::vector<std::size_t> states_1b(Z.modelspace->orbits_3body_space_.begin(),
+                                     Z.modelspace->orbits_3body_space_.end());
+  std::sort(states_1b.begin(), states_1b.end());
+
+  std::vector<std::size_t> pq_states;
+  for (const auto &p : states_1b) {
+    const Orbit &op = Z.modelspace->GetOrbit(p);
+    const int ep = op.n * 2 + op.l;
+    for (const auto &q : states_1b) {
+      const Orbit &oq = Z.modelspace->GetOrbit(q);
+      const int eq = oq.n * 2 + oq.l;
+      if ((p <= q) && ((p != q) || (ch_2b.J % 2 == 0)) && // Pauli principle
+          (op.tz2 + oq.tz2 == ch_2b.Tz * 2) &&
+          ((op.l + oq.l) % 2 == ch_2b.parity) &&
+          (std::abs(op.j2 - oq.j2) <= ch_2b.J * 2) &&
+          (std::abs(op.j2 + oq.j2) >= ch_2b.J * 2) && (ep + eq <= e3max) &&
+          (std::abs(op.occ * oq.occ) > 1e-12)) {
+        pq_states.push_back(p * wrap_factor + q);
+      }
+    }
+  }
+
+  return TwoBodyBasis(pq_states, wrap_factor);
+}
+
+TwoBodyBasis TwoBodyBasis::PQInTwoBodyChannelWithE3Max_PP(std::size_t i_ch_2b,
+                                                          const Operator &Z,
+                                                          int e3max) {
+  const std::size_t wrap_factor = ExtractWrapFactor(Z);
+  const TwoBodyChannel &ch_2b = Z.modelspace->GetTwoBodyChannel(i_ch_2b);
+
+  std::vector<std::size_t> states_1b(Z.modelspace->orbits_3body_space_.begin(),
+                                     Z.modelspace->orbits_3body_space_.end());
+  std::sort(states_1b.begin(), states_1b.end());
+
+  std::vector<std::size_t> pq_states;
+  for (const auto &p : states_1b) {
+    const Orbit &op = Z.modelspace->GetOrbit(p);
+    const int ep = op.n * 2 + op.l;
+    for (const auto &q : states_1b) {
+      const Orbit &oq = Z.modelspace->GetOrbit(q);
+      const int eq = oq.n * 2 + oq.l;
+      if ((p <= q) && ((p != q) || (ch_2b.J % 2 == 0)) && // Pauli principle
+          (op.tz2 + oq.tz2 == ch_2b.Tz * 2) &&
+          ((op.l + oq.l) % 2 == ch_2b.parity) &&
+          (std::abs(op.j2 - oq.j2) <= ch_2b.J * 2) &&
+          (std::abs(op.j2 + oq.j2) >= ch_2b.J * 2) && (ep + eq <= e3max) &&
+          (std::abs((1 - op.occ) * (1 - oq.occ)) > 1e-12)) {
         pq_states.push_back(p * wrap_factor + q);
       }
     }
@@ -372,4 +542,4 @@ std::size_t ThreeBodyBasis::NumBytes() const {
 }
 
 } // namespace internal
-} // namespace comm232
+} // namespace comm331

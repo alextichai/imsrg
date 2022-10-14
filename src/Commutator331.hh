@@ -71,6 +71,20 @@ public:
   static OneBodyBasis FromQuantumNumbers(const Operator &Z, int j2min,
                                          int j2max, int parity, int tz2);
 
+  // Make a 1B basis of hole states (from emax_3body, not emax) using given
+  // quantum numbers.
+  //
+  // "hole" refers to the general VS-IMSRG hole where n_p > 0.
+  static OneBodyBasis FromQuantumNumbers_H(const Operator &Z, int j2min,
+                                           int j2max, int parity, int tz2);
+
+  // Make a 1B basis of particle states (from emax_3body, not emax) using given
+  // quantum numbers.
+  //
+  // "particle" refers to the general VS-IMSRG particle where n_p < 1.
+  static OneBodyBasis FromQuantumNumbers_P(const Operator &Z, int j2min,
+                                           int j2max, int parity, int tz2);
+
   // Construct 1B basis directly.
   //
   // Do not do this directly. Prefer using a factory method (see above).
@@ -145,6 +159,26 @@ public:
   // These are states in the emax_3body model space.
   static TwoBodyBasis PQInTwoBodyChannelWithE3Max(std::size_t i_ch_2b,
                                                   const Operator &Z, int e3max);
+
+  // Create a basis of hole-hole states |pq> (p <= q) allowed in a specific
+  // channel that are compatible with the given e3max truncation.
+  //
+  // These are states in the emax_3body model space.
+  //
+  // "hole" refers to the general VS-IMSRG hole where n_p > 0.
+  static TwoBodyBasis PQInTwoBodyChannelWithE3Max_HH(std::size_t i_ch_2b,
+                                                     const Operator &Z,
+                                                     int e3max);
+
+  // Create a basis of particle-particle states |pq> (p <= q) allowed in a
+  // specific channel that are compatible with the given e3max truncation.
+  //
+  // These are states in the emax_3body model space.
+  //
+  // "particle" refers to the general VS-IMSRG particle where n_p < 1.
+  static TwoBodyBasis PQInTwoBodyChannelWithE3Max_PP(std::size_t i_ch_2b,
+                                                     const Operator &Z,
+                                                     int e3max);
 
   // Construct 2B basis directly.
   //
