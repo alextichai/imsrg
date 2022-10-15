@@ -2289,7 +2289,7 @@ void comm330ss( const Operator& X, const Operator& Y, Operator& Z )
 //
 void comm331ss( const Operator& X, const Operator& Y, Operator& Z ) {
   double tstart = omp_get_wtime();
-  comm331ss_srs(X, Y, Z);
+  comm331ss_expand(X, Y, Z);
   Z.profiler.timer[__func__] += omp_get_wtime() - tstart;
 }
 
