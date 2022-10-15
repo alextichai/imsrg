@@ -71,39 +71,50 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
       const auto bases_abalpha_hhx = internal::PrestoreABAlphaBases_HHX(
           i_ch_3b, chans_2b, Z, e3max, jj1max);
+      if (bases_abalpha_hhx.size() == 0) {
+        continue;
+      }
+
       const auto bases_cde_ppp =
           internal::PrestoreCDEBases_PPP(i_ch_3b, chans_2b, Z, e3max, jj1max);
+      if (bases_cde_ppp.size() == 0) {
+        continue;
+      }
 
-      for (const auto &basis_abalpha_hhx : bases_abalpha_hhx) {
-        for (const auto &basis_cde_ppp : bases_cde_ppp) {
-          const internal::TwoBodyBasis &basis_2b_ab =
-              basis_abalpha_hhx.second.BasisAB();
-          const internal::OneBodyBasis &basis_1b_alpha =
-              basis_abalpha_hhx.second.BasisAlpha();
-          const internal::ThreeBodyBasis &basis_3b_abalpha =
-              basis_abalpha_hhx.second.BasisABAlpha();
+      const auto iters_2b_chans =
+          internal::Flatten2BChannelLoops(bases_abalpha_hhx, bases_cde_ppp);
+      num_chans += iters_2b_chans.size();
 
-          const internal::ThreeBodyBasis &basis_3b_cde = basis_cde_ppp.second;
+      for (const auto &loop_iter : iters_2b_chans) {
+        const auto i_ch_2b_ab = loop_iter.first;
+        const auto i_ch_2b_cd = loop_iter.second;
+        const auto &basis_abalpha = bases_abalpha_hhx.at(i_ch_2b_ab);
 
-          num_chans += 1;
+        const internal::TwoBodyBasis &basis_2b_ab = basis_abalpha.BasisAB();
+        const internal::OneBodyBasis &basis_1b_alpha =
+            basis_abalpha.BasisAlpha();
+        const internal::ThreeBodyBasis &basis_3b_abalpha =
+            basis_abalpha.BasisABAlpha();
 
-          const auto X_mat_3b =
-              internal::Generate3BMatrix(X, i_ch_3b, basis_3b_abalpha, basis_3b_cde,
-                                         basis_2b_ab, basis_1b_alpha);
-          const auto Y_mat_3b =
-              internal::Generate3BMatrix(Y, i_ch_3b, basis_3b_abalpha, basis_3b_cde,
-                                         basis_2b_ab, basis_1b_alpha);
+        const internal::ThreeBodyBasis &basis_3b_cde =
+            bases_cde_ppp.at(i_ch_2b_cd);
 
-          const auto alpha_jj_vals =
-              internal::Get1BBasisJJVals(basis_1b_alpha, Z);
+        const auto X_mat_3b = internal::Generate3BMatrix(
+            X, i_ch_3b, basis_3b_abalpha, basis_3b_cde, basis_2b_ab,
+            basis_1b_alpha);
+        const auto Y_mat_3b = internal::Generate3BMatrix(
+            Y, i_ch_3b, basis_3b_abalpha, basis_3b_cde, basis_2b_ab,
+            basis_1b_alpha);
 
-          internal::EvalComm331Contraction(
-              basis_2b_ab, basis_3b_cde, basis_1b_alpha, alpha_jj_vals, X_mat_3b,
-              Y_mat_3b, hY * j3_factor, Z.OneBody);
-          internal::EvalComm331Contraction(
-              basis_2b_ab, basis_3b_cde, basis_1b_alpha, alpha_jj_vals, Y_mat_3b,
-              X_mat_3b, -1 * hX * j3_factor, Z.OneBody);
-        }
+        const auto alpha_jj_vals =
+            internal::Get1BBasisJJVals(basis_1b_alpha, Z);
+
+        internal::EvalComm331Contraction(
+            basis_2b_ab, basis_3b_cde, basis_1b_alpha, alpha_jj_vals, X_mat_3b,
+            Y_mat_3b, hY * j3_factor, Z.OneBody);
+        internal::EvalComm331Contraction(
+            basis_2b_ab, basis_3b_cde, basis_1b_alpha, alpha_jj_vals, Y_mat_3b,
+            X_mat_3b, -1 * hX * j3_factor, Z.OneBody);
       }
     }
     Print("NUM_CHANS_HHPPP", num_chans);
@@ -810,6 +821,21 @@ PrestoreCDEBases_PPP(const std::size_t i_ch_3b,
   }
 
   return bases_map;
+}
+
+std::vector<std::pair<std::size_t, std::size_t>> Flatten2BChannelLoops(
+    const std::unordered_map<std::size_t, ABAlphaBases> &bases_abalpha,
+    const std::unordered_map<std::size_t, ThreeBodyBasis> &bases_cde) {
+  std::vector<std::pair<std::size_t, std::size_t>> loop_iters;
+  loop_iters.reserve(bases_abalpha.size() * bases_cde.size());
+
+  for (const auto &basis_abalpha : bases_abalpha) {
+    for (const auto &basis_cde : bases_cde) {
+      loop_iters.push_back(
+          std::make_pair(basis_abalpha.first, basis_cde.first));
+    }
+  }
+  return loop_iters;
 }
 
 } // namespace internal
