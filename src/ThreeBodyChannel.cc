@@ -39,7 +39,7 @@ int ThreeBodyChannel::GetNumber3bKets()
 }
 
 // We will need to deal with requests of indices with the wrong ordering...
-size_t ThreeBodyChannel::GetLocalIndex( int p, int q, int r, int Jpq )
+size_t ThreeBodyChannel::GetLocalIndex( int p, int q, int r, int Jpq ) const
 {
 //   std::cout << "|||||In " << __func__ << " pqr Jpq = " << p << " " << q << " " << r << "  " << Jpq << std::endl;
 //   std::cout <<  "       Ket3Index = " << modelspace->GetKet3Index(p,q,r,Jpq) << std::endl;

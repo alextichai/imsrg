@@ -1504,7 +1504,7 @@ void ModelSpace::Setup3bKets()
 
 // Turn p,q,r,Jpq into a single index
 // For now at least, we are storing p>=q>=r
-size_t ModelSpace::Ket3IndexHash(size_t p, size_t q, size_t r, size_t Jpq)
+size_t ModelSpace::Ket3IndexHash(size_t p, size_t q, size_t r, size_t Jpq) const
 {
   size_t hash = ( p << 24 )
               + ( q << 16 ) 
