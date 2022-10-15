@@ -412,14 +412,12 @@ inline std::size_t Index4D(std::size_t p, std::size_t q, std::size_t r,
   return p * dim_q * dim_r * dim_s + q * dim_r * dim_s + r * dim_s + s;
 }
 
-std::vector<double> Generate3BMatrix(
-  const Operator& Z,
-  std::size_t i_ch_3b,
-  const ThreeBodyBasis &basis_abalpha,
-  const ThreeBodyBasis &basis_cde,
-  const TwoBodyBasis &basis_ab,
-  const OneBodyBasis& basis_alpha
-);
+// Extract 3B matrix alpha,ab,cde based on the provided bases.
+std::vector<double> Generate3BMatrix(const Operator &Z, std::size_t i_ch_3b,
+                                     const ThreeBodyBasis &basis_abalpha,
+                                     const ThreeBodyBasis &basis_cde,
+                                     const TwoBodyBasis &basis_ab,
+                                     const OneBodyBasis &basis_alpha);
 
 } // namespace internal
 } // namespace comm331
