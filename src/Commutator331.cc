@@ -60,7 +60,11 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
   // Initialize thread-safe storage
   size_t norb = Z.modelspace->GetNumberOrbits();
-  int num_threads = omp_get_max_threads();
+  // We restrict number of threads to 10 at most
+  // to save memory.
+  // The code does in principle benefit from more threads
+  // for large model spaces, but the memory cost is generally too large.
+  int num_threads = std::min(omp_get_max_threads(), 10);
   std::vector<arma::mat> Z_mats;
   Z_mats.reserve(num_threads);
   for (int i = 0; i < num_threads; i += 1) {
@@ -69,7 +73,7 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
   // Case 1: AB=HH, CDE=PPP
   {
-#pragma omp parallel for schedule(dynamic, 1)
+#pragma omp parallel for schedule(dynamic, 1) num_threads(num_threads)
     for (std::size_t i_ch_3b = 0;
          i_ch_3b < Y.modelspace->GetNumberThreeBodyChannels(); i_ch_3b += 1) {
       int tid = omp_get_thread_num();
@@ -102,7 +106,7 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
   // Case 2: AB=PP, CDE=HHH
   {
-#pragma omp parallel for schedule(dynamic, 1)
+#pragma omp parallel for schedule(dynamic, 1) num_threads(num_threads)
     for (std::size_t i_ch_3b = 0;
          i_ch_3b < Y.modelspace->GetNumberThreeBodyChannels(); i_ch_3b += 1) {
       int tid = omp_get_thread_num();
