@@ -443,6 +443,43 @@ void EvalComm331Contraction(const TwoBodyBasis &basis_2b_ab,
                             const std::vector<double> &mat_jabcde,
                             int overall_factor, arma::mat &output_mat);
 
+// Collection of abalpha bases.
+class ABAlphaBases {
+public:
+  // Move only constructor for efficiency.
+  ABAlphaBases(TwoBodyBasis &&basis_2b_ab, OneBodyBasis &&basis_1b_alpha,
+               ThreeBodyBasis &&basis_3b_abalpha)
+      : basis_2b_ab_(std::move(basis_2b_ab)),
+        basis_1b_alpha_(std::move(basis_1b_alpha)),
+        basis_3b_abalpha_(std::move(basis_3b_abalpha)) {}
+
+  // Get basis for ab.
+  const TwoBodyBasis &BasisAB() const { return basis_2b_ab_; }
+
+  // Get basis for alpha.
+  const OneBodyBasis &BasisAlpha() const { return basis_1b_alpha_; }
+
+  // Get basis for abalpha to read from 3B operator.
+  const ThreeBodyBasis &BasisABAlpha() const { return basis_3b_abalpha_; }
+
+private:
+  TwoBodyBasis basis_2b_ab_;
+  OneBodyBasis basis_1b_alpha_;
+  ThreeBodyBasis basis_3b_abalpha_;
+};
+
+// Get HHX bases for abalpha.
+std::unordered_map<std::size_t, ABAlphaBases>
+PrestoreABAlphaBases_HHX(const std::size_t i_ch_3b,
+                         const std::vector<std::size_t> &ch_2b_ab_indices,
+                         const Operator &Z, int e3max, int jj1max);
+
+// Get PPP bases for cde.
+std::unordered_map<std::size_t, ThreeBodyBasis>
+PrestoreCDEBases_PPP(const std::size_t i_ch_3b,
+                     const std::vector<std::size_t> &ch_2b_cd_indices,
+                     const Operator &Z, int e3max, int jj1max);
+
 } // namespace internal
 } // namespace comm331
 
