@@ -85,37 +85,9 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
           internal::Flatten2BChannelLoops(bases_abalpha_hhx, bases_cde_ppp);
       num_chans += iters_2b_chans.size();
 
-      for (const auto &loop_iter : iters_2b_chans) {
-        const auto i_ch_2b_ab = loop_iter.first;
-        const auto i_ch_2b_cd = loop_iter.second;
-        const auto &basis_abalpha = bases_abalpha_hhx.at(i_ch_2b_ab);
-
-        const internal::TwoBodyBasis &basis_2b_ab = basis_abalpha.BasisAB();
-        const internal::OneBodyBasis &basis_1b_alpha =
-            basis_abalpha.BasisAlpha();
-        const internal::ThreeBodyBasis &basis_3b_abalpha =
-            basis_abalpha.BasisABAlpha();
-
-        const internal::ThreeBodyBasis &basis_3b_cde =
-            bases_cde_ppp.at(i_ch_2b_cd);
-
-        const auto X_mat_3b = internal::Generate3BMatrix(
-            X, i_ch_3b, basis_3b_abalpha, basis_3b_cde, basis_2b_ab,
-            basis_1b_alpha);
-        const auto Y_mat_3b = internal::Generate3BMatrix(
-            Y, i_ch_3b, basis_3b_abalpha, basis_3b_cde, basis_2b_ab,
-            basis_1b_alpha);
-
-        const auto alpha_jj_vals =
-            internal::Get1BBasisJJVals(basis_1b_alpha, Z);
-
-        internal::EvalComm331Contraction(
-            basis_2b_ab, basis_3b_cde, basis_1b_alpha, alpha_jj_vals, X_mat_3b,
-            Y_mat_3b, hY * j3_factor, Z.OneBody);
-        internal::EvalComm331Contraction(
-            basis_2b_ab, basis_3b_cde, basis_1b_alpha, alpha_jj_vals, Y_mat_3b,
-            X_mat_3b, -1 * hX * j3_factor, Z.OneBody);
-      }
+      internal::DoComm331ssCoreLoop(iters_2b_chans, bases_abalpha_hhx,
+                                    bases_cde_ppp, X, Y, hX, hY, i_ch_3b,
+                                    j3_factor, Z);
     }
     Print("NUM_CHANS_HHPPP", num_chans);
   }
@@ -836,6 +808,42 @@ std::vector<std::pair<std::size_t, std::size_t>> Flatten2BChannelLoops(
     }
   }
   return loop_iters;
+}
+
+void DoComm331ssCoreLoop(
+    const std::vector<std::pair<std::size_t, std::size_t>> &iters_2b_chans,
+    const std::unordered_map<std::size_t, ABAlphaBases> &bases_abalpha,
+    const std::unordered_map<std::size_t, ThreeBodyBasis> &bases_cde,
+    const Operator &X, const Operator &Y, int hX, int hY, std::size_t i_ch_3b,
+    int j3_factor, Operator &Z) {
+  for (const auto &loop_iter : iters_2b_chans) {
+    const auto i_ch_2b_ab = loop_iter.first;
+    const auto i_ch_2b_cd = loop_iter.second;
+    const auto &basis_abalpha = bases_abalpha.at(i_ch_2b_ab);
+
+    const internal::TwoBodyBasis &basis_2b_ab = basis_abalpha.BasisAB();
+    const internal::OneBodyBasis &basis_1b_alpha = basis_abalpha.BasisAlpha();
+    const internal::ThreeBodyBasis &basis_3b_abalpha =
+        basis_abalpha.BasisABAlpha();
+
+    const internal::ThreeBodyBasis &basis_3b_cde = bases_cde.at(i_ch_2b_cd);
+
+    const auto X_mat_3b =
+        internal::Generate3BMatrix(X, i_ch_3b, basis_3b_abalpha, basis_3b_cde,
+                                   basis_2b_ab, basis_1b_alpha);
+    const auto Y_mat_3b =
+        internal::Generate3BMatrix(Y, i_ch_3b, basis_3b_abalpha, basis_3b_cde,
+                                   basis_2b_ab, basis_1b_alpha);
+
+    const auto alpha_jj_vals = internal::Get1BBasisJJVals(basis_1b_alpha, Z);
+
+    internal::EvalComm331Contraction(basis_2b_ab, basis_3b_cde, basis_1b_alpha,
+                                     alpha_jj_vals, X_mat_3b, Y_mat_3b,
+                                     hY * j3_factor, Z.OneBody);
+    internal::EvalComm331Contraction(basis_2b_ab, basis_3b_cde, basis_1b_alpha,
+                                     alpha_jj_vals, Y_mat_3b, X_mat_3b,
+                                     -1 * hX * j3_factor, Z.OneBody);
+  }
 }
 
 } // namespace internal
