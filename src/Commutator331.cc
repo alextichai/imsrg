@@ -91,6 +91,40 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
     }
     Print("NUM_CHANS_HHPPP", num_chans);
   }
+
+  // Case 2: AB=PP, CDE=HHH
+  {
+    std::size_t num_chans = 0;
+    for (std::size_t i_ch_3b = 0;
+         i_ch_3b < Y.modelspace->GetNumberThreeBodyChannels(); i_ch_3b += 1) {
+      const ThreeBodyChannel &ch_3b =
+          Z.modelspace->GetThreeBodyChannel(i_ch_3b);
+      const int j3_factor = ch_3b.twoJ + 1;
+      const std::vector<std::size_t> chans_2b =
+          internal::Extract2BChannelsValidIn3BChannel(jj1max, i_ch_3b, Z);
+
+      const auto bases_abalpha_ppx = internal::PrestoreABAlphaBases_PPX(
+          i_ch_3b, chans_2b, Z, e3max, jj1max);
+      if (bases_abalpha_ppx.size() == 0) {
+        continue;
+      }
+
+      const auto bases_cde_hhh =
+          internal::PrestoreCDEBases_HHH(i_ch_3b, chans_2b, Z, e3max, jj1max);
+      if (bases_cde_hhh.size() == 0) {
+        continue;
+      }
+
+      const auto iters_2b_chans =
+          internal::Flatten2BChannelLoops(bases_abalpha_ppx, bases_cde_hhh);
+      num_chans += iters_2b_chans.size();
+
+      internal::DoComm331ssCoreLoop(iters_2b_chans, bases_abalpha_ppx,
+                                    bases_cde_hhh, X, Y, hX, hY, i_ch_3b,
+                                    j3_factor, Z);
+    }
+    Print("NUM_CHANS_PPHHH", num_chans);
+  }
   Z.profiler.timer[__func__] += omp_get_wtime() - tstart;
 }
 
@@ -787,6 +821,95 @@ PrestoreCDEBases_PPP(const std::size_t i_ch_3b,
     internal::ThreeBodyBasis basis_cde =
         internal::ThreeBodyBasis::MinFrom2BAnd1BBasis(
             i_ch_3b, i_ch_2b_cd, Z, basis_2b_cd_pp, basis_e_p, e3max);
+    if (basis_cde.BasisSize() != 0) {
+      bases_map.emplace(i_ch_2b_cd, std::move(basis_cde));
+    }
+  }
+
+  return bases_map;
+}
+
+std::unordered_map<std::size_t, ABAlphaBases>
+PrestoreABAlphaBases_PPX(const std::size_t i_ch_3b,
+                         const std::vector<std::size_t> &ch_2b_ab_indices,
+                         const Operator &Z, int e3max, int jj1max) {
+  std::unordered_map<std::size_t, ABAlphaBases> bases_map;
+  const ThreeBodyChannel &ch_3b = Z.modelspace->GetThreeBodyChannel(i_ch_3b);
+  for (const auto &i_ch_2b_ab : ch_2b_ab_indices) {
+    const TwoBodyChannel &ch_2b_ab =
+        Z.modelspace->GetTwoBodyChannel(i_ch_2b_ab);
+
+    // Make 2B basis for ab == pp.
+    internal::TwoBodyBasis basis_2b_ab_pp =
+        internal::TwoBodyBasis::PQInTwoBodyChannelWithE3Max_PP(i_ch_2b_ab, Z,
+                                                               e3max);
+    if (basis_2b_ab_pp.BasisSize() == 0) {
+      continue;
+    }
+
+    // Make 1B basis for alpha.
+    //
+    // external indices alpha constrained by being in state | (ab) J_ab
+    // alpha>
+    const int tz2_alpha = ch_3b.twoTz - 2 * ch_2b_ab.Tz;
+    const int parity_alpha = (ch_3b.parity + ch_2b_ab.parity) % 2;
+    const int jj_min_alpha = std::abs(ch_3b.twoJ - ch_2b_ab.J * 2);
+    const int jj_max_alpha = std::min(ch_3b.twoJ + ch_2b_ab.J * 2, jj1max);
+    internal::OneBodyBasis basis_1b_alpha =
+        internal::OneBodyBasis::FromQuantumNumbers(
+            Z, jj_min_alpha, jj_max_alpha, parity_alpha, tz2_alpha);
+    if (basis_1b_alpha.BasisSize() == 0) {
+      continue;
+    }
+
+    // Make full 3B basis for abalpha.
+    internal::ThreeBodyBasis basis_abalpha =
+        internal::ThreeBodyBasis::From2BAnd1BBasis(
+            i_ch_3b, i_ch_2b_ab, Z, basis_2b_ab_pp, basis_1b_alpha, e3max);
+
+    if (basis_abalpha.BasisSize() != 0) {
+      bases_map.emplace(
+          std::make_pair(i_ch_2b_ab, ABAlphaBases(std::move(basis_2b_ab_pp),
+                                                  std::move(basis_1b_alpha),
+                                                  std::move(basis_abalpha))));
+    }
+  }
+
+  return bases_map;
+}
+
+std::unordered_map<std::size_t, ThreeBodyBasis>
+PrestoreCDEBases_HHH(const std::size_t i_ch_3b,
+                     const std::vector<std::size_t> &ch_2b_cd_indices,
+                     const Operator &Z, int e3max, int jj1max) {
+  std::unordered_map<std::size_t, ThreeBodyBasis> bases_map;
+  const ThreeBodyChannel &ch_3b = Z.modelspace->GetThreeBodyChannel(i_ch_3b);
+  for (const auto &i_ch_2b_cd : ch_2b_cd_indices) {
+    const TwoBodyChannel &ch_2b_cd =
+        Z.modelspace->GetTwoBodyChannel(i_ch_2b_cd);
+    const internal::TwoBodyBasis basis_2b_cd_hh =
+        internal::TwoBodyBasis::PQInTwoBodyChannelWithE3Max_HH(i_ch_2b_cd, Z,
+                                                               e3max);
+    if (basis_2b_cd_hh.BasisSize() == 0) {
+      continue;
+    }
+
+    // final contracted index e constrained by being in state | (cd) J_cd
+    // e>
+    const int tz2_e = ch_3b.twoTz - 2 * ch_2b_cd.Tz;
+    const int parity_e = (ch_3b.parity + ch_2b_cd.parity) % 2;
+    const int jj_min_e = std::abs(ch_3b.twoJ - ch_2b_cd.J * 2);
+    const int jj_max_e = std::min(ch_3b.twoJ + ch_2b_cd.J * 2, jj1max);
+    const internal::OneBodyBasis basis_e_h =
+        internal::OneBodyBasis::FromQuantumNumbers_H(Z, jj_min_e, jj_max_e,
+                                                     parity_e, tz2_e);
+    if (basis_e_h.BasisSize() == 0) {
+      continue;
+    }
+
+    internal::ThreeBodyBasis basis_cde =
+        internal::ThreeBodyBasis::MinFrom2BAnd1BBasis(
+            i_ch_3b, i_ch_2b_cd, Z, basis_2b_cd_hh, basis_e_h, e3max);
     if (basis_cde.BasisSize() != 0) {
       bases_map.emplace(i_ch_2b_cd, std::move(basis_cde));
     }

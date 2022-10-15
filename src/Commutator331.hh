@@ -480,6 +480,18 @@ PrestoreCDEBases_PPP(const std::size_t i_ch_3b,
                      const std::vector<std::size_t> &ch_2b_cd_indices,
                      const Operator &Z, int e3max, int jj1max);
 
+// Get PPX bases for abalpha.
+std::unordered_map<std::size_t, ABAlphaBases>
+PrestoreABAlphaBases_PPX(const std::size_t i_ch_3b,
+                         const std::vector<std::size_t> &ch_2b_ab_indices,
+                         const Operator &Z, int e3max, int jj1max);
+
+// Get HHH bases for cde.
+std::unordered_map<std::size_t, ThreeBodyBasis>
+PrestoreCDEBases_HHH(const std::size_t i_ch_3b,
+                     const std::vector<std::size_t> &ch_2b_cd_indices,
+                     const Operator &Z, int e3max, int jj1max);
+
 // Get flattened vector of loop indices from lookups.
 std::vector<std::pair<std::size_t, std::size_t>> Flatten2BChannelLoops(
     const std::unordered_map<std::size_t, ABAlphaBases> &bases_abalpha,
