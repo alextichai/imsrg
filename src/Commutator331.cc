@@ -58,11 +58,21 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
   const int e3max = Z.modelspace->GetE3max();
   const int jj1max = internal::ExtractJJ1Max(Z);
 
+  // Initialize thread-safe storage
+  size_t norb = Z.modelspace->GetNumberOrbits();
+  int num_threads = omp_get_max_threads();
+  std::vector<arma::mat> Z_mats;
+  Z_mats.reserve(num_threads);
+  for (int i = 0; i < num_threads; i += 1) {
+    Z_mats.push_back(arma::zeros(norb, norb));
+  }
+
   // Case 1: AB=HH, CDE=PPP
   {
-    std::size_t num_chans = 0;
+#pragma omp parallel for schedule(dynamic, 1)
     for (std::size_t i_ch_3b = 0;
          i_ch_3b < Y.modelspace->GetNumberThreeBodyChannels(); i_ch_3b += 1) {
+      int tid = omp_get_thread_num();
       const ThreeBodyChannel &ch_3b =
           Z.modelspace->GetThreeBodyChannel(i_ch_3b);
       const int j3_factor = ch_3b.twoJ + 1;
@@ -83,20 +93,19 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
       const auto iters_2b_chans =
           internal::Flatten2BChannelLoops(bases_abalpha_hhx, bases_cde_ppp);
-      num_chans += iters_2b_chans.size();
 
       internal::DoComm331ssCoreLoop(iters_2b_chans, bases_abalpha_hhx,
                                     bases_cde_ppp, X, Y, hX, hY, i_ch_3b,
-                                    j3_factor, Z);
+                                    j3_factor, Z, Z_mats[tid]);
     }
-    Print("NUM_CHANS_HHPPP", num_chans);
   }
 
   // Case 2: AB=PP, CDE=HHH
   {
-    std::size_t num_chans = 0;
+#pragma omp parallel for schedule(dynamic, 1)
     for (std::size_t i_ch_3b = 0;
          i_ch_3b < Y.modelspace->GetNumberThreeBodyChannels(); i_ch_3b += 1) {
+      int tid = omp_get_thread_num();
       const ThreeBodyChannel &ch_3b =
           Z.modelspace->GetThreeBodyChannel(i_ch_3b);
       const int j3_factor = ch_3b.twoJ + 1;
@@ -117,14 +126,22 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
       const auto iters_2b_chans =
           internal::Flatten2BChannelLoops(bases_abalpha_ppx, bases_cde_hhh);
-      num_chans += iters_2b_chans.size();
 
       internal::DoComm331ssCoreLoop(iters_2b_chans, bases_abalpha_ppx,
                                     bases_cde_hhh, X, Y, hX, hY, i_ch_3b,
-                                    j3_factor, Z);
+                                    j3_factor, Z, Z_mats[tid]);
     }
-    Print("NUM_CHANS_PPHHH", num_chans);
   }
+
+  // Write from thread-safe storage to destination operator
+  for (int tid = 0; tid < num_threads; tid += 1) {
+    for (std::size_t i = 0; i < norb; i += 1) {
+      for (std::size_t j = 0; j < norb; j += 1) {
+        Z.OneBody(i, j) += Z_mats[tid](i, j);
+      }
+    }
+  }
+
   Z.profiler.timer[__func__] += omp_get_wtime() - tstart;
 }
 
@@ -938,7 +955,7 @@ void DoComm331ssCoreLoop(
     const std::unordered_map<std::size_t, ABAlphaBases> &bases_abalpha,
     const std::unordered_map<std::size_t, ThreeBodyBasis> &bases_cde,
     const Operator &X, const Operator &Y, int hX, int hY, std::size_t i_ch_3b,
-    int j3_factor, Operator &Z) {
+    int j3_factor, const Operator &Z, arma::mat &Z_mat) {
   for (const auto &loop_iter : iters_2b_chans) {
     const auto i_ch_2b_ab = loop_iter.first;
     const auto i_ch_2b_cd = loop_iter.second;
@@ -962,10 +979,10 @@ void DoComm331ssCoreLoop(
 
     internal::EvalComm331Contraction(basis_2b_ab, basis_3b_cde, basis_1b_alpha,
                                      alpha_jj_vals, X_mat_3b, Y_mat_3b,
-                                     hY * j3_factor, Z.OneBody);
+                                     hY * j3_factor, Z_mat);
     internal::EvalComm331Contraction(basis_2b_ab, basis_3b_cde, basis_1b_alpha,
                                      alpha_jj_vals, Y_mat_3b, X_mat_3b,
-                                     -1 * hX * j3_factor, Z.OneBody);
+                                     -1 * hX * j3_factor, Z_mat);
   }
 }
 

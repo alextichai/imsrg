@@ -499,16 +499,13 @@ std::vector<std::pair<std::size_t, std::size_t>> Flatten2BChannelLoops(
 
 // Do the core work loop once we have set up all model space details.
 void DoComm331ssCoreLoop(
-  const std::vector<std::pair<std::size_t, std::size_t>>& iters_2b_chans,
+    const std::vector<std::pair<std::size_t, std::size_t>> &iters_2b_chans,
     const std::unordered_map<std::size_t, ABAlphaBases> &bases_abalpha,
     const std::unordered_map<std::size_t, ThreeBodyBasis> &bases_cde,
-    const Operator& X, const Operator& Y, int hX, int hY,
-    std::size_t i_ch_3b,
-    int j3_factor,
-    Operator& Z
-);
+    const Operator &X, const Operator &Y, int hX, int hY, std::size_t i_ch_3b,
+    int j3_factor, const Operator &Z, arma::mat &Z_mat);
 
 } // namespace internal
 } // namespace comm331
 
-#endif  // COMMUTATOR331_H_
+#endif // COMMUTATOR331_H_
