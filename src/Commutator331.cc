@@ -64,6 +64,7 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
          i_ch_3b < Y.modelspace->GetNumberThreeBodyChannels(); i_ch_3b += 1) {
       const ThreeBodyChannel &ch_3b =
           Z.modelspace->GetThreeBodyChannel(i_ch_3b);
+      const int j3_factor = ch_3b.twoJ + 1;
       const std::vector<std::size_t> chans_2b =
           internal::Extract2BChannelsValidIn3BChannel(jj1max, i_ch_3b, Z);
 
@@ -93,7 +94,7 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
               internal::ThreeBodyBasis::MinFrom2BAnd1BBasis(
                   i_ch_3b, i_ch_2b_cd, Z, basis_2b_cd_pp, basis_e_p, e3max);
 
-          // exterenal indices alpha constrained by being in state | (ab) J_ab
+          // external indices alpha constrained by being in state | (ab) J_ab
           // alpha>
           const int tz2_alpha = ch_3b.twoTz - 2 * ch_2b_ab.Tz;
           const int parity_alpha = (ch_3b.parity + ch_2b_ab.parity) % 2;
@@ -119,32 +120,65 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
 
           num_chans += 1;
 
-          // Print("JJ_3B", ch_3b.twoJ);
-          // Print("P_3B", ch_3b.parity);
-          // Print("TTz_3B", ch_3b.twoTz);
-          // Print("JJ_2B_AB", ch_2b_ab.J * 2);
-          // Print("P_2B_AB", ch_2b_ab.parity);
-          // Print("TTz_2B_AB", ch_2b_ab.Tz * 2);
-          // Print("JJ_2B_CD", ch_2b_cd.J * 2);
-          // Print("P_2b_CD", ch_2b_cd.parity);
-          // Print("TTz_2b_CD", ch_2b_cd.Tz * 2);
-
-          // Print("DIM_AB_HH", basis_2b_ab_hh.BasisSize());
-          // Print("DIM_CD_PP", basis_2b_cd_pp.BasisSize());
-          // Print("DIM_E_P", basis_e_p.BasisSize());
-          // Print("DIM_I/J", basis_1b_alpha.BasisSize());
-          // Print("DIM_CDE_PPP", basis_cde.BasisSize());
-          // Print("DIM_ABALPHA_HHX", basis_abalpha.BasisSize());
-          Print("3B_DIM", basis_2b_ab_hh.BasisSize() *
-                              basis_1b_alpha.BasisSize() *
-                              basis_cde.BasisSize());
-
           const auto X_mat_3b =
               internal::Generate3BMatrix(X, i_ch_3b, basis_abalpha, basis_cde,
                                          basis_2b_ab_hh, basis_1b_alpha);
           const auto Y_mat_3b =
               internal::Generate3BMatrix(Y, i_ch_3b, basis_abalpha, basis_cde,
                                          basis_2b_ab_hh, basis_1b_alpha);
+
+          const auto dim_ab = basis_2b_ab_hh.BasisSize();
+          const auto dim_cde = basis_cde.BasisSize();
+          const auto &i_vals = basis_1b_alpha.GetPVals();
+          const auto &j_vals = basis_1b_alpha.GetPVals();
+          const auto dim_alpha = basis_1b_alpha.BasisSize();
+          for (std::size_t i_i = 0; i_i < dim_alpha; i_i += 1) {
+            for (std::size_t i_j = 0; i_j < dim_alpha; i_j += 1) {
+              const auto i = i_vals[i_i];
+              const auto j = j_vals[i_j];
+              const auto jj_i = Z.modelspace->GetOrbit(i).j2;
+              const auto jj_j = Z.modelspace->GetOrbit(j).j2;
+              if (jj_i != jj_j) {
+                continue;
+              }
+
+              double me_X_Y = 0.0;
+
+              const double *ab_factors =
+                  basis_2b_ab_hh.GetPQNormFactors().data();
+              const double *cde_factors = basis_cde.GetPQRNormFactors().data();
+              const double *x_iabcde_slice =
+                  &(X_mat_3b.data()[i_i * dim_ab * dim_cde]);
+              const double *y_jabcde_slice =
+                  &(Y_mat_3b.data()[i_j * dim_ab * dim_cde]);
+
+              for (std::size_t i_ab = 0; i_ab < dim_ab; i_ab += 1) {
+                for (std::size_t i_cde = 0; i_cde < dim_cde; i_cde += 1) {
+                  me_X_Y += ab_factors[i_ab] * cde_factors[i_cde] *
+                        x_iabcde_slice[i_ab * dim_cde + i_cde] *
+                        y_jabcde_slice[i_ab * dim_cde + i_cde];
+                }
+              }
+
+              double me_Y_X = 0.0;
+
+              const double *x_jabcde_slice =
+                  &(X_mat_3b.data()[i_j * dim_ab * dim_cde]);
+              const double *y_iabcde_slice =
+                  &(Y_mat_3b.data()[i_i * dim_ab * dim_cde]);
+
+              for (std::size_t i_ab = 0; i_ab < dim_ab; i_ab += 1) {
+                for (std::size_t i_cde = 0; i_cde < dim_cde; i_cde += 1) {
+                  me_X_Y += ab_factors[i_ab] * cde_factors[i_cde] *
+                        x_jabcde_slice[i_ab * dim_cde + i_cde] *
+                        y_iabcde_slice[i_ab * dim_cde + i_cde];
+                }
+              }
+
+              Z.OneBody(i, j) += hY * (me_X_Y * j3_factor) / (jj_i + 1);
+              Z.OneBody(i, j) -= hX * (me_Y_X * j3_factor) / (jj_i + 1);
+            }
+          }
         }
       }
     }
