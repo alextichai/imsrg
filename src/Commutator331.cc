@@ -80,28 +80,28 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
               basis_abalpha_hhx.second.BasisAB();
           const internal::OneBodyBasis &basis_1b_alpha =
               basis_abalpha_hhx.second.BasisAlpha();
-          const internal::ThreeBodyBasis &basis_abalpha =
+          const internal::ThreeBodyBasis &basis_3b_abalpha =
               basis_abalpha_hhx.second.BasisABAlpha();
 
-          const internal::ThreeBodyBasis &basis_cde = basis_cde_ppp.second;
+          const internal::ThreeBodyBasis &basis_3b_cde = basis_cde_ppp.second;
 
           num_chans += 1;
 
           const auto X_mat_3b =
-              internal::Generate3BMatrix(X, i_ch_3b, basis_abalpha, basis_cde,
+              internal::Generate3BMatrix(X, i_ch_3b, basis_3b_abalpha, basis_3b_cde,
                                          basis_2b_ab, basis_1b_alpha);
           const auto Y_mat_3b =
-              internal::Generate3BMatrix(Y, i_ch_3b, basis_abalpha, basis_cde,
+              internal::Generate3BMatrix(Y, i_ch_3b, basis_3b_abalpha, basis_3b_cde,
                                          basis_2b_ab, basis_1b_alpha);
 
           const auto alpha_jj_vals =
               internal::Get1BBasisJJVals(basis_1b_alpha, Z);
 
           internal::EvalComm331Contraction(
-              basis_2b_ab, basis_cde, basis_1b_alpha, alpha_jj_vals, X_mat_3b,
+              basis_2b_ab, basis_3b_cde, basis_1b_alpha, alpha_jj_vals, X_mat_3b,
               Y_mat_3b, hY * j3_factor, Z.OneBody);
           internal::EvalComm331Contraction(
-              basis_2b_ab, basis_cde, basis_1b_alpha, alpha_jj_vals, Y_mat_3b,
+              basis_2b_ab, basis_3b_cde, basis_1b_alpha, alpha_jj_vals, Y_mat_3b,
               X_mat_3b, -1 * hX * j3_factor, Z.OneBody);
         }
       }
