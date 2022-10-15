@@ -53,6 +53,7 @@
 #include <stdio.h>
 #include <string>
 #include <omp.h>
+#include "Commutator.hh"
 #include "IMSRG.hh"
 #include "Parameters.hh"
 #include "PhysicalConstants.hh"
@@ -101,6 +102,7 @@ int main(int argc, char** argv)
   bool relativistic_correction = parameters.s("relativistic_correction") == "true";
   bool IMSRG3 = parameters.s("IMSRG3") == "true";
   bool imsrg3_n7 = parameters.s("imsrg3_n7") == "true";
+  bool reduced_232_impl = parameters.s("reduced_232_impl") == "true";
   bool imsrg3_mp4 = parameters.s("imsrg3_mp4") == "true";
   bool imsrg3_at_end = parameters.s("imsrg3_at_end") == "true";
   bool imsrg3_no_qqq = parameters.s("imsrg3_no_qqq") == "true";
@@ -972,6 +974,7 @@ int main(int argc, char** argv)
   Commutator::SetUseBruecknerBCH(use_brueckner_bch);
   Commutator::SetUseIMSRG3(IMSRG3);
   Commutator::SetUseIMSRG3N7(imsrg3_n7);
+  Commutator::SetUseReduced232Impl(reduced_232_impl);
   Commutator::SetUseIMSRG3_MP4(imsrg3_mp4);
   Commutator::SetIMSRG3Noqqq(imsrg3_no_qqq);
   if (use_brueckner_bch)
@@ -985,6 +988,9 @@ int main(int argc, char** argv)
   if (imsrg3_n7)
   {
     std::cout << "  only including IMSRG3 commutator terms that scale up to n7" << std::endl;
+  }
+  if (reduced_232_impl) {
+    std::cout << "  using comm232ss implementation fully restricted to emax_3body" << std::endl;
   }
   if ( threebody_threshold > 1e-12 )
   {
@@ -1096,6 +1102,7 @@ int main(int argc, char** argv)
 
       Commutator::SetUseIMSRG3(true);
       Commutator::SetUseIMSRG3N7(imsrg3_n7);
+      Commutator::SetUseReduced232Impl(reduced_232_impl);
 //      Operator H_with_3 = imsrgsolver.Transform(  *(imsrgsolver.H_0) );
       Operator H_with_3 = imsrgsolver.Transform( HNO );
 

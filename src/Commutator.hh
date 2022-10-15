@@ -62,6 +62,7 @@ namespace Commutator{
   void SetUseGooseTank(bool tf);
   void SetUseIMSRG3(bool tf);
   void SetUseIMSRG3N7(bool tf);
+  void SetUseReduced232Impl(bool tf);
   void SetUseIMSRG3_MP4(bool tf);
   void SetOnly2bOmega(bool tf);
   void SetBCHSkipiEq1(bool tf);

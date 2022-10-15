@@ -33,6 +33,7 @@ bool use_goose_tank_correction = false;
 bool use_brueckner_bch = false;
 bool use_imsrg3 = false;
 bool use_imsrg3_n7 = false;
+bool use_reduced_232_impl = false;
 bool use_imsrg3_mp4 = false;
 bool only_2b_omega = false;
 bool perturbative_triples = false;
@@ -93,6 +94,9 @@ void SetUseIMSRG3(bool tf)
 
 void SetUseIMSRG3N7(bool tf)
 {use_imsrg3_n7 = tf;}
+
+void SetUseReduced232Impl(bool tf)
+{use_reduced_232_impl = tf;}
 
 void SetUseIMSRG3_MP4(bool tf)
 {use_imsrg3_mp4 = tf;}
@@ -2939,7 +2943,11 @@ void comm232ss( const Operator& X, const Operator& Y, Operator& Z )
 {
   double tstart = omp_get_wtime();
 
-  comm232ss_expand_full(X, Y, Z);
+  if (use_reduced_232_impl) {
+    comm232ss_expand_reduced(X, Y, Z);
+  } else {
+    comm232ss_expand_full(X, Y, Z);
+  }
 
   Z.profiler.timer[__func__] += omp_get_wtime() - tstart;
 }
