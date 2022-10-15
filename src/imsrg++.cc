@@ -289,7 +289,7 @@ int main(int argc, char** argv)
   // Test whether the scratch directory exists and we can write to it.
   // This is necessary because otherwise you get garbage for transformed operators and it's
   // not obvious what went wrong.
-  if ( (method == "magnus") and  ( (opnames.size() + opsfromfile.size()) > 0 )  )
+  if ( ((method == "magnus") || (method == "magnus_backoff")) and  ( (opnames.size() + opsfromfile.size()) > 0 )  )
   {
     if ( scratch=="/dev/null" or scratch=="/dev/null/")
     {
@@ -675,7 +675,8 @@ int main(int argc, char** argv)
 
   std::cout << "done with pert stuff, method = " << method << std::endl;
   // Calculate all the desired operators. If we're using magnus, we'll do this after the flow is over
-  if ( method != "magnus" )
+  // TODO(mheinz): revert this logic to standard magnus logic and shift backoff details into solver.
+  if (!(( method == "magnus" ) || (method == "magnus_backoff")))
   {
 
     for (auto& opname : opnames)
@@ -1026,7 +1027,7 @@ int main(int argc, char** argv)
   {
     std::cout << "Norm of 3-body = " << imsrgsolver.GetH_s().ThreeBodyNorm() << std::endl;
   }
-  if ( perturbative_triples and method=="magnus" )
+  if ( perturbative_triples and ((method=="magnus") || (method == "magnus_backoff")) )
   {
 //    modelspace.SetdE3max(dE3max);
 //    modelspace.SetOccNat3Cut(OccNat3Cut);
@@ -1051,7 +1052,7 @@ int main(int argc, char** argv)
 
   if (nsteps > 1 and valence_space != reference) // two-step decoupling, do core first
   {
-    if (method == "magnus") smax *= 2;
+    if ((method == "magnus") || (method == "magnus_backoff")) smax *= 2;
 
     imsrgsolver.SetGenerator(valence_generator);
     std::cout << "Setting generator to " << valence_generator << std::endl;
@@ -1279,7 +1280,7 @@ int main(int argc, char** argv)
   else // single ref. just print the zero body pieces out. (maybe check if its magnus?)
   {
     std::cout << "Core Energy = " << std::setprecision(6) << imsrgsolver.GetH_s().ZeroBody << std::endl;
-    if ( method != "magnus")
+    if (!(( method == "magnus") || (method == "magnus_backoff")))
     {
       for (index_t i=0;i<ops.size();++i)
       {
@@ -1312,7 +1313,7 @@ int main(int argc, char** argv)
 
 
 
-  if (method == "magnus")
+  if ((method == "magnus") || (method == "magnus_backoff"))
   {
 
     /// if method is magnus, we didn't do this already. So we need to unpack any operators from file.
