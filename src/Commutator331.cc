@@ -127,58 +127,15 @@ void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
               internal::Generate3BMatrix(Y, i_ch_3b, basis_abalpha, basis_cde,
                                          basis_2b_ab_hh, basis_1b_alpha);
 
-          const auto dim_ab = basis_2b_ab_hh.BasisSize();
-          const auto dim_cde = basis_cde.BasisSize();
-          const auto &i_vals = basis_1b_alpha.GetPVals();
-          const auto &j_vals = basis_1b_alpha.GetPVals();
-          const auto dim_alpha = basis_1b_alpha.BasisSize();
-          for (std::size_t i_i = 0; i_i < dim_alpha; i_i += 1) {
-            for (std::size_t i_j = 0; i_j < dim_alpha; i_j += 1) {
-              const auto i = i_vals[i_i];
-              const auto j = j_vals[i_j];
-              const auto jj_i = Z.modelspace->GetOrbit(i).j2;
-              const auto jj_j = Z.modelspace->GetOrbit(j).j2;
-              if (jj_i != jj_j) {
-                continue;
-              }
+          const auto alpha_jj_vals =
+              internal::Get1BBasisJJVals(basis_1b_alpha, Z);
 
-              double me_X_Y = 0.0;
-
-              const double *ab_factors =
-                  basis_2b_ab_hh.GetPQNormFactors().data();
-              const double *cde_factors = basis_cde.GetPQRNormFactors().data();
-              const double *x_iabcde_slice =
-                  &(X_mat_3b.data()[i_i * dim_ab * dim_cde]);
-              const double *y_jabcde_slice =
-                  &(Y_mat_3b.data()[i_j * dim_ab * dim_cde]);
-
-              for (std::size_t i_ab = 0; i_ab < dim_ab; i_ab += 1) {
-                for (std::size_t i_cde = 0; i_cde < dim_cde; i_cde += 1) {
-                  me_X_Y += ab_factors[i_ab] * cde_factors[i_cde] *
-                        x_iabcde_slice[i_ab * dim_cde + i_cde] *
-                        y_jabcde_slice[i_ab * dim_cde + i_cde];
-                }
-              }
-
-              double me_Y_X = 0.0;
-
-              const double *x_jabcde_slice =
-                  &(X_mat_3b.data()[i_j * dim_ab * dim_cde]);
-              const double *y_iabcde_slice =
-                  &(Y_mat_3b.data()[i_i * dim_ab * dim_cde]);
-
-              for (std::size_t i_ab = 0; i_ab < dim_ab; i_ab += 1) {
-                for (std::size_t i_cde = 0; i_cde < dim_cde; i_cde += 1) {
-                  me_X_Y += ab_factors[i_ab] * cde_factors[i_cde] *
-                        x_jabcde_slice[i_ab * dim_cde + i_cde] *
-                        y_iabcde_slice[i_ab * dim_cde + i_cde];
-                }
-              }
-
-              Z.OneBody(i, j) += hY * (me_X_Y * j3_factor) / (jj_i + 1);
-              Z.OneBody(i, j) -= hX * (me_Y_X * j3_factor) / (jj_i + 1);
-            }
-          }
+          internal::EvalComm331Contraction(
+              basis_2b_ab_hh, basis_cde, basis_1b_alpha, alpha_jj_vals,
+              X_mat_3b, Y_mat_3b, hY * j3_factor, Z.OneBody);
+          internal::EvalComm331Contraction(
+              basis_2b_ab_hh, basis_cde, basis_1b_alpha, alpha_jj_vals,
+              Y_mat_3b, X_mat_3b, -1 * hX * j3_factor, Z.OneBody);
         }
       }
     }
@@ -743,6 +700,60 @@ std::vector<double> Generate3BMatrix(const Operator &Z, std::size_t i_ch_3b,
   }
 
   return mat_3b;
+}
+
+std::vector<int> Get1BBasisJJVals(const OneBodyBasis &basis_1b,
+                                  const Operator &Z) {
+  std::vector<int> jjs(basis_1b.BasisSize(), 0);
+
+  for (std::size_t i_i = 0; i_i < basis_1b.BasisSize(); i_i += 1) {
+    const auto i = basis_1b.GetPVals()[i_i];
+    jjs[i_i] = Z.modelspace->GetOrbit(i).j2;
+  }
+
+  return jjs;
+}
+
+void EvalComm331Contraction(const TwoBodyBasis &basis_2b_ab,
+                            const ThreeBodyBasis &basis_3b_cde,
+                            const OneBodyBasis &basis_1b_alpha,
+                            const std::vector<int> &alpha_jj_vals,
+                            const std::vector<double> &mat_iabcde,
+                            const std::vector<double> &mat_jabcde,
+                            int overall_factor, arma::mat &output_mat) {
+  const auto dim_ab = basis_2b_ab.BasisSize();
+  const auto dim_cde = basis_3b_cde.BasisSize();
+  const auto &i_vals = basis_1b_alpha.GetPVals();
+  const auto &j_vals = basis_1b_alpha.GetPVals();
+  const auto dim_alpha = basis_1b_alpha.BasisSize();
+  for (std::size_t i_i = 0; i_i < dim_alpha; i_i += 1) {
+    for (std::size_t i_j = 0; i_j < dim_alpha; i_j += 1) {
+      const auto i = i_vals[i_i];
+      const auto j = j_vals[i_j];
+      const auto jj_i = alpha_jj_vals[i_i];
+      const auto jj_j = alpha_jj_vals[i_j];
+      if (jj_i != jj_j) {
+        continue;
+      }
+
+      double me = 0.0;
+
+      const double *ab_factors = basis_2b_ab.GetPQNormFactors().data();
+      const double *cde_factors = basis_3b_cde.GetPQRNormFactors().data();
+      const double *iabcde_slice = &(mat_iabcde.data()[i_i * dim_ab * dim_cde]);
+      const double *jabcde_slice = &(mat_jabcde.data()[i_j * dim_ab * dim_cde]);
+
+      for (std::size_t i_ab = 0; i_ab < dim_ab; i_ab += 1) {
+        for (std::size_t i_cde = 0; i_cde < dim_cde; i_cde += 1) {
+          me += ab_factors[i_ab] * cde_factors[i_cde] *
+                iabcde_slice[i_ab * dim_cde + i_cde] *
+                jabcde_slice[i_ab * dim_cde + i_cde];
+        }
+      }
+
+      output_mat(i, j) += overall_factor * me / (jj_i + 1);
+    }
+  }
 }
 
 } // namespace internal

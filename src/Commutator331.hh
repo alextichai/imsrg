@@ -419,6 +419,30 @@ std::vector<double> Generate3BMatrix(const Operator &Z, std::size_t i_ch_3b,
                                      const TwoBodyBasis &basis_ab,
                                      const OneBodyBasis &basis_alpha);
 
+// Get vector of jj vals for states in basis_1b.
+std::vector<int> Get1BBasisJJVals(const OneBodyBasis &basis_1b,
+                                  const Operator &Z);
+
+// Evaluate contraction
+// output_mat(i, j) += overall_factor *
+//                     ab_norms(a, b) * cde_norms(c, d, e) *
+//                     mat_iabcde(i, a, b, c, d, e) *
+//                     mat_jabcde(j, a, b, c, d, e).
+//
+// We exploit hermiticity to arrive at this expression
+// and we pretransposed mat[abi,cde] to mat[i,ab,cde].
+//
+// One possible remaining optimization is to absorb ab_norms
+// and cde_norms into mat_iabcde, mat_jabcde with a sqrt
+// as they are constructed.
+void EvalComm331Contraction(const TwoBodyBasis &basis_2b_ab,
+                            const ThreeBodyBasis &basis_3b_cde,
+                            const OneBodyBasis &basis_1b_alpha,
+                            const std::vector<int> &alpha_jj_vals,
+                            const std::vector<double> &mat_iabcde,
+                            const std::vector<double> &mat_jabcde,
+                            int overall_factor, arma::mat &output_mat);
+
 } // namespace internal
 } // namespace comm331
 
