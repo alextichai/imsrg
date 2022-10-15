@@ -198,7 +198,7 @@ public:
   //
   // This may simply be normalization factors or alternatively also
   // occupation number factors.
-  const std::vector<double> &GetPQFactors() const { return pq_factors; }
+  const std::vector<double> &GetPQNormFactors() const { return pq_factors; }
 
   // Get reference to the vector of p states corresponding to |pq> in the basis.
   const std::vector<std::size_t> &GetPVals() const { return p_states; }
@@ -328,7 +328,7 @@ public:
   //
   // This may simply be normalization factors or alternatively also
   // occupation number factors.
-  const std::vector<double> &GetPQRFactors() const { return pqr_factors; }
+  const std::vector<double> &GetPQRNormFactors() const { return pqr_factors; }
 
   // Get reference to the vector of p states corresponding to |pqr> in the
   // basis.
