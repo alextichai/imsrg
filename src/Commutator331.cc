@@ -590,7 +590,7 @@ ThreeBodyBasis ThreeBodyBasis::MinFrom2BAnd1BBasis(
     const int ep = op.n * 2 + op.l;
     const int eq = oq.n * 2 + oq.l;
     for (const std::size_t &r : basis_r.GetPVals()) {
-      if (r > q) {
+      if (q > r) {
         continue;
       }
       const Orbit &oR = Z.modelspace->GetOrbit(r);
@@ -618,7 +618,7 @@ ThreeBodyBasis ThreeBodyBasis::MinFrom2BAnd1BBasis(
     const int ep = op.n * 2 + op.l;
     const int eq = oq.n * 2 + oq.l;
     for (const std::size_t &r : basis_r.GetPVals()) {
-      if (r > q) {
+      if (q > r) {
         continue;
       }
       const Orbit &oR = Z.modelspace->GetOrbit(r);
