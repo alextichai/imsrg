@@ -1187,6 +1187,11 @@ int main(int argc, char** argv)
     for ( auto i : modelspace_imsrg.all_orbits ) std::cout << "  " << i << " : " << HNO.OneBody(i,i) << std::endl;
     if (IMSRG3)
     {
+      rw.Write_NaiveVS3B(intfile + ".vs3b", HNO);
+      // Use emax=3 because we are interested in pf shell systems
+      rw.Write_me1j(intfile + "_ENO.me1j", HNO, 3, 3);
+      rw.Write_me2jp(intfile + "_ENO.me2jp", HNO, 3, 6, 3);
+      rw.Write_me3jp(intfile + "_ENO.me3jp", HNO, 3, 6, 9);
       std::cout << "Re-normal-ordering wrt the core. For now, we just throw away the 3N at this step." << std::endl;
       HNO.SetNumberLegs(4);
       HNO.SetParticleRank(2);
@@ -1196,6 +1201,12 @@ int main(int argc, char** argv)
     HNO.SetModelSpace(ms2);
     std::cout << "Doing NO wrt A=" << ms2.GetAref() << " Z=" << ms2.GetZref() << "  norbits = " << ms2.GetNumberOrbits() << std::endl;
     HNO = HNO.DoNormalOrdering();
+
+    rw.Write_NaiveVS1B(intfile + ".vs1b", HNO);
+    rw.Write_NaiveVS2B(intfile + ".vs2b", HNO);
+    // Use emax=3 because we are interested in pf shell systems
+    rw.Write_me1j(intfile + "_coreNO.me1j", HNO, 3, 3);
+    rw.Write_me2jp(intfile + "_coreNO.me2jp", HNO, 3, 6, 3);
 
     imsrgsolver.FlowingOps[0] = HNO;
 
