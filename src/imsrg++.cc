@@ -234,12 +234,14 @@ int main(int argc, char** argv)
       // now make sure the files exist before we add them to the list.
 
 //     if( not std::ifstream(f2name).good() )
+if (opff.file2name != "") {
      if( not std::ifstream(opff.file2name).good() )
      {
 //       std::cout << "trouble reading " << f2name << " exiting. " << std::endl;
        std::cout << "trouble reading " << opff.file2name << " exiting. " << std::endl;
        return 1;
      }
+}
 
      if ( opff.file3name != "") // is there a 3-body file too?
      {
