@@ -722,6 +722,18 @@ int main(int argc, char** argv)
         }
         if ( opff.r>2 and opff.file3name != "")  rw.Read_Darmstadt_3body( opff.file3name, op,  file3e1max,file3e2max,file3e3max);
       }
+      else if ( input_op_fmt == "heinz")
+      {
+        if ( opff.r>2 and opff.file3name != "")  
+        {
+
+          op.ThreeBody.SetMode("no2b");
+          if (no2b_precision == "half")  op.ThreeBody.SetMode("no2bhalf");
+
+          op.ThreeBody.ReadFile( {opff.file3name}, {file3e1max, file3e2max, file3e3max, file3e1max} );
+          // rw.Read_Darmstadt_3body( opff.file3name, op,  file3e1max,file3e2max,file3e3max);
+        }
+      }
       ops.push_back( op );
       opnames.push_back( opff.opname );
     }
@@ -1364,6 +1376,18 @@ int main(int argc, char** argv)
               op.TwoBody = optmp.TwoBody;
           }
           if ( opff.r>2 and opff.file3name != "")  rw.Read_Darmstadt_3body( opff.file3name, op,  file3e1max,file3e2max,file3e3max);
+        }
+        else if ( input_op_fmt == "heinz")
+        {
+          if ( opff.r>2 and opff.file3name != "")  
+          {
+
+            op.ThreeBody.SetMode("no2b");
+            if (no2b_precision == "half")  op.ThreeBody.SetMode("no2bhalf");
+
+            op.ThreeBody.ReadFile( {opff.file3name}, {file3e1max, file3e2max, file3e3max, file3e1max} );
+            // rw.Read_Darmstadt_3body( opff.file3name, op,  file3e1max,file3e2max,file3e3max);
+          }
         }
         count_from_file++;
         opname = opff.opname; // Get rid of the _FROMFILE bit.
