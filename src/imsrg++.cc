@@ -710,7 +710,11 @@ if (opff.file2name != "") {
     for ( auto& opff : opsfromfile_unpacked)
     {
       Operator op(modelspace, opff.j, opff.t, opff.p, opff.r );
-      if (opff.r>2) op.ThreeBody.Allocate();
+      if (opff.r>2) 
+      { 
+        op.ThreeBody.SetMode("no2b");
+        op.ThreeBody.Allocate();
+      }
       if ( input_op_fmt == "navratil" )
       {
         rw.Read2bCurrent_Navratil( opff.file2name, op );
@@ -1365,7 +1369,11 @@ if (opff.file2name != "") {
         OpFromFile& opff = opsfromfile_unpacked[count_from_file];
          std::cout << "reading " << opff.opname << " with " << opff.j << " " << opff.t << " " << opff.p << " " << opff.r << "  from file " << opff.file2name << std::endl;
         op = Operator(modelspace, opff.j, opff.t, opff.p, opff.r );
-        if (opff.r>2) op.ThreeBody.Allocate();
+        if (opff.r>2) 
+        { 
+          op.ThreeBody.SetMode("no2b");
+          op.ThreeBody.Allocate();
+        }
         if ( input_op_fmt == "navratil" )
         {
           rw.Read2bCurrent_Navratil( opff.file2name, op );
