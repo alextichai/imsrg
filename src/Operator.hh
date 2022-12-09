@@ -171,6 +171,7 @@ class Operator
   Operator DoNormalOrdering() const; ///< Calls DoNormalOrdering2() or DoNormalOrdering3(), depending on the rank of the operator.
   Operator DoNormalOrdering2(int sign, std::set<index_t> occupied) const; ///< Returns the normal ordered two-body operator
   Operator DoNormalOrdering3(int sign, std::set<index_t> occupied) const; ///< Returns the normal ordered three-body operator
+  Operator DoNormalOrdering2NO2B() const;
   Operator DoNormalOrderingCore() const; ///< Normal order with respect to core
 //  Operator DoNormalOrdering2(int sign=+1) const; ///< Returns the normal ordered two-body operator
 //  Operator DoNormalOrdering3(int sign=+1) const; ///< Returns the normal ordered three-body operator
