@@ -408,6 +408,77 @@ Operator HFMBPT::GetNormalOrderedHNAT(int particle_rank)
   return HNO;
 }
 
+Operator HFMBPT::GetNormalOrdered3BOperator(Operator& OpIn, int particle_rank)
+{
+  double start_time = omp_get_wtime();
+  std::cout << "Normal ordering 3B operator in NAT basis" << std::endl;
+
+//  Operator HNO = Operator(*HartreeFock::modelspace,0,0,0,2);
+  Operator HNO = Operator(*HartreeFock::modelspace,0,0,0,particle_rank);
+  // HNO.ZeroBody = EHF;
+  // HNO.OneBody = C_HO2NAT.t() * F * C_HO2NAT;
+
+  int nchan = HartreeFock::modelspace->GetNumberTwoBodyChannels();
+
+
+
+    for (int ch=0;ch<nchan;++ch)
+    {
+      TwoBodyChannel& tbc = modelspace->GetTwoBodyChannel(ch);
+      int J = tbc.J;
+      int npq = tbc.GetNumberKets();
+
+      arma::mat D(npq,npq,arma::fill::zeros);  // <ij|ab> = <ji|ba>
+      arma::mat V3NO(npq,npq,arma::fill::zeros);  // <ij|ab> = <ji|ba>
+#pragma omp parallel for schedule(dynamic,1)
+      for (int i=0; i<npq; ++i)
+      {
+        Ket & bra = tbc.GetKet(i);
+        int e2bra = 2*bra.op->n + bra.op->l + 2*bra.oq->n + bra.oq->l;
+        for (int j=0; j<npq; ++j)
+        {
+          Ket & ket = tbc.GetKet(j);
+          int e2ket = 2*ket.op->n + ket.op->l + 2*ket.oq->n + ket.oq->l;
+          D(i,j) = C_HO2NAT(bra.p,ket.p) * C_HO2NAT(bra.q,ket.q);
+          if (bra.p!=bra.q)
+          {
+            D(i,j) += C_HO2NAT(bra.q,ket.p) * C_HO2NAT(bra.p,ket.q) * bra.Phase(J);
+          }
+          if (bra.p==bra.q)    D(i,j) *= PhysConst::SQRT2;
+          if (ket.p==ket.q)    D(i,j) /= PhysConst::SQRT2;
+
+          // Now generate the NO2B part of the 3N interaction
+          if (OpIn.GetParticleRank()<3) continue;
+          if (i>j) continue;
+          for ( auto a : modelspace->all_orbits )
+          {
+            Orbit & oa = modelspace->GetOrbit(a);
+            if ( 2*oa.n+oa.l+e2bra > OpIn.GetE3max() ) continue;
+            for (int b : OpIn.OneBodyChannels.at({oa.l,oa.j2,oa.tz2}))
+            {
+              if ( std::abs(rho(a,b)) < 1e-8 ) continue; // Turns out this helps a bit (factor of 5 speed up in tests)
+              Orbit & ob = HartreeFock::modelspace->GetOrbit(b);
+              if ( 2*ob.n+ob.l+e2ket > OpIn.GetE3max() ) continue;
+//              V3NO(i,j) += rho(a,b) * GetVNO2B(bra.p, bra.q, a, ket.p, ket.q, b, J);
+              V3NO(i,j) += rho(a,b) * OpIn.ThreeBody.GetME_pn_no2b(bra.p,bra.q,a,ket.p,ket.q,b,J);
+            }
+          }
+          V3NO(i,j) /= (2*J+1);
+          if (bra.p==bra.q)  V3NO(i,j) /= PhysConst::SQRT2;
+          if (ket.p==ket.q)  V3NO(i,j) /= PhysConst::SQRT2;
+          V3NO(j,i) = V3NO(i,j);
+        }
+      }
+
+      auto& OUT =  HNO.TwoBody.GetMatrix(ch);
+      OUT  =    D.t() * V3NO * D;
+    }
+
+//  rho = rho_swap;
+  profiler.timer["HFMBT_GetNormalOrdered3BOperator"] += omp_get_wtime() - start_time;
+  return HNO.DoNormalOrdering2NO2B();
+}
+
 //*********************************************************************
 // Compute the MBPT2 corrections to the 1b density matrix.
 //*********************************************************************

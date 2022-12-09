@@ -48,6 +48,7 @@ class HFMBPT : public HartreeFock
     Operator TransformHFToNATBasis(Operator& OpIn);
     Operator TransformHOToNATBasis(Operator& OpIn);
     Operator GetNormalOrderedHNAT(int particle_rank=2);
+    Operator GetNormalOrdered3BOperator(Operator& OpIn, int particle_rank=2);
 //    Operator GetNormalOrderedHNAT();
 //    double GetTransformed3bme( int Jab, int Jde, int J2, size_t a, size_t b, size_t c, size_t d, size_t e, size_t f);
     double GetTransformed3bme( Operator& OpIn, int Jab, int Jde, int J2, size_t a, size_t b, size_t c, size_t d, size_t e, size_t f);
