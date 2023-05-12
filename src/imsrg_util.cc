@@ -1071,9 +1071,14 @@ Operator KineticEnergy_RelativisticCorr(ModelSpace& modelspace)
  Operator Rp2_corrected_Op(ModelSpace& modelspace, int A, int Z)
  {
    if (Z==0) return 0.0*KineticEnergy_Op(modelspace);
-   return R2CM_Op(modelspace) + (A-2.0)/(A*Z)*R2_1body_Op(modelspace,"proton")
-                                   - 4./(A*Z)*R2_2body_Op(modelspace,"proton")
-                                   + 1./Z * RpSpinOrbitCorrection(modelspace);
+   Operator ret = R2CM_Op(modelspace);
+   ret += (A-2.0)/(A*Z)*R2_1body_Op(modelspace,"proton");
+   ret -= 4./(A*Z)*R2_2body_Op(modelspace,"proton");
+   ret += 1./Z * RpSpinOrbitCorrection(modelspace);
+   return ret;
+  //  return R2CM_Op(modelspace) + (A-2.0)/(A*Z)*R2_1body_Op(modelspace,"proton")
+  //                                  - 4./(A*Z)*R2_2body_Op(modelspace,"proton")
+  //                                  + 1./Z * RpSpinOrbitCorrection(modelspace);
  }
 
  Operator Rn2_corrected_Op(ModelSpace& modelspace, int A, int Z)
