@@ -1,0 +1,10 @@
+Language:        Cpp
+BasedOnStyle:  Google
+DerivePointerAlignment: false
+PointerAlignment: Left
+IncludeBlocks: Preserve
+BinPackArguments: false
+BinPackParameters: false
+AlignAfterOpenBracket: AlwaysBreak
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false

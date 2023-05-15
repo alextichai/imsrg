@@ -92,17 +92,16 @@
 
 struct OpFromFile {
   std::string file2name, file3name, opname;
-  int j, p, t, r; // J rank, parity, dTz, particle rank
+  int j, p, t, r;  // J rank, parity, dTz, particle rank
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   // Default parameters, and everything passed by command line args.
   std::cout << "######  imsrg++ build version: " << version::BuildVersion()
             << std::endl;
 
   Parameters parameters(argc, argv);
-  if (parameters.help_mode)
-    return 0;
+  if (parameters.help_mode) return 0;
 
   std::string inputtbme = parameters.s("2bme");
   std::string input3bme = parameters.s("3bme");
@@ -158,13 +157,13 @@ int main(int argc, char **argv) {
   bool perturbative_triples = (parameters.s("perturbative_triples") == "true");
   bool brueckner_restart = false;
   bool write_HO_ops =
-      parameters.s("write_HO_ops") == "true"; // added by Antoine Belley
+      parameters.s("write_HO_ops") == "true";  // added by Antoine Belley
   bool write_HF_ops =
-      parameters.s("write_HF_ops") == "true"; // added by Antoine Belley
+      parameters.s("write_HF_ops") == "true";  // added by Antoine Belley
 
   int eMax = parameters.i("emax");
   int lmax =
-      parameters.i("lmax"); // so far I only use this with atomic systems.
+      parameters.i("lmax");  // so far I only use this with atomic systems.
   int E3max = parameters.i("e3max");
   int lmax3 = parameters.i("lmax3");
   int targetMass = parameters.i("A");
@@ -243,7 +242,7 @@ int main(int argc, char **argv) {
   // 2-body, then 3bfile is not needed.
   std::vector<OpFromFile> opsfromfile_unpacked;
   // If we're reading in other operators, make sure those are ok too
-  for (auto &tag : opsfromfile) {
+  for (auto& tag : opsfromfile) {
     std::istringstream ss(tag);
     std::string opname, qnumbers, f2name, f3name = "";
 
@@ -252,8 +251,7 @@ int main(int argc, char **argv) {
     getline(ss, opname, '^');
     getline(ss, qnumbers, '^');
     getline(ss, f2name, '^');
-    if (!ss.eof())
-      getline(ss, f3name, '^');
+    if (!ss.eof()) getline(ss, f3name, '^');
     opff.opname = opname;
     opff.file2name = f2name;
     opff.file3name = f3name;
@@ -316,8 +314,7 @@ int main(int argc, char **argv) {
     method = "magnus";
   }
   if (method.find("brueckner") != std::string::npos) {
-    if (method == "brueckner2")
-      brueckner_restart = true;
+    if (method == "brueckner2") brueckner_restart = true;
     if (method == "brueckner1step") {
       nsteps = 1;
       core_generator = valence_generator;
@@ -360,10 +357,10 @@ int main(int argc, char **argv) {
 
   //  ModelSpace modelspace;
 
-  if (custom_valence_space != "") // if a custom space is defined, the input
-                                  // valence_space is just used as a name
+  if (custom_valence_space != "")  // if a custom space is defined, the input
+                                   // valence_space is just used as a name
   {
-    if (valence_space == "") // if no name is given, then just name it "custom"
+    if (valence_space == "")  // if no name is given, then just name it "custom"
     {
       parameters.string_par["valence_space"] = "custom";
       flowfile = parameters.DefaultFlowFile();
@@ -399,10 +396,8 @@ int main(int argc, char **argv) {
   }
 
   modelspace.SetHbarOmega(hw);
-  if (targetMass > 0)
-    modelspace.SetTargetMass(targetMass);
-  if (lmax3 > 0)
-    modelspace.SetLmax3(lmax3);
+  if (targetMass > 0) modelspace.SetTargetMass(targetMass);
+  if (lmax3 > 0) modelspace.SetLmax3(lmax3);
 
   // For both dagger operators and single particle wave functions, it's
   // convenient to just get every orbit in the valence space. So if
@@ -410,16 +405,18 @@ int main(int argc, char **argv) {
   if (std::find(spwf.begin(), spwf.end(), "valence") != spwf.end()) {
     // this erase/remove idiom is needed because remove just shuffles things
     // around rather than actually removing it.
-    spwf.erase(std::remove(spwf.begin(), spwf.end(), "valence"),
-               std::end(spwf));
+    spwf.erase(
+        std::remove(spwf.begin(), spwf.end(), "valence"),
+        std::end(spwf));
     for (auto v : modelspace.valence) {
       spwf.push_back(modelspace.Index2String(v));
     }
   }
 
   if (std::find(opnames.begin(), opnames.end(), "rhop_all") != opnames.end()) {
-    opnames.erase(std::remove(opnames.begin(), opnames.end(), "rhop_all"),
-                  std::end(opnames));
+    opnames.erase(
+        std::remove(opnames.begin(), opnames.end(), "rhop_all"),
+        std::end(opnames));
     for (double r = 0.0; r <= 10.0; r += 0.2) {
       std::ostringstream opn;
       opn << "rhop_" << r;
@@ -428,8 +425,9 @@ int main(int argc, char **argv) {
   }
 
   if (std::find(opnames.begin(), opnames.end(), "rhon_all") != opnames.end()) {
-    opnames.erase(std::remove(opnames.begin(), opnames.end(), "rhon_all"),
-                  std::end(opnames));
+    opnames.erase(
+        std::remove(opnames.begin(), opnames.end(), "rhon_all"),
+        std::end(opnames));
     for (double r = 0.0; r <= 10.0; r += 0.2) {
       std::ostringstream opn;
       opn << "rhon_" << r;
@@ -448,8 +446,7 @@ int main(int argc, char **argv) {
     std::cout
         << "I found DaggerHF_valence, so I'm changing the opnames list to :"
         << std::endl;
-    for (auto opn : opnames)
-      std::cout << opn << " ,  ";
+    for (auto opn : opnames) std::cout << opn << " ,  ";
     std::cout << std::endl;
   }
 
@@ -464,8 +461,7 @@ int main(int argc, char **argv) {
     std::cout
         << "I found DaggerAlln_valence, so I'm changing the opnames list to :"
         << std::endl;
-    for (auto opn : opnames)
-      std::cout << opn << " ,  ";
+    for (auto opn : opnames) std::cout << opn << " ,  ";
     std::cout << std::endl;
   }
 
@@ -481,22 +477,33 @@ int main(int argc, char **argv) {
 
   if (inputtbme != "none") {
     if (fmt2 == "me2j")
-      rw.ReadBareTBME_Darmstadt(inputtbme, Hbare, file2e1max, file2e2max,
-                                file2lmax);
+      rw.ReadBareTBME_Darmstadt(
+          inputtbme,
+          Hbare,
+          file2e1max,
+          file2e2max,
+          file2lmax);
     else if (fmt2 == "navratil" or fmt2 == "Navratil")
       rw.ReadBareTBME_Navratil(inputtbme, Hbare);
     else if (fmt2 == "oslo")
       rw.ReadTBME_Oslo(inputtbme, Hbare);
-    else if (fmt2.find("oakridge") !=
-             std::string::npos) { // input format should be:
-                                  // singleparticle.dat,vnn.dat
+    else if (
+        fmt2.find("oakridge") !=
+        std::string::npos) {  // input format should be:
+                              // singleparticle.dat,vnn.dat
       size_t comma_pos = inputtbme.find_first_of(",");
       if (fmt2.find("bin") != std::string::npos)
-        rw.ReadTBME_OakRidge(inputtbme.substr(0, comma_pos),
-                             inputtbme.substr(comma_pos + 1), Hbare, "binary");
+        rw.ReadTBME_OakRidge(
+            inputtbme.substr(0, comma_pos),
+            inputtbme.substr(comma_pos + 1),
+            Hbare,
+            "binary");
       else
-        rw.ReadTBME_OakRidge(inputtbme.substr(0, comma_pos),
-                             inputtbme.substr(comma_pos + 1), Hbare, "ascii");
+        rw.ReadTBME_OakRidge(
+            inputtbme.substr(0, comma_pos),
+            inputtbme.substr(comma_pos + 1),
+            Hbare,
+            "ascii");
     } else if (fmt2 == "takayuki")
       rw.ReadTwoBody_Takayuki(inputtbme, Hbare);
     else if (fmt2 == "nushellx")
@@ -513,23 +520,27 @@ int main(int argc, char **argv) {
   // Read in the 3-body file
   if (Hbare.particle_rank >= 3) {
     if (input3bme_type == "full") {
-      rw.Read_Darmstadt_3body(input3bme, Hbare, file3e1max, file3e2max,
-                              file3e3max);
+      rw.Read_Darmstadt_3body(
+          input3bme,
+          Hbare,
+          file3e1max,
+          file3e2max,
+          file3e3max);
     }
     if (input3bme_type == "no2b") {
-
       Hbare.ThreeBody.SetMode("no2b");
-      if (no2b_precision == "half")
-        Hbare.ThreeBody.SetMode("no2bhalf");
+      if (no2b_precision == "half") Hbare.ThreeBody.SetMode("no2bhalf");
 
       Hbare.ThreeBody.ReadFile(
-          {input3bme}, {file3e1max, file3e2max, file3e3max, file3e1max});
+          {input3bme},
+          {file3e1max, file3e2max, file3e3max, file3e1max});
       rw.File3N = input3bme;
 
     } else if (input3bme_type == "mono") {
       Hbare.ThreeBody.SetMode("mono");
       Hbare.ThreeBody.ReadFile(
-          {input3bme}, {file3e1max, file3e2max, file3e3max, file3e1max});
+          {input3bme},
+          {file3e1max, file3e2max, file3e3max, file3e1max});
       rw.File3N = input3bme;
     }
     std::cout << "done reading 3N" << std::endl;
@@ -540,25 +551,25 @@ int main(int argc, char **argv) {
   }
 
   if (inputtbme == "none" and physical_system == "atomic") {
-
     using PhysConst::M_ELECTRON;
     using PhysConst::M_NUCLEON;
     int Z = (atomicZ >= 0) ? atomicZ : modelspace.GetTargetZ();
     Hbare -= Z * imsrg_util::VCentralCoulomb_Op(modelspace, lmax) *
              sqrt((M_ELECTRON * 1e6) / M_NUCLEON);
     Hbare += imsrg_util::VCoulomb_Op(modelspace, lmax) *
-             sqrt((M_ELECTRON * 1e6) /
-                  M_NUCLEON); // convert oscillator length from fm with nucleon
+             sqrt(
+                 (M_ELECTRON * 1e6) /
+                 M_NUCLEON);  // convert oscillator length from fm with nucleon
                               // mass to nm with electon mass (in eV).
     Hbare += imsrg_util::KineticEnergy_Op(
-        modelspace); // Don't need to rescale this, because it's related to the
-                     // oscillator frequency, which we input.
-    Hbare /= PhysConst::HARTREE; // Convert to Hartree
+        modelspace);  // Don't need to rescale this, because it's related to the
+                      // oscillator frequency, which we input.
+    Hbare /= PhysConst::HARTREE;  // Convert to Hartree
   }
 
   if (fmt2 != "nushellx" and physical_system != "atomic" and
-      hw_trap < 0) // Don't need to add kinetic energy if we read a shell model
-                   // interaction
+      hw_trap < 0)  // Don't need to add kinetic energy if we read a shell model
+                    // interaction
   {
     Hbare += imsrg_util::Trel_Op(modelspace);
     if (Hbare.OneBody.has_nan()) {
@@ -574,7 +585,7 @@ int main(int argc, char **argv) {
              (PhysConst::HBARC * PhysConst::HBARC) *
              imsrg_util::RSquaredOp(modelspace);
     Hbare += imsrg_util::KineticEnergy_Op(
-        modelspace); // use lab-frame kinetic energy
+        modelspace);  // use lab-frame kinetic energy
   }
 
   // correction to kinetic energy because M_proton != M_neutron
@@ -589,8 +600,7 @@ int main(int argc, char **argv) {
   // Add a Lawson center of mass term. If hwBetaCM is specified, use that
   // frequency, otherwise use the basis frequency
   if (std::abs(BetaCM) > 1e-3) {
-    if (hwBetaCM < 0)
-      hwBetaCM = modelspace.GetHbarOmega();
+    if (hwBetaCM < 0) hwBetaCM = modelspace.GetHbarOmega();
     std::ostringstream hcm_opname;
     hcm_opname << "HCM_" << hwBetaCM;
     Hbare +=
@@ -598,13 +608,11 @@ int main(int argc, char **argv) {
   }
 
   std::cout << "Creating HF" << std::endl;
-  HFMBPT hf(Hbare); // HFMBPT inherits from HartreeFock, so this works for HF
-                    // and NAT bases.
+  HFMBPT hf(Hbare);  // HFMBPT inherits from HartreeFock, so this works for HF
+                     // and NAT bases.
 
-  if (not freeze_occupations)
-    hf.UnFreezeOccupations();
-  if (discard_no2b_from_3n)
-    hf.DiscardNO2Bfrom3N();
+  if (not freeze_occupations) hf.UnFreezeOccupations();
+  if (discard_no2b_from_3n) hf.DiscardNO2Bfrom3N();
   std::cout << "Solving" << std::endl;
 
   if (basis != "oscillator") {
@@ -613,24 +621,20 @@ int main(int argc, char **argv) {
 
   // decide what to keep after normal ordering
   int hno_particle_rank = 2;
-  if ((IMSRG3) and (Hbare.ThreeBodyNorm() > 1e-5))
-    hno_particle_rank = 3;
-  if (discard_residual_input3N)
-    hno_particle_rank = 2;
-  if (input3bme_type == "no2b")
-    hno_particle_rank = 2;
+  if ((IMSRG3) and (Hbare.ThreeBodyNorm() > 1e-5)) hno_particle_rank = 3;
+  if (discard_residual_input3N) hno_particle_rank = 2;
+  if (input3bme_type == "no2b") hno_particle_rank = 2;
 
-  Operator &HNO =
-      Hbare; // The reference & means we overwrite Hbare and save some memory
+  Operator& HNO =
+      Hbare;  // The reference & means we overwrite Hbare and save some memory
   if (basis == "HF" and method != "HF") {
     HNO = hf.GetNormalOrderedH(hno_particle_rank);
     if ((IMSRG3 or perturbative_triples) and OccNat3Cut > 0)
       hf.GetNaturalOrbitals();
-  } else if (basis == "NAT") // we want to use the natural orbital basis
+  } else if (basis == "NAT")  // we want to use the natural orbital basis
   {
     // for backwards compatibility: order_NAT_by_energy overrides NAT_order
-    if (order_NAT_by_energy)
-      NAT_order = "energy";
+    if (order_NAT_by_energy) NAT_order = "energy";
 
     hf.UseNATOccupations(use_NAT_occupations);
     hf.OrderNATBy(NAT_order);
@@ -686,7 +690,7 @@ int main(int argc, char **argv) {
               << " out of " << nstates[1] << std::endl;
 
     if (hno_particle_rank <
-        3) // if we're doing IMSRG3, we need a 3 body operator
+        3)  // if we're doing IMSRG3, we need a 3 body operator
     {
       Operator H3(modelspace, 0, 0, 0, 3);
       std::cout << "Constructed H3" << std::endl;
@@ -707,8 +711,8 @@ int main(int argc, char **argv) {
   imsrg_util::WriteSPWaveFunctions(spwf, hf, intfile);
   //  }
 
-  HNO -= BetaCM * 1.5 * hwBetaCM; // This is just the zero-body piece. The other
-                                  // stuff was added earlier.
+  HNO -= BetaCM * 1.5 * hwBetaCM;  // This is just the zero-body piece. The
+                                   // other stuff was added earlier.
   std::cout << "Hbare 0b = " << std::setprecision(8) << HNO.ZeroBody
             << std::endl;
 
@@ -732,8 +736,7 @@ int main(int argc, char **argv) {
   // TODO(mheinz): revert this logic to standard magnus logic and shift backoff
   // details into solver.
   if (!((method == "magnus") || (method == "magnus_backoff"))) {
-
-    for (auto &opname : opnames) {
+    for (auto& opname : opnames) {
       ops.emplace_back(imsrg_util::OperatorFromString(modelspace, opname));
     }
 
@@ -741,25 +744,30 @@ int main(int argc, char **argv) {
     // that's what we asked for. Strictly speaking, it doesn't make much sense
     // to do this and then proceed with the IMSRG calculation, but I'm not here
     // to tell people what to do...
-    for (auto &opnamept1 : opnamesPT1) {
+    for (auto& opnamept1 : opnamesPT1) {
       ops.emplace_back(imsrg_util::FirstOrderCorr_1b(
-          imsrg_util::OperatorFromString(modelspace, opnamept1), HNO));
+          imsrg_util::OperatorFromString(modelspace, opnamept1),
+          HNO));
       opnames.push_back(opnamept1 + "PT1");
     }
-    for (auto &opnametda :
-         opnamesTDA) { // passing the argument "TDA" just sets the phhp and hpph
-                       // blocks to zero in the RPA calculation
+    for (auto& opnametda :
+         opnamesTDA) {  // passing the argument "TDA" just sets the phhp and
+                        // hpph blocks to zero in the RPA calculation
       ops.emplace_back(imsrg_util::RPA_resummed_1b(
-          imsrg_util::OperatorFromString(modelspace, opnametda), HNO, "TDA"));
+          imsrg_util::OperatorFromString(modelspace, opnametda),
+          HNO,
+          "TDA"));
       opnames.push_back(opnametda + "TDA");
     }
-    for (auto &opnamerpa : opnamesRPA) {
+    for (auto& opnamerpa : opnamesRPA) {
       ops.emplace_back(imsrg_util::RPA_resummed_1b(
-          imsrg_util::OperatorFromString(modelspace, opnamerpa), HNO, "RPA"));
+          imsrg_util::OperatorFromString(modelspace, opnamerpa),
+          HNO,
+          "RPA"));
       opnames.push_back(opnamerpa + "RPA");
     }
 
-    for (auto &opff : opsfromfile_unpacked) {
+    for (auto& opff : opsfromfile_unpacked) {
       Operator op(modelspace, opff.j, opff.t, opff.p, opff.r);
       if (opff.r > 2) {
         op.ThreeBody.SetMode("no2b");
@@ -773,17 +781,20 @@ int main(int argc, char **argv) {
           op.TwoBody = optmp.TwoBody;
         }
         if (opff.r > 2 and opff.file3name != "")
-          rw.Read_Darmstadt_3body(opff.file3name, op, file3e1max, file3e2max,
-                                  file3e3max);
+          rw.Read_Darmstadt_3body(
+              opff.file3name,
+              op,
+              file3e1max,
+              file3e2max,
+              file3e3max);
       } else if (input_op_fmt == "heinz") {
         if (opff.r > 2 and opff.file3name != "") {
-
           op.ThreeBody.SetMode("no2b");
-          if (no2b_precision == "half")
-            op.ThreeBody.SetMode("no2bhalf");
+          if (no2b_precision == "half") op.ThreeBody.SetMode("no2bhalf");
 
-          op.ThreeBody.ReadFile({opff.file3name}, {file3e1max, file3e2max,
-                                                   file3e3max, file3e1max});
+          op.ThreeBody.ReadFile(
+              {opff.file3name},
+              {file3e1max, file3e2max, file3e3max, file3e1max});
           // rw.Read_Darmstadt_3body( opff.file3name, op,
           // file3e1max,file3e2max,file3e3max);
         }
@@ -794,8 +805,7 @@ int main(int argc, char **argv) {
 
     if (ops.size() > 0) {
       std::cout << "operators to transform: " << std::endl;
-      for (auto &opn : opnames)
-        std::cout << opn << " ";
+      for (auto& opn : opnames) std::cout << opn << " ";
       std::cout << std::endl;
     }
 
@@ -808,8 +818,9 @@ int main(int argc, char **argv) {
       if ((basis == "HF") and
           (opnames[i].find("DaggerHF") == std::string::npos)) {
         ops[i] = hf.TransformToHFBasis(ops[i]);
-      } else if ((basis == "NAT") and
-                 (opnames[i].find("DaggerHF") == std::string::npos)) {
+      } else if (
+          (basis == "NAT") and
+          (opnames[i].find("DaggerHF") == std::string::npos)) {
         ops[i] = hf.TransformHOToNATBasis(ops[i]);
       }
       //     std::cout << "After transforming  " << opnames[i] << " has 3b norm
@@ -832,13 +843,14 @@ int main(int argc, char **argv) {
         std::cout << " HF charge radius = "
                   << (abs(Rp2) < 1e-6
                           ? 0.0
-                          : sqrt(Rp2 + PROTON_RCH2 +
-                                 NEUTRON_RCH2 * (A - Z) / Z + DARWIN_FOLDY))
+                          : sqrt(
+                                Rp2 + PROTON_RCH2 + NEUTRON_RCH2 * (A - Z) / Z +
+                                DARWIN_FOLDY))
                   << std::endl;
       }
-    } // for ops.size
+    }  // for ops.size
 
-  } // if method != "magnus"
+  }  // if method != "magnus"
 
   if (basis == "HF" or basis == "NAT") {
     std::cout << basis
@@ -871,7 +883,7 @@ int main(int argc, char **argv) {
           rw.WriteTensorTokyo(intfile + opnames[i] + ".snt", ops[i]);
         }
       }
-    } else // Write in NuShellX Format
+    } else  // Write in NuShellX Format
     {
       // we want the 1b piece to be diagonal in the vacuum NO representation
       HNO = HNO.UndoNormalOrdering();
@@ -898,10 +910,14 @@ int main(int argc, char **argv) {
         if ((ops[i].GetJRank() + ops[i].GetTRank() + ops[i].GetParity()) < 1) {
           rw.WriteNuShellX_op(ops[i], intfile + opnames[i] + ".int");
         } else {
-          rw.WriteTensorOneBody(intfile + opnames[i] + "_1b.op", ops[i],
-                                opnames[i]);
-          rw.WriteTensorTwoBody(intfile + opnames[i] + "_2b.op", ops[i],
-                                opnames[i]);
+          rw.WriteTensorOneBody(
+              intfile + opnames[i] + "_1b.op",
+              ops[i],
+              opnames[i]);
+          rw.WriteTensorTwoBody(
+              intfile + opnames[i] + "_2b.op",
+              ops[i],
+              opnames[i]);
         }
       }
     }
@@ -923,15 +939,10 @@ int main(int argc, char **argv) {
   ModelSpace modelspace_imsrg = modelspace;
   if ((eMax_imsrg != -1) or (e2Max_imsrg != -1) or (e3Max_imsrg != -1) or
       (eMax_3body_imsrg != -1)) {
-
-    if (eMax_imsrg == -1)
-      eMax_imsrg = eMax;
-    if (e2Max_imsrg == -1)
-      e2Max_imsrg = 2 * eMax_imsrg;
-    if (e3Max_imsrg == -1)
-      e3Max_imsrg = std::min(E3max, 3 * eMax_imsrg);
-    if (eMax_3body_imsrg == -1)
-      eMax_3body_imsrg = eMax_imsrg;
+    if (eMax_imsrg == -1) eMax_imsrg = eMax;
+    if (e2Max_imsrg == -1) e2Max_imsrg = 2 * eMax_imsrg;
+    if (e3Max_imsrg == -1) e3Max_imsrg = std::min(E3max, 3 * eMax_imsrg);
+    if (eMax_3body_imsrg == -1) eMax_3body_imsrg = eMax_imsrg;
 
     //     ModelSpace modelspace_imsrg = modelspace;
     std::cout
@@ -956,11 +967,11 @@ int main(int argc, char **argv) {
     // If the occupations in modelspace were different from the naive filling,
     // we want to keep those.
     std::map<index_t, double> hole_map;
-    for (auto &i_new : modelspace_imsrg.all_orbits) {
-      Orbit &oi_new = modelspace_imsrg.GetOrbit(i_new);
+    for (auto& i_new : modelspace_imsrg.all_orbits) {
+      Orbit& oi_new = modelspace_imsrg.GetOrbit(i_new);
       index_t i_old =
           modelspace.GetOrbitIndex(oi_new.n, oi_new.l, oi_new.j2, oi_new.tz2);
-      Orbit &oi_old = modelspace.GetOrbit(i_old);
+      Orbit& oi_old = modelspace.GetOrbit(i_old);
       hole_map[i_new] = oi_old.occ;
     }
     modelspace_imsrg.SetReference(hole_map);
@@ -1079,8 +1090,7 @@ int main(int argc, char **argv) {
   //  std::cout << "MADE IT TO LINE " << __LINE__ << std::endl;
 
   if (method == "flow" or method == "flow_RK4") {
-    for (auto &op : ops)
-      imsrgsolver.AddOperator(op);
+    for (auto& op : ops) imsrgsolver.AddOperator(op);
     std::cout << " Added ops. FlowingOps.size = "
               << imsrgsolver.FlowingOps.size() << std::endl;
   }
@@ -1128,10 +1138,9 @@ int main(int argc, char **argv) {
   }
 
   if (nsteps > 1 and
-      valence_space != reference) // two-step decoupling, do core first
+      valence_space != reference)  // two-step decoupling, do core first
   {
-    if ((method == "magnus") || (method == "magnus_backoff"))
-      smax *= 2;
+    if ((method == "magnus") || (method == "magnus_backoff")) smax *= 2;
 
     imsrgsolver.SetGenerator(valence_generator);
     std::cout << "Setting generator to " << valence_generator << std::endl;
@@ -1164,9 +1173,11 @@ int main(int argc, char **argv) {
       modelspace_imsrg.SetOccNat3Cut(OccNat3Cut);
       int new_E3max = std::min(
           modelspace_imsrg.GetE3max(),
-          int(std::ceil(3 * std::max(modelspace_imsrg.GetEFermi()[-1],
-                                     modelspace_imsrg.GetEFermi()[+1]) +
-                        dE3max)));
+          int(std::ceil(
+              3 * std::max(
+                      modelspace_imsrg.GetEFermi()[-1],
+                      modelspace_imsrg.GetEFermi()[+1]) +
+              dE3max)));
       std::cout << "Setting new E3max = " << new_E3max << std::endl;
       //      modelspace.SetE3max(  new_E3max);
       modelspace_imsrg.SetE3max(new_E3max);
@@ -1233,7 +1244,7 @@ int main(int argc, char **argv) {
   // and do any remaining flow.
   //  ModelSpace ms2(modelspace);
   ModelSpace ms2(modelspace_imsrg);
-  ms2.SetReference(ms2.core); // change the reference
+  ms2.SetReference(ms2.core);  // change the reference
   bool renormal_order = false;
   //  if (modelspace.valence.size() > 0 )
   if (modelspace_imsrg.valence.size() > 0)
@@ -1247,8 +1258,10 @@ int main(int argc, char **argv) {
         //         if ( (find( modelspace.holes.begin(), modelspace.holes.end(),
         //         c) == modelspace.holes.end()) or
         //         (std::abs(1-modelspace.GetOrbit(c).occ)>1e-6))
-        if ((find(modelspace_imsrg.holes.begin(), modelspace_imsrg.holes.end(),
-                  c) == modelspace_imsrg.holes.end()) or
+        if ((find(
+                 modelspace_imsrg.holes.begin(),
+                 modelspace_imsrg.holes.end(),
+                 c) == modelspace_imsrg.holes.end()) or
             (std::abs(1 - modelspace_imsrg.GetOrbit(c).occ) > 1e-6)) {
           renormal_order = true;
           break;
@@ -1257,7 +1270,6 @@ int main(int argc, char **argv) {
     }
   }
   if (renormal_order) {
-
     HNO = imsrgsolver.GetH_s();
 
     //    int nOmega = imsrgsolver.GetOmegaSize() +
@@ -1322,13 +1334,15 @@ int main(int argc, char **argv) {
   // interaction files to disk.
   //  if (modelspace.valence.size() > 0)
   if (modelspace_imsrg.valence.size() > 0) {
-    if (valence_file_format == "antoine") // this is still being tested...
+    if (valence_file_format == "antoine")  // this is still being tested...
     {
       rw.WriteAntoine_int(imsrgsolver.GetH_s(), intfile + ".ant");
       //      rw.WriteAntoine_input(imsrgsolver.GetH_s(),intfile+".inp",modelspace.GetAref(),modelspace.GetZref());
-      rw.WriteAntoine_input(imsrgsolver.GetH_s(), intfile + ".inp",
-                            modelspace_imsrg.GetAref(),
-                            modelspace_imsrg.GetZref());
+      rw.WriteAntoine_input(
+          imsrgsolver.GetH_s(),
+          intfile + ".inp",
+          modelspace_imsrg.GetAref(),
+          modelspace_imsrg.GetZref());
     }
     std::cout << "Writing files: " << intfile << std::endl;
     if (valence_file_format == "tokyo") {
@@ -1377,17 +1391,17 @@ int main(int argc, char **argv) {
     //          }
     //       }
     //    }
-  } else // single ref. just print the zero body pieces out. (maybe check if its
-         // magnus?)
+  } else  // single ref. just print the zero body pieces out. (maybe check if
+          // its magnus?)
   {
     std::cout << "Core Energy = " << std::setprecision(6)
               << imsrgsolver.GetH_s().ZeroBody << std::endl;
     if (!((method == "magnus") || (method == "magnus_backoff"))) {
       for (index_t i = 0; i < ops.size(); ++i) {
         //        Operator& op = ops[i];
-        Operator &op =
+        Operator& op =
             imsrgsolver
-                .FlowingOps[i + 1]; // the first operator is the Hamiltonian
+                .FlowingOps[i + 1];  // the first operator is the Hamiltonian
         std::cout << opnames[i] << " = " << op.ZeroBody << std::endl;
         if (opnames[i] == "Rp2") {
           //           int Z = modelspace.GetTargetZ();
@@ -1397,13 +1411,14 @@ int main(int argc, char **argv) {
           std::cout << " IMSRG point proton radius = " << sqrt(op.ZeroBody)
                     << std::endl;
           std::cout << " IMSRG charge radius = "
-                    << sqrt(op.ZeroBody + PROTON_RCH2 +
-                            NEUTRON_RCH2 * (A - Z) / Z + DARWIN_FOLDY)
+                    << sqrt(
+                           op.ZeroBody + PROTON_RCH2 +
+                           NEUTRON_RCH2 * (A - Z) / Z + DARWIN_FOLDY)
                     << std::endl;
         }
         if ((op.GetJRank() > 0) or
             (op.GetTRank() >
-             0)) // if it's a tensor, you probably want the full operator
+             0))  // if it's a tensor, you probably want the full operator
         {
           std::cout << "Writing operator to " << intfile + opnames[i] + ".op"
                     << std::endl;
@@ -1417,18 +1432,16 @@ int main(int argc, char **argv) {
   /// Transform operators and write them
 
   if ((method == "magnus") || (method == "magnus_backoff")) {
-
     /// if method is magnus, we didn't do this already. So we need to unpack any
     /// operators from file.
 
-    for (auto &opff : opsfromfile_unpacked) {
+    for (auto& opff : opsfromfile_unpacked) {
       opnames.push_back(opff.opname + "_FROMFILE");
     }
 
     int count_from_file = 0;
 
-    if (opnames.size() > 0)
-      std::cout << "transforming operators" << std::endl;
+    if (opnames.size() > 0) std::cout << "transforming operators" << std::endl;
 
     for (size_t i = 0; i < opnames.size(); ++i) {
       auto opname = opnames[i];
@@ -1437,7 +1450,7 @@ int main(int argc, char **argv) {
       Operator op;
 
       if (opname.find("_FROMFILE") != std::string::npos) {
-        OpFromFile &opff = opsfromfile_unpacked[count_from_file];
+        OpFromFile& opff = opsfromfile_unpacked[count_from_file];
         std::cout << "reading " << opff.opname << " with " << opff.j << " "
                   << opff.t << " " << opff.p << " " << opff.r << "  from file "
                   << opff.file2name << std::endl;
@@ -1455,23 +1468,26 @@ int main(int argc, char **argv) {
             op.TwoBody = optmp.TwoBody;
           }
           if (opff.r > 2 and opff.file3name != "")
-            rw.Read_Darmstadt_3body(opff.file3name, op, file3e1max, file3e2max,
-                                    file3e3max);
+            rw.Read_Darmstadt_3body(
+                opff.file3name,
+                op,
+                file3e1max,
+                file3e2max,
+                file3e3max);
         } else if (input_op_fmt == "heinz") {
           if (opff.r > 2 and opff.file3name != "") {
-
             op.ThreeBody.SetMode("no2b");
-            if (no2b_precision == "half")
-              op.ThreeBody.SetMode("no2bhalf");
+            if (no2b_precision == "half") op.ThreeBody.SetMode("no2bhalf");
 
-            op.ThreeBody.ReadFile({opff.file3name}, {file3e1max, file3e2max,
-                                                     file3e3max, file3e1max});
+            op.ThreeBody.ReadFile(
+                {opff.file3name},
+                {file3e1max, file3e2max, file3e3max, file3e1max});
             // rw.Read_Darmstadt_3body( opff.file3name, op,
             // file3e1max,file3e2max,file3e3max);
           }
         }
         count_from_file++;
-        opname = opff.opname; // Get rid of the _FROMFILE bit.
+        opname = opff.opname;  // Get rid of the _FROMFILE bit.
       } else {
         op = imsrg_util::OperatorFromString(modelspace, opname);
       }
@@ -1484,10 +1500,14 @@ int main(int argc, char **argv) {
         if (valence_file_format == "tokyo") {
           rw.WriteTensorTokyo(intfile + opnames[i] + "_HO_2b.snt", op);
         } else {
-          rw.WriteTensorOneBody(intfile + opnames[i] + "_HO_1b.op", op,
-                                opnames[i]);
-          rw.WriteTensorTwoBody(intfile + opnames[i] + "_HO_2b.op", op,
-                                opnames[i]);
+          rw.WriteTensorOneBody(
+              intfile + opnames[i] + "_HO_1b.op",
+              op,
+              opnames[i]);
+          rw.WriteTensorTwoBody(
+              intfile + opnames[i] + "_HO_2b.op",
+              op,
+              opnames[i]);
         }
       }
 
@@ -1518,10 +1538,14 @@ int main(int argc, char **argv) {
         if (valence_file_format == "tokyo") {
           rw.WriteTensorTokyo(intfile + opnames[i] + "_HF_2b.snt", op);
         } else {
-          rw.WriteTensorOneBody(intfile + opnames[i] + "_HF_1b.op", op,
-                                opnames[i]);
-          rw.WriteTensorTwoBody(intfile + opnames[i] + "_HF_2b.op", op,
-                                opnames[i]);
+          rw.WriteTensorOneBody(
+              intfile + opnames[i] + "_HF_1b.op",
+              op,
+              opnames[i]);
+          rw.WriteTensorTwoBody(
+              intfile + opnames[i] + "_HF_2b.op",
+              op,
+              opnames[i]);
         }
       }
 
@@ -1551,8 +1575,8 @@ int main(int argc, char **argv) {
         } else {
           rw.WriteNuShellX_op(op, intfile + opname + ".int");
         }
-      } else if (op.GetNumberLegs() % 2 ==
-                 1) // odd number of legs -> this is a dagger operator
+      } else if (op.GetNumberLegs() % 2 == 1)  // odd number of legs -> this is
+                                               // a dagger operator
       {
         //      rw.WriteNuShellX_op(ops[i],intfile+opnames[i]+".int"); // do
         //      this for now. later make a *.dag format.
@@ -1567,14 +1591,14 @@ int main(int argc, char **argv) {
         }
       }
 
-    } // for opnames
+    }  // for opnames
 
-  } // if method == "magnus"
+  }  // if method == "magnus"
 
   if (method == "flow" or method == "flow_RK4") {
     for (size_t i = 0; i < ops.size(); ++i) {
       auto op = imsrgsolver.GetOperator(
-          i + 1); // the zero-th operator is the Hamiltonian
+          i + 1);  // the zero-th operator is the Hamiltonian
       auto opname = opnames[i];
 
       if (renormal_order) {
@@ -1596,8 +1620,8 @@ int main(int argc, char **argv) {
         } else {
           rw.WriteNuShellX_op(op, intfile + opname + ".int");
         }
-      } else if (op.GetNumberLegs() % 2 ==
-                 1) // odd number of legs -> this is a dagger operator
+      } else if (op.GetNumberLegs() % 2 == 1)  // odd number of legs -> this is
+                                               // a dagger operator
       {
         //      rw.WriteNuShellX_op(ops[i],intfile+opnames[i]+".int"); // do
         //      this for now. later make a *.dag format.
@@ -1636,7 +1660,7 @@ int main(int argc, char **argv) {
     name_occ << intfile << "_occ.dat";
     file_occ.open(name_occ.str(), std::ofstream::out);
     for (auto i : modelspace.all_orbits) {
-      Orbit &oi = modelspace.GetOrbit(i);
+      Orbit& oi = modelspace.GetOrbit(i);
       if (std::abs(oi.occ) > 1e-6) {
         file_occ << std::setw(wint) << oi.n << std::setw(wint) << oi.l
                  << std::setw(wint) << oi.j2 << std::setw(wint) << oi.tz2
@@ -1651,7 +1675,7 @@ int main(int argc, char **argv) {
       name_occ << intfile << "_occ_nat.dat";
       file_occ.open(name_occ.str(), std::ofstream::out);
       for (auto i : modelspace.all_orbits) {
-        Orbit &oi = modelspace.GetOrbit(i);
+        Orbit& oi = modelspace.GetOrbit(i);
         if (std::abs(oi.occ_nat) > 1e-6) {
           file_occ << std::setw(wint) << oi.n << std::setw(wint) << oi.l
                    << std::setw(wint) << oi.j2 << std::setw(wint) << oi.tz2
