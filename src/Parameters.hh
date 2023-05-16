@@ -58,6 +58,8 @@ class Parameters
 
 std::map<std::string,std::string> Parameters::string_par = {
   {"2bme",			"none"},        // name of file containing 2-body matrix elements
+  {"2bme_NLO",			"none"},        // name of file containing 2-body matrix elements to be treated as first order perturbation
+  {"2bme_N2LO",			"none"},        // name of file containing 2-body matrix elements to be treated as second order perturbation
   {"3bme",			"none"},        // name of file containing 3-body matrix elements
   {"3bme_type",			"full"},        // are the 3-body matrix elements in NO2B format, or do we get all of them (full)?
   {"no2b_precision",		"single"},      // if we use the no2b file type, do we store with single precision, or half precision?
