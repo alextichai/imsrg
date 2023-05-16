@@ -866,6 +866,7 @@ int main(int argc, char** argv) {
 
     Hbare_NLO = imsrgsolver.Transform(Hbare_NLO);
     Hbare_NLO += imsrgsolver.GetH_s();
+    Hbare_NLO.ZeroBody -= imsrgsolver.GetH_s().ZeroBody;
 
     std::cout << "transforming N2LO hamiltonian" << std::endl;
 
