@@ -87,6 +87,7 @@
 #include "Commutator.hh"
 #include "IMSRG.hh"
 #include "Parameters.hh"
+#include "PerturbationTheory.hh"
 #include "PhysicalConstants.hh"
 #include "version.hh"
 
@@ -104,6 +105,8 @@ int main(int argc, char** argv) {
   if (parameters.help_mode) return 0;
 
   std::string inputtbme = parameters.s("2bme");
+  std::string inputtbme_NLO = parameters.s("2bme_NLO");
+  std::string inputtbme_N2LO = parameters.s("2bme_N2LO");
   std::string input3bme = parameters.s("3bme");
   std::string input3bme_type = parameters.s("3bme_type");
   std::string no2b_precision = parameters.s("no2b_precision");
@@ -169,6 +172,16 @@ int main(int argc, char** argv) {
       (fmt2 != "schematic")) {
     if (!std::ifstream(inputtbme).good()) {
       std::cout << "trouble reading " << inputtbme << "  fmt2 = " << fmt2
+                << "   exiting. " << std::endl;
+      return 1;
+    }
+    if ((inputtbme_NLO != "none") && !std::ifstream(inputtbme_NLO).good()) {
+      std::cout << "trouble reading " << inputtbme_NLO << "  fmt2 = " << fmt2
+                << "   exiting. " << std::endl;
+      return 1;
+    }
+    if ((inputtbme_N2LO != "none") && !std::ifstream(inputtbme_N2LO).good()) {
+      std::cout << "trouble reading " << inputtbme_N2LO << "  fmt2 = " << fmt2
                 << "   exiting. " << std::endl;
       return 1;
     }
@@ -300,6 +313,10 @@ int main(int argc, char** argv) {
   int particle_rank = input3bme == "none" ? 2 : 3;
   Operator Hbare = Operator(modelspace, 0, 0, 0, particle_rank);
   Hbare.SetHermitian();
+  Operator Hbare_NLO = Operator(modelspace, 0, 0, 0, particle_rank);
+  Hbare_NLO.SetHermitian();
+  Operator Hbare_N2LO = Operator(modelspace, 0, 0, 0, particle_rank);
+  Hbare_N2LO.SetHermitian();
 
   std::cout << "Reading interactions..." << std::endl;
 
@@ -342,6 +359,88 @@ int main(int argc, char** argv) {
     }
 
     std::cout << "done reading 2N" << std::endl;
+  }
+
+  if (inputtbme_NLO != "none") {
+    if (fmt2 == "me2j") {
+      rw.ReadBareTBME_Darmstadt(
+          inputtbme_NLO,
+          Hbare_NLO,
+          file2e1max,
+          file2e2max,
+          file2lmax);
+    } else if ((fmt2 == "navratil") || (fmt2 == "Navratil")) {
+      rw.ReadBareTBME_Navratil(inputtbme_NLO, Hbare_NLO);
+    } else if (fmt2 == "oslo") {
+      rw.ReadTBME_Oslo(inputtbme_NLO, Hbare_NLO);
+    } else if (fmt2.find("oakridge") != std::string::npos) {
+      // input format should be:
+      // singleparticle.dat,vnn.dat
+      size_t comma_pos = inputtbme_NLO.find_first_of(",");
+      if (fmt2.find("bin") != std::string::npos)
+        rw.ReadTBME_OakRidge(
+            inputtbme_NLO.substr(0, comma_pos),
+            inputtbme_NLO.substr(comma_pos + 1),
+            Hbare_NLO,
+            "binary");
+      else
+        rw.ReadTBME_OakRidge(
+            inputtbme_NLO.substr(0, comma_pos),
+            inputtbme_NLO.substr(comma_pos + 1),
+            Hbare_NLO,
+            "ascii");
+    } else if (fmt2 == "takayuki") {
+      rw.ReadTwoBody_Takayuki(inputtbme_NLO, Hbare_NLO);
+    } else if (fmt2 == "nushellx") {
+      rw.ReadNuShellX_int(Hbare_NLO, inputtbme_NLO);
+    } else if (fmt2 == "schematic") {
+      std::cout << "using schematic potential " << inputtbme_NLO << std::endl;
+      if (inputtbme_NLO == "Minnesota")
+        Hbare_NLO += imsrg_util::MinnesotaPotential(modelspace);
+    }
+
+    std::cout << "done reading 2N (NLO)" << std::endl;
+  }
+
+  if (inputtbme_N2LO != "none") {
+    if (fmt2 == "me2j") {
+      rw.ReadBareTBME_Darmstadt(
+          inputtbme_N2LO,
+          Hbare_N2LO,
+          file2e1max,
+          file2e2max,
+          file2lmax);
+    } else if ((fmt2 == "navratil") || (fmt2 == "Navratil")) {
+      rw.ReadBareTBME_Navratil(inputtbme_N2LO, Hbare_N2LO);
+    } else if (fmt2 == "oslo") {
+      rw.ReadTBME_Oslo(inputtbme_N2LO, Hbare_N2LO);
+    } else if (fmt2.find("oakridge") != std::string::npos) {
+      // input format should be:
+      // singleparticle.dat,vnn.dat
+      size_t comma_pos = inputtbme_N2LO.find_first_of(",");
+      if (fmt2.find("bin") != std::string::npos)
+        rw.ReadTBME_OakRidge(
+            inputtbme_N2LO.substr(0, comma_pos),
+            inputtbme_N2LO.substr(comma_pos + 1),
+            Hbare_N2LO,
+            "binary");
+      else
+        rw.ReadTBME_OakRidge(
+            inputtbme_N2LO.substr(0, comma_pos),
+            inputtbme_N2LO.substr(comma_pos + 1),
+            Hbare_N2LO,
+            "ascii");
+    } else if (fmt2 == "takayuki") {
+      rw.ReadTwoBody_Takayuki(inputtbme_N2LO, Hbare_N2LO);
+    } else if (fmt2 == "nushellx") {
+      rw.ReadNuShellX_int(Hbare_N2LO, inputtbme_N2LO);
+    } else if (fmt2 == "schematic") {
+      std::cout << "using schematic potential " << inputtbme_N2LO << std::endl;
+      if (inputtbme_N2LO == "Minnesota")
+        Hbare_N2LO += imsrg_util::MinnesotaPotential(modelspace);
+    }
+
+    std::cout << "done reading 2N (N2LO)" << std::endl;
   }
 
   // Read in the 3-body file
@@ -739,7 +838,60 @@ int main(int argc, char** argv) {
 
     int count_from_file = 0;
 
-    if (opnames.size() > 0) std::cout << "transforming operators" << std::endl;
+    std::cout << "transforming operators" << std::endl;
+
+    std::cout << "transforming NLO hamiltonian" << std::endl;
+
+    if (basis == "oscillator") {
+      Hbare_NLO = Hbare_NLO.DoNormalOrdering();
+    } else if (basis == "HF") {
+      Hbare_NLO = hf.TransformToHFBasis(Hbare_NLO).DoNormalOrdering();
+    } else if (basis == "NAT") {
+      Operator op_2b = hf.TransformHOToNATBasis(Hbare_NLO);
+      op_2b.SetParticleRank(2);
+
+      Hbare_NLO =
+          hf.GetNormalOrdered3BOperator(Hbare_NLO) + op_2b.DoNormalOrdering();
+    }
+    std::cout << "   HF: " << Hbare_NLO.ZeroBody << std::endl;
+
+    if ((eMax_imsrg != -1) || (e2Max_imsrg != -1) || (e3Max_imsrg) != -1) {
+      //     ModelSpace modelspace_imsrg = modelspace;
+      std::cout << "Truncating modelspace for IMSRG calculation: emax e2max "
+                   "e3max  ->  "
+                << eMax_imsrg << " " << e2Max_imsrg << " " << e3Max_imsrg
+                << std::endl;
+      Hbare_NLO = Hbare_NLO.Truncate(modelspace_imsrg);
+    }
+
+    Hbare_NLO = imsrgsolver.Transform(Hbare_NLO);
+    Hbare_NLO += imsrgsolver.GetH_s();
+
+    std::cout << "transforming N2LO hamiltonian" << std::endl;
+
+    if (basis == "oscillator") {
+      Hbare_N2LO = Hbare_N2LO.DoNormalOrdering();
+    } else if (basis == "HF") {
+      Hbare_N2LO = hf.TransformToHFBasis(Hbare_N2LO).DoNormalOrdering();
+    } else if (basis == "NAT") {
+      Operator op_2b = hf.TransformHOToNATBasis(Hbare_N2LO);
+      op_2b.SetParticleRank(2);
+
+      Hbare_N2LO =
+          hf.GetNormalOrdered3BOperator(Hbare_N2LO) + op_2b.DoNormalOrdering();
+    }
+    std::cout << "   HF: " << Hbare_N2LO.ZeroBody << std::endl;
+
+    if ((eMax_imsrg != -1) || (e2Max_imsrg != -1) || (e3Max_imsrg) != -1) {
+      //     ModelSpace modelspace_imsrg = modelspace;
+      std::cout << "Truncating modelspace for IMSRG calculation: emax e2max "
+                   "e3max  ->  "
+                << eMax_imsrg << " " << e2Max_imsrg << " " << e3Max_imsrg
+                << std::endl;
+      Hbare_N2LO = Hbare_N2LO.Truncate(modelspace_imsrg);
+    }
+
+    Hbare_N2LO = imsrgsolver.Transform(Hbare_N2LO);
 
     for (size_t i = 0; i < opnames.size(); ++i) {
       auto opname = opnames[i];
@@ -807,7 +959,14 @@ int main(int argc, char** argv) {
       }
 
     }  // for opnames
-  }  // if method == "magnus"
+  }    // if method == "magnus"
+
+  std::cout << "E_NLO = " << Hbare_NLO.ZeroBody << "\n";
+  std::cout
+      << "E_N2LO = "
+      << GetSecondOrderCorrection(imsrgsolver.GetH_s(), Hbare_NLO, Hbare_NLO) +
+             Hbare_N2LO.ZeroBody
+      << "\n";
 
   if (write_omega) {
     std::string scratch = rw.GetScratchDir();

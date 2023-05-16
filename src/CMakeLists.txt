@@ -439,6 +439,17 @@ target_link_libraries(
 )
 
 add_library(
+    PerturbationTheory
+    PerturbationTheory.hh PerturbationTheory.cc
+)
+target_link_libraries(
+    PerturbationTheory
+    PUBLIC
+    ModelSpace
+    Operator
+)
+
+add_library(
     Generator
     Generator.hh Generator.cc
 )
@@ -540,6 +551,7 @@ target_link_libraries(
     Commutator
     IMSRGSolver
     Generator
+    PerturbationTheory
     imsrg_util
     AngMom
     IMSRGProfiler
