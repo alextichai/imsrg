@@ -582,6 +582,36 @@ int main(int argc, char** argv) {
     return 0;
   }
 
+  std::cout << "normal ordering NLO hamiltonian" << std::endl;
+
+  if (basis == "oscillator") {
+    Hbare_NLO = Hbare_NLO.DoNormalOrdering();
+  } else if (basis == "HF") {
+    Hbare_NLO = hf.TransformToHFBasis(Hbare_NLO).DoNormalOrdering();
+  } else if (basis == "NAT") {
+    Operator op_2b = hf.TransformHOToNATBasis(Hbare_NLO);
+    op_2b.SetParticleRank(2);
+
+    Hbare_NLO =
+        hf.GetNormalOrdered3BOperator(Hbare_NLO) + op_2b.DoNormalOrdering();
+  }
+  std::cout << "NLO HF: " << Hbare_NLO.ZeroBody << std::endl;
+
+  std::cout << "normal ordering N2LO hamiltonian" << std::endl;
+
+  if (basis == "oscillator") {
+    Hbare_N2LO = Hbare_N2LO.DoNormalOrdering();
+  } else if (basis == "HF") {
+    Hbare_N2LO = hf.TransformToHFBasis(Hbare_N2LO).DoNormalOrdering();
+  } else if (basis == "NAT") {
+    Operator op_2b = hf.TransformHOToNATBasis(Hbare_N2LO);
+    op_2b.SetParticleRank(2);
+
+    Hbare_N2LO =
+        hf.GetNormalOrdered3BOperator(Hbare_N2LO) + op_2b.DoNormalOrdering();
+  }
+  std::cout << "N2LO HF: " << Hbare_N2LO.ZeroBody << std::endl;
+
   // We may want to use a smaller model space for the IMSRG evolution than we
   // used for the HF step. This is most effective when using natural orbitals or
   // when including 3-body operators.
@@ -619,6 +649,9 @@ int main(int argc, char** argv) {
     modelspace_imsrg.SetReference(hole_map);
 
     HNO = HNO.Truncate(modelspace_imsrg);
+    Hbare_NLO = Hbare_NLO.Truncate(modelspace_imsrg);
+    Hbare_N2LO = Hbare_N2LO.Truncate(modelspace_imsrg);
+
     if (IMSRG3) {
       HNO.ThreeBody.SwitchToPN_and_discard();
     }
@@ -699,6 +732,170 @@ int main(int argc, char** argv) {
       imsrgsolver.SetDs(ds_0);
       imsrgsolver.SetDsmax(dsmax);
     }
+  }
+  double adaptive_eta_criterion = 1.0;
+  imsrgsolver.SetEtaCriterion(adaptive_eta_criterion);
+
+  while (adaptive_eta_criterion > eta_criterion) {
+    imsrgsolver.Solve();
+
+    if (IMSRG3) {
+      std::cout << "Norm of 3-body = " << imsrgsolver.GetH_s().ThreeBodyNorm()
+                << std::endl;
+    }
+
+    if ((nsteps > 1) && (valence_space != reference)) {
+      // two-step decoupling, do core first
+      if (method == "magnus") smax *= 2;
+
+      imsrgsolver.SetGenerator(valence_generator);
+      std::cout << "Setting generator to " << valence_generator << std::endl;
+      //    modelspace.ResetFirstPass();
+      modelspace_imsrg.ResetFirstPass();
+      if ((valence_generator.find("imaginary") != std::string::npos) ||
+          (valence_generator.find("wegner") != std::string::npos)) {
+        if (ds_0 > 1e-2) {
+          ds_0 = 1e-4;
+          dsmax = 1e-2;
+          imsrgsolver.SetDs(ds_0);
+          imsrgsolver.SetDsmax(dsmax);
+        }
+      }
+      imsrgsolver.SetSmax(smax);
+      imsrgsolver.Solve();
+    }
+
+    // If we're doing targeted/ensemble normal ordering
+    // we now re-normal order wrt to the core
+    // and do any remaining flow.
+    //  ModelSpace ms2(modelspace);
+    ModelSpace ms2(modelspace_imsrg);
+    ms2.SetReference(ms2.core);  // change the reference
+    bool renormal_order = false;
+    //  if (modelspace.valence.size() > 0 )
+    if (modelspace_imsrg.valence.size() > 0) {
+      renormal_order =
+          modelspace_imsrg.holes.size() != modelspace_imsrg.core.size();
+      if (!renormal_order) {
+        for (auto c : modelspace_imsrg.core) {
+          if ((find(
+                   modelspace_imsrg.holes.begin(),
+                   modelspace_imsrg.holes.end(),
+                   c) == modelspace_imsrg.holes.end()) ||
+              (std::abs(1 - modelspace_imsrg.GetOrbit(c).occ) > 1e-6)) {
+            renormal_order = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (renormal_order) {
+      HNO = imsrgsolver.GetH_s();
+
+      std::cout << "Undoing NO wrt A=" << modelspace_imsrg.GetAref()
+                << " Z=" << modelspace_imsrg.GetZref() << std::endl;
+      std::cout << "Before doing so, the spes are " << std::endl;
+      for (auto i : modelspace_imsrg.all_orbits)
+        std::cout << "  " << i << " : " << HNO.OneBody(i, i) << std::endl;
+      if (IMSRG3) {
+        rw.Write_NaiveVS3B(intfile + ".vs3b", HNO);
+        // Use emax=3 because we are interested in pf shell systems
+        rw.Write_me1j(intfile + "_ENO.me1j", HNO, 3, 3);
+        rw.Write_me2jp(intfile + "_ENO.me2jp", HNO, 3, 6, 3);
+        rw.Write_me3jp(intfile + "_ENO.me3jp", HNO, 3, 6, 9);
+        std::cout << "Re-normal-ordering wrt the core. For now, we just throw "
+                     "away the 3N at this step."
+                  << std::endl;
+        HNO.SetNumberLegs(4);
+        HNO.SetParticleRank(2);
+      }
+
+      HNO = HNO.UndoNormalOrdering();
+      HNO.SetModelSpace(ms2);
+      std::cout << "Doing NO wrt A=" << ms2.GetAref() << " Z=" << ms2.GetZref()
+                << "  norbits = " << ms2.GetNumberOrbits() << std::endl;
+      HNO = HNO.DoNormalOrdering();
+
+      rw.Write_NaiveVS1B(intfile + ".vs1b", HNO);
+      rw.Write_NaiveVS2B(intfile + ".vs2b", HNO);
+      // Use emax=3 because we are interested in pf shell systems
+      rw.Write_me1j(intfile + "_coreNO.me1j", HNO, 3, 3);
+      rw.Write_me2jp(intfile + "_coreNO.me2jp", HNO, 3, 6, 3);
+
+      imsrgsolver.FlowingOps[0] = HNO;
+    }
+
+    // Write the output
+
+    // If we're doing a shell model interaction, write the
+    // interaction files to disk.
+    //  if (modelspace.valence.size() > 0)
+    if (modelspace_imsrg.valence.size() > 0) {
+      std::cout << "Writing files: " << intfile << std::endl;
+      if (valence_file_format == "tokyo") {
+        rw.WriteTokyo(imsrgsolver.GetH_s(), intfile + ".snt", "");
+      } else {
+        rw.WriteNuShellX_int(imsrgsolver.GetH_s(), intfile + ".int");
+        rw.WriteNuShellX_sps(imsrgsolver.GetH_s(), intfile + ".sp");
+      }
+
+    } else {
+      // single ref. just print the zero body pieces out. (maybe check if
+      // its magnus?)
+      std::cout << "Core Energy = " << std::setprecision(6)
+                << imsrgsolver.GetH_s().ZeroBody << std::endl;
+      if (method != "magnus") {
+        for (index_t i = 0; i < ops.size(); ++i) {
+          // the first operator is the Hamiltonian
+          Operator& op = imsrgsolver.FlowingOps[i + 1];
+          std::cout << opnames[i] << " = " << op.ZeroBody << std::endl;
+          if (opnames[i] == "Rp2") {
+            int Z = modelspace_imsrg.GetTargetZ();
+            int A = modelspace_imsrg.GetTargetMass();
+            std::cout << " IMSRG point proton radius = " << sqrt(op.ZeroBody)
+                      << std::endl;
+            std::cout << " IMSRG charge radius = "
+                      << sqrt(
+                             op.ZeroBody + PROTON_RCH2 +
+                             NEUTRON_RCH2 * (A - Z) / Z + DARWIN_FOLDY)
+                      << std::endl;
+          }
+        }
+      }
+    }
+
+    /////////////////////
+    /// Transform operators and write them
+
+    if (method == "magnus") {
+      /// if method is magnus, we didn't do this already. So we need to unpack
+      /// any operators from file.
+
+      std::cout << "transforming operators" << std::endl;
+
+      std::cout << "transforming NLO hamiltonian" << std::endl;
+
+      Operator Hbare_NLOt = imsrgsolver.Transform(Hbare_NLO);
+      Hbare_NLOt += imsrgsolver.GetH_s();
+      Hbare_NLOt.ZeroBody -= imsrgsolver.GetH_s().ZeroBody;
+
+      std::cout << "transforming N2LO hamiltonian" << std::endl;
+
+      Operator Hbare_N2LOt = imsrgsolver.Transform(Hbare_N2LO);
+
+      std::cout << "E_NLO = " << Hbare_NLOt.ZeroBody << "\n";
+      std::cout << "E_N2LO = "
+                << GetSecondOrderCorrection(
+                       imsrgsolver.GetH_s(),
+                       Hbare_NLOt,
+                       Hbare_NLOt) +
+                       Hbare_N2LOt.ZeroBody
+                << "\n";
+    }
+    adaptive_eta_criterion /= 10.0;
+    adaptive_eta_criterion = std::max(adaptive_eta_criterion, eta_criterion);
+    imsrgsolver.SetEtaCriterion(adaptive_eta_criterion);
   }
 
   imsrgsolver.Solve();
@@ -836,64 +1033,29 @@ int main(int argc, char** argv) {
     /// if method is magnus, we didn't do this already. So we need to unpack any
     /// operators from file.
 
-    int count_from_file = 0;
-
     std::cout << "transforming operators" << std::endl;
 
     std::cout << "transforming NLO hamiltonian" << std::endl;
 
-    if (basis == "oscillator") {
-      Hbare_NLO = Hbare_NLO.DoNormalOrdering();
-    } else if (basis == "HF") {
-      Hbare_NLO = hf.TransformToHFBasis(Hbare_NLO).DoNormalOrdering();
-    } else if (basis == "NAT") {
-      Operator op_2b = hf.TransformHOToNATBasis(Hbare_NLO);
-      op_2b.SetParticleRank(2);
-
-      Hbare_NLO =
-          hf.GetNormalOrdered3BOperator(Hbare_NLO) + op_2b.DoNormalOrdering();
-    }
-    std::cout << "   HF: " << Hbare_NLO.ZeroBody << std::endl;
-
-    if ((eMax_imsrg != -1) || (e2Max_imsrg != -1) || (e3Max_imsrg) != -1) {
-      //     ModelSpace modelspace_imsrg = modelspace;
-      std::cout << "Truncating modelspace for IMSRG calculation: emax e2max "
-                   "e3max  ->  "
-                << eMax_imsrg << " " << e2Max_imsrg << " " << e3Max_imsrg
-                << std::endl;
-      Hbare_NLO = Hbare_NLO.Truncate(modelspace_imsrg);
-    }
-
-    Hbare_NLO = imsrgsolver.Transform(Hbare_NLO);
-    Hbare_NLO += imsrgsolver.GetH_s();
-    Hbare_NLO.ZeroBody -= imsrgsolver.GetH_s().ZeroBody;
+    Operator Hbare_NLOt = imsrgsolver.Transform(Hbare_NLO);
+    Hbare_NLOt += imsrgsolver.GetH_s();
+    Hbare_NLOt.ZeroBody -= imsrgsolver.GetH_s().ZeroBody;
 
     std::cout << "transforming N2LO hamiltonian" << std::endl;
 
-    if (basis == "oscillator") {
-      Hbare_N2LO = Hbare_N2LO.DoNormalOrdering();
-    } else if (basis == "HF") {
-      Hbare_N2LO = hf.TransformToHFBasis(Hbare_N2LO).DoNormalOrdering();
-    } else if (basis == "NAT") {
-      Operator op_2b = hf.TransformHOToNATBasis(Hbare_N2LO);
-      op_2b.SetParticleRank(2);
+    Operator Hbare_N2LOt = imsrgsolver.Transform(Hbare_N2LO);
 
-      Hbare_N2LO =
-          hf.GetNormalOrdered3BOperator(Hbare_N2LO) + op_2b.DoNormalOrdering();
-    }
-    std::cout << "   HF: " << Hbare_N2LO.ZeroBody << std::endl;
+    std::cout << "E_NLO = " << Hbare_NLOt.ZeroBody << "\n";
+    std::cout << "E_N2LO = "
+              << GetSecondOrderCorrection(
+                     imsrgsolver.GetH_s(),
+                     Hbare_NLOt,
+                     Hbare_NLOt) +
+                     Hbare_N2LOt.ZeroBody
+              << "\n";
+  }
 
-    if ((eMax_imsrg != -1) || (e2Max_imsrg != -1) || (e3Max_imsrg) != -1) {
-      //     ModelSpace modelspace_imsrg = modelspace;
-      std::cout << "Truncating modelspace for IMSRG calculation: emax e2max "
-                   "e3max  ->  "
-                << eMax_imsrg << " " << e2Max_imsrg << " " << e3Max_imsrg
-                << std::endl;
-      Hbare_N2LO = Hbare_N2LO.Truncate(modelspace_imsrg);
-    }
-
-    Hbare_N2LO = imsrgsolver.Transform(Hbare_N2LO);
-
+  if (method == "magnus") {
     for (size_t i = 0; i < opnames.size(); ++i) {
       auto opname = opnames[i];
       std::cout << i << ": " << opname << " " << std::endl;
@@ -961,13 +1123,6 @@ int main(int argc, char** argv) {
 
     }  // for opnames
   }    // if method == "magnus"
-
-  std::cout << "E_NLO = " << Hbare_NLO.ZeroBody << "\n";
-  std::cout
-      << "E_N2LO = "
-      << GetSecondOrderCorrection(imsrgsolver.GetH_s(), Hbare_NLO, Hbare_NLO) +
-             Hbare_N2LO.ZeroBody
-      << "\n";
 
   if (write_omega) {
     std::string scratch = rw.GetScratchDir();
