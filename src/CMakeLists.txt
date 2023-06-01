@@ -591,6 +591,20 @@ target_link_libraries(
     OpenMP::OpenMP_CXX
 )
 
+add_executable(
+    imsrg++_nonpert
+    imsrg++_nonpert.cc
+)
+target_link_libraries(
+    imsrg++_nonpert
+    PUBLIC
+    IMSRG
+    Parameters
+    PhysicalConstants
+    Version
+    OpenMP::OpenMP_CXX
+)
+
 
 add_executable(
     unit_test
