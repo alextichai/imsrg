@@ -3079,7 +3079,7 @@ void ReadWrite::Write_me3jp( std::string ofilename, Operator& Hbare, int E1max, 
       int twojMax = 2*l+1;
       for (int twoj=twojMin; twoj<=twojMax; twoj+=2)
       {
-        for (const int tz2 : {1, 1}) {
+        for (const int tz2 : {1, -1}) {
          orbits_remap.push_back( modelspace->GetOrbitIndex(n,l,twoj,tz2) );
         }
       }
