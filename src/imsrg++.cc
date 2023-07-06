@@ -117,6 +117,7 @@ int main(int argc, char** argv)
   bool store_3bme_pn = (parameters.s("store_3bme_pn")=="true");
   bool only_2b_eta = (parameters.s("only_2b_eta")=="true");
   bool only_2b_omega = (parameters.s("only_2b_omega")=="true");
+  bool only_2b_omega_at_end = (parameters.s("only_2b_omega_at_end")=="true");
   bool perturbative_triples = (parameters.s("perturbative_triples")=="true");
   bool brueckner_restart = false;
   bool write_HO_ops = parameters.s("write_HO_ops") == "true";  // added by Antoine Belley
@@ -1340,6 +1341,11 @@ if (opff.file2name != "") {
 /////////////////////
 /// Transform operators and write them
 
+  if (only_2b_omega_at_end) {
+    Commutator::SetUseIMSRG3(false);
+    Commutator::SetUseIMSRG3N7(false);
+    Commutator::SetUseIMSRG3_MP4(false);
+  }
 
 
   if ((method == "magnus") || (method == "magnus_backoff"))
