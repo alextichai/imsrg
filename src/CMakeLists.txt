@@ -401,6 +401,20 @@ add_library(
 )
 
 add_library(
+    Pwd
+    Pwd.hh Pwd.cc
+)
+target_link_libraries(
+    Pwd
+    PUBLIC
+    OpenMP::OpenMP_CXX
+    GSL::gsl
+    PhysicalConstants
+    PRIVATE
+    AngMom
+)
+
+add_library(
     M0nu
     M0nu.hh M0nu.cc
 )
@@ -413,6 +427,7 @@ target_link_libraries(
     Operator
     imsrg_util
     PhysicalConstants
+    Pwd
     PRIVATE
     AngMom
 )
@@ -549,6 +564,7 @@ target_link_libraries(
     UnitTest
     PhysicalConstants
     RPA
+    Pwd
 )
 
 add_executable(

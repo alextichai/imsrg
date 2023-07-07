@@ -120,6 +120,7 @@ namespace imsrg_util
       else if (opname == "VBareDelta")    theop =  BareDelta( modelspace );
       else if (opname == "OccRef")        theop =  NumberOpRef( modelspace );
       else if (opname == "LdotS")         theop =  LdotS_Op( modelspace);
+      else if (opname == "DGT")           theop = M0nu::DGT_Op(modelspace);
       else if (opnamesplit[0] =="VGaus")
       {
          double sigma = 1.0;
@@ -313,18 +314,115 @@ namespace imsrg_util
       }
       else if (opnamesplit[0] == "M0nu") // Neutrinoless Double Beta Decay Operators   format e.g.  M0nu_GT_7.72_none or M0nu_F_12.6_AV18
       {
-        double Eclosure;
+        
         std::string M0nuopname = opnamesplit[1];
-        std::istringstream(opnamesplit[2]) >> Eclosure;
-        std::string src = opnamesplit[3];
-        std::map<std::string, Operator (*)(ModelSpace&, double, std::string) > M0nuop = {
-              {"GT", &M0nu::GamowTeller},
-              {"F",  &M0nu::Fermi},
-              {"T",  &M0nu::Tensor},
-             };
-        if ( M0nuop.find(M0nuopname) != M0nuop.end() )
+        std::map<std::string, Operator (*)(ModelSpace&, double, std::string, std::function<double(double)>)> OPList{
+            {"GT", &M0nu::GamowTeller},
+            {"F", &M0nu::Fermi},
+            {"T", &M0nu::Tensor}};
+
+        if (M0nuopname != "C")
         {
-        theop =  M0nuop[M0nuopname](modelspace,Eclosure,src);
+          double Eclosure;
+          std::istringstream(opnamesplit[2]) >> Eclosure;
+          std::string src = opnamesplit[3];
+          if (opnamesplit.size() == 4)
+          {
+            std::map<std::string, std::function<double(double)>> FormFactorList{
+                {"GT",M0nu::GTFormFactor},
+                {"F", M0nu::FermiFormFactor},
+                {"T", M0nu::TensorFormFactor}
+            };
+            theop = OPList[M0nuopname](modelspace, Eclosure, src, FormFactorList[M0nuopname]);
+          }
+          else if (opnamesplit.size() == 5)
+          { 
+            std::string formfactor = opnamesplit[4];
+            if (M0nuopname == "GT")
+            {
+              if (formfactor == "AA")
+              {
+                theop = M0nu::GamowTeller(modelspace, Eclosure, src, M0nu::hGT_AA);
+              }
+              else if (formfactor == "AP")
+              {
+                theop = M0nu::GamowTeller(modelspace, Eclosure, src, M0nu::hGT_AP);
+              }
+              else if (formfactor == "PP")
+              {
+                theop = M0nu::GamowTeller(modelspace, Eclosure, src, M0nu::hGT_PP);
+              }
+              else if (formfactor == "MM")
+              {
+                theop = M0nu::GamowTeller(modelspace, Eclosure, src, M0nu::hGT_MM);
+              }
+            }
+            else if (M0nuopname == "T")
+            {
+              if (formfactor == "AA")
+              {
+                theop = M0nu::Tensor(modelspace, Eclosure, src, M0nu::hT_AA);
+              }
+              else if (formfactor == "AP")
+              {
+                theop = M0nu::Tensor(modelspace, Eclosure, src, M0nu::hT_AP);
+              }
+              else if (formfactor == "PP")
+              {
+                theop = M0nu::Tensor(modelspace, Eclosure, src, M0nu::hT_PP);
+              }
+              else if (formfactor == "MM")
+              {
+                theop = M0nu::Tensor(modelspace, Eclosure, src, M0nu::hT_MM);
+              }
+            }
+          }
+        }
+        else
+        {
+          double regulator_cutoff;
+          std::istringstream(opnamesplit[2]) >> regulator_cutoff;
+          int regulator_power;
+          std::istringstream(opnamesplit[3]) >> regulator_power;
+          theop = M0nu::Contact(modelspace, regulator_cutoff, regulator_power);
+        }
+        
+      }
+      else if (opnamesplit[0] == "M0nuHeavy") // Neutrinoless Double Beta Decay Operators   format e.g.  M0nu_GT_7.72_none or M0nu_F_12.6_AV18
+      {
+        std::string M0nuopname = opnamesplit[1];
+        std::string src = opnamesplit[2];
+        std::string formfactor = opnamesplit[3];
+        if (M0nuopname == "GT")
+        {
+          if (formfactor == "AA")
+          {
+            theop = M0nu::GamowTellerHeavy(modelspace, src, M0nu::hGT_AA);
+          }
+          else if (formfactor == "AP")
+          {
+            theop = M0nu::GamowTellerHeavy(modelspace, src, M0nu::hGT_AP);
+          }
+          else if (formfactor == "PP")
+          {
+            theop = M0nu::GamowTellerHeavy(modelspace, src, M0nu::hGT_PP);
+          }
+        }
+        else if (M0nuopname == "F")
+        {
+          theop = M0nu::FermiHeavy(modelspace, src, M0nu::hF_VV);
+        }
+        else if (M0nuopname == "T")
+        {
+
+          if (formfactor == "AP")
+          {
+            theop = M0nu::TensorHeavy(modelspace, src, M0nu::hT_AP);
+          }
+          else if (formfactor == "PP")
+          {
+            theop = M0nu::TensorHeavy(modelspace, src, M0nu::hT_PP);
+          }
         }
       }
       else if (opnamesplit[0] == "VWS")
@@ -356,6 +454,26 @@ namespace imsrg_util
           return theop;
         }
         theop = TViolatingPotential_Op( modelspace, LECs );
+      }
+      else if (opnamesplit[0] == "M0nuR") // Radial dependance of GT part of M0nu
+      {
+        double Eclosure;
+        double r12;
+        std::istringstream(opnamesplit[1]) >> Eclosure;
+        std::istringstream(opnamesplit[2]) >> r12;
+        theop = M0nu::GamowTeller_R(modelspace, Eclosure, r12);
+      }
+      else if (opnamesplit[0] == "DGTR") //Radial depedance of DGT operator
+      {
+        double r12;
+        std::istringstream(opnamesplit[1]) >> r12;
+        theop = M0nu::DGT_R(modelspace, r12);
+      }
+      else if (opnamesplit[0] == "DGTRLocal") //Radial depedance of DGT operator with surface localization
+      {
+        double r12;
+        std::istringstream(opnamesplit[1]) >> r12;
+        theop = M0nu::DGT_R_SurfaceLocalization(modelspace, r12);
       }
       else //need to remove from the list
       {
