@@ -47,6 +47,7 @@ double bch_transform_threshold = 1e-9;
 double bch_product_threshold = 1e-4;
 double threebody_threshold = 0;
 double imsrg3_dE6max = 1e20;
+int imsrg3_commutator_depth = 100;
 
 std::map<std::string,bool> comm_term_on = {
      {"comm330ss"           , true},
@@ -112,6 +113,10 @@ void SetIMSRG3Noqqq(bool tf)
 
 void SetIMSRG3valence2b(bool tf)
 {imsrg3_valence_2b = tf;}
+
+void SetIMSRG3CommutatorDepth(int depth) {
+	imsrg3_commutator_depth = depth;
+}
 
 //Operator Operator::Commutator( Operator& opright)
 /// Returns \f$ Z = [X,Y] \f$
@@ -191,25 +196,6 @@ Operator CommutatorScalarScalar( const Operator& X, const Operator& Y)
      Z.ThreeBody.SwitchToPN_and_discard();
    }
 
-   // Here is where we start calling the IMSRG(2) commutator expressions.
-   if ( not Z.IsAntiHermitian() )
-   {
-      comm110ss(X, Y, Z);
-      if (X.particle_rank>1 and Y.particle_rank>1)
-        comm220ss(X, Y, Z) ;
-   }
-
-   comm111ss(X, Y, Z);
-   comm121ss(X, Y, Z);
-   comm122ss(X, Y, Z); 
-
-
-   if (X.particle_rank>1 and Y.particle_rank>1)
-   {
-     comm222_pp_hh_221ss(X, Y, Z);
-     comm222_phss(X, Y, Z);
-   }
-
 
    if (use_imsrg3)
    {
@@ -244,7 +230,7 @@ Operator CommutatorScalarScalar( const Operator& X, const Operator& Y)
        if ( comm_term_on["comm232ss"])
        {
         //one of the two most important IMSRG(3) terms
-        std::cout << " comm232 " << std::endl;
+        // std::cout << " comm232 " << std::endl;
          comm232ss(X, Y, Z);   // this is the slowest n^7 term
         //comm232ss_new(X, Y, Z);   // this is the slowest n^7 term
 //       comm232ss_debug(X, Y, Z);   // this is the slowest n^7 term
@@ -340,7 +326,6 @@ Operator CommutatorScalarScalar( const Operator& X, const Operator& Y)
      // after going through once, we've stored all the 6js (and maybe 9js), so we can run in OMP loops from now on
      X.modelspace->scalar3b_transform_first_pass = false;
    } // if threshold
-   } // if use imsrg3
 
    // TODO: I don't like that this gets done here. It should be in the individual commutator expressions themselves
    // As it currently is, it invites a mistake of updating the wrong triangle of the matrix.
@@ -349,6 +334,32 @@ Operator CommutatorScalarScalar( const Operator& X, const Operator& Y)
    else if (Z.IsAntiHermitian() )
       Z.AntiSymmetrize();
 
+   std::cout 
+	   << std::setprecision(6) 
+	   << "Norm(Z) from IMSRG(3): 0B = " 
+	   << std::setw(12)
+	   << Z.ZeroBody 
+	   << ", 1B = "
+	   << std::setw(12)
+	   << Z.OneBodyNorm() 
+	   << " / " 
+	   << std::setw(12)
+	   << Z.OneBodyDimension() 
+	   << ", 2B = " 
+	   << std::setw(12)
+	   << Z.TwoBodyNorm() 
+	   << " / " 
+	   << std::setw(12)
+	   << Z.TwoBodyDimension() 
+	   << ", 3B = " 
+	   << std::setw(12)
+	   << Z.ThreeBodyNorm() 
+	   << " / " 
+	   << std::setw(12)
+	   << Z.ThreeBodyDimension() 
+	   << "\n";
+
+   } // if use imsrg3
 
      if ( discard_2b_from_3b  or discard_1b_from_3b or discard_0b_from_3b )
      {
@@ -365,6 +376,60 @@ Operator CommutatorScalarScalar( const Operator& X, const Operator& Y)
         Z -= Zcopy; // Remove the NOnB part of the 3b operator.
      }
 
+
+
+   // Here is where we start calling the IMSRG(2) commutator expressions.
+   if ( not Z.IsAntiHermitian() )
+   {
+      comm110ss(X, Y, Z);
+      if (X.particle_rank>1 and Y.particle_rank>1)
+        comm220ss(X, Y, Z) ;
+   }
+
+   comm111ss(X, Y, Z);
+   comm121ss(X, Y, Z);
+   comm122ss(X, Y, Z); 
+
+
+   if (X.particle_rank>1 and Y.particle_rank>1)
+   {
+     comm222_pp_hh_221ss(X, Y, Z);
+     comm222_phss(X, Y, Z);
+   }
+
+   // TODO: I don't like that this gets done here. It should be in the individual commutator expressions themselves
+   // As it currently is, it invites a mistake of updating the wrong triangle of the matrix.
+   if ( Z.IsHermitian() )
+      Z.Symmetrize();
+   else if (Z.IsAntiHermitian() )
+      Z.AntiSymmetrize();
+
+
+
+   std::cout 
+	   << std::setprecision(6) 
+	   << "Norm(Z) from IMSRG(*): 0B = " 
+	   << std::setw(12)
+	   << Z.ZeroBody 
+	   << ", 1B = "
+	   << std::setw(12)
+	   << Z.OneBodyNorm() 
+	   << " / " 
+	   << std::setw(12)
+	   << Z.OneBodyDimension() 
+	   << ", 2B = " 
+	   << std::setw(12)
+	   << Z.TwoBodyNorm() 
+	   << " / " 
+	   << std::setw(12)
+	   << Z.TwoBodyDimension() 
+	   << ", 3B = " 
+	   << std::setw(12)
+	   << Z.ThreeBodyNorm() 
+	   << " / " 
+	   << std::setw(12)
+	   << Z.ThreeBodyDimension() 
+	   << "\n";
 
    X.profiler.timer["CommutatorScalarScalar"] += omp_get_wtime() - t_css;
    X.profiler.counter["N_ScalarCommutators"] += 1;
@@ -483,9 +548,10 @@ Operator BCH_Transform(  const Operator& OpIn, const Operator& Omega)
 /// with all commutators truncated at the two-body level.
 Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
 {
+		std::cout << "BCH_Expansion\n";
 //   std::cout << "!!! " << __func__ << " !!!   particles ranks are " << OpIn.GetParticleRank() << "  and  " << Omega.GetParticleRank() 
 //             << "  PN mode is " << OpIn.ThreeBody.GetStorageMode() << "   and  " << Omega.ThreeBody.GetStorageMode()  << std::endl;
-
+	const auto _save_use_imsrg3 = use_imsrg3;
    double t_start = omp_get_wtime();
    int max_iter = 40;
    int warn_iter = 12;
@@ -528,6 +594,9 @@ Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
      double epsilon = nx * exp(-2*ny) * bch_transform_threshold / (2*ny); // this should probably be explained somewhere...
      for (int i=1; i<=max_iter; ++i)
      {
+	   if (i > imsrg3_commutator_depth) {
+		   use_imsrg3 = false;
+	   }
 
         // Specifically for the perturbative triples, we need 1/(i+1)! rather than 1/i!
         // This is because we have Wbar = [Omega,H]_3b + 1/2![Omega,[Omega,H]]_3b + 1/3![Omega,[Omega,[Omega,H]]]_3b + ...
@@ -560,6 +629,8 @@ Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
         else if (i == max_iter)   std::cout << "Warning: BCH_Transform didn't coverge after "<< max_iter << " nested commutators" << std::endl;
      }
    }
+
+   use_imsrg3 = _save_use_imsrg3;
 //   std::cout << "Done with BCH_Transform, 3-body norm of OpOut = " << OpOut.ThreeBodyNorm() << std::endl;
    OpIn.profiler.timer["BCH_Transform"] += omp_get_wtime() - t_start;
    return OpOut;
@@ -636,6 +707,7 @@ Operator Brueckner_BCH_Transform( const Operator& OpIn, const Operator& Omega)
 //*****************************************************************************************
 Operator BCH_Product(  Operator& X, Operator& Y)
 {
+	std::cout << "Magnus_Expansion\n";
 //   std::cout << "!!! " << __func__ << " !!! " << std::endl;
    double tstart = omp_get_wtime();
    double nx = X.Norm();
@@ -671,6 +743,9 @@ Operator BCH_Product(  Operator& X, Operator& Y)
 //   while( Nested.Norm() > bch_product_threshold and k<9)
    while( nxy > bch_product_threshold )
    {
+	   if (k > imsrg3_commutator_depth) {
+		   use_imsrg3 = false;
+	   }
      if ((k<2) or (k%2==0))
      {
         Z += (bernoulli[k]/factorial[k]) * Nested;

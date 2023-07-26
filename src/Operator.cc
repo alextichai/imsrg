@@ -1646,6 +1646,31 @@ double Operator::ThreeBodyNorm() const
   return ThreeBody.Norm();
 }
 
+size_t Operator::OneBodyDimension() const {
+	size_t dim = 0UL;
+//   for ( size_t p=0; p<modelspace->GetNumberOrbits(); ++p)
+   for ( auto p : modelspace->all_orbits )
+   {
+     Orbit& op = modelspace->GetOrbit(p);
+     for ( auto q : OneBodyChannels.at({op.l, op.j2, op.tz2}) )
+     {
+       Orbit& oq = modelspace->GetOrbit(q);
+       int degeneracy_factor = (op.j2+1) * ( (std::min(oq.j2,op.j2+rank_J)-std::max(-oq.j2,op.j2-rank_J))/2+1 );
+//       nrm += OneBody(p,q)*OneBody(p,q) * degeneracy_factor * degeneracy_factor;
+       dim += degeneracy_factor ;
+     }
+   }
+ 	return dim;
+}
+
+size_t Operator::TwoBodyDimension() const {
+	return TwoBody.Dimension();
+}
+
+size_t Operator::ThreeBodyDimension() const {
+	return ThreeBody.Dimension();
+}
+
 double Operator::OneLegNorm() const
 {
    double nrm = 0;

@@ -49,6 +49,7 @@ class ThreeBodyStorage_pn : public ThreeBodyStorage
   void Erase() override; // Set all elements to zero
   void Deallocate() override;
   size_t size() const override;
+  size_t Dimension() const override { return MatEl.size(); }
   void WriteBinary(std::ofstream& f) override;
   void ReadBinary(std::ifstream& f) override;
 

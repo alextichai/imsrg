@@ -43,7 +43,7 @@ namespace comm232 {
 
 void comm232ss_expand_impl_red(const Operator &X, const Operator &Y,
                                Operator &Z) {
-  std::cout << "In comm232ss_expand (reduced version)\n";
+  // std::cout << "In comm232ss_expand (reduced version)\n";
   double tstart = omp_get_wtime();
   Z.modelspace->PreCalculateSixJ();
 
@@ -256,7 +256,7 @@ void comm232ss_expand_impl_red(const Operator &X, const Operator &Y,
 
 void comm232ss_expand_impl_full(const Operator &X, const Operator &Y,
                                Operator &Z) {
-  std::cout << "In comm232ss_expand (full version)\n";
+  // std::cout << "In comm232ss_expand (full version)\n";
   double tstart = omp_get_wtime();
   Z.modelspace->PreCalculateSixJ();
 

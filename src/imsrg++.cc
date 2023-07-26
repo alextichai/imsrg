@@ -122,6 +122,7 @@ int main(int argc, char** argv)
   bool brueckner_restart = false;
   bool write_HO_ops = parameters.s("write_HO_ops") == "true";  // added by Antoine Belley
   bool write_HF_ops = parameters.s("write_HF_ops") == "true";  // added by Antoine Belley
+  bool use_HF_reference_in_NAT = parameters.s("use_HF_reference_in_NAT") == "true";
 
   int eMax = parameters.i("emax");
   int lmax = parameters.i("lmax"); // so far I only use this with atomic systems.
@@ -141,6 +142,7 @@ int main(int argc, char** argv)
   int e2Max_imsrg = parameters.i("e2max_imsrg");
   int e3Max_imsrg = parameters.i("e3max_imsrg");
   int eMax_3body_imsrg = parameters.i("emax_3body_imsrg");
+  int imsrg3_commutator_depth = parameters.i("imsrg3_commutator_depth");
 //  if ( not ( eMax_imsrg==-1 and e2Max_imsrg==-1 and e3Max_imsrg==-1 ) )
 //  {
 //    if ( eMax_imsrg==-1 ) eMax_imsrg = eMax;
@@ -595,6 +597,9 @@ if (opff.file2name != "") {
 //  using the NO2B Hamiltonian in the HF basis, obtained with GetNormalOrderedH().
 //  Then it calls DiagonalizeRho() which diagonalizes the density matrix, yielding the natural orbital basis.
     hf.GetNaturalOrbitals();
+    if (use_HF_reference_in_NAT) {
+	    hf.UseHFForHoleStates();
+    }
     HNO = hf.GetNormalOrderedHNAT( hno_particle_rank );
 
 //  SRS: I'm commenting this out because this is not reasonably-expected default behavior
@@ -668,10 +673,10 @@ if (opff.file2name != "") {
     double EMP2_3B = HNO.GetMP2_3BEnergy();
     std::cout << "EMP2 = " << EMP2 << std::endl;
     std::cout << "EMP2_3B = " << EMP2_3B << std::endl;
-    std::array<double,3> Emp_3 = HNO.GetMP3_Energy();
-    double EMP3 = Emp_3[0]+Emp_3[1]+Emp_3[2];
-    std::cout << "E3_pp = " << Emp_3[0] << "  E3_hh = " << Emp_3[1] << " E3_ph = " << Emp_3[2] << "   EMP3 = " << EMP3 << std::endl;
-    std::cout << "To 3rd order, E = " << HNO.ZeroBody + EMP2 + EMP3 + EMP2_3B << std::endl;
+    // std::array<double,3> Emp_3 = HNO.GetMP3_Energy();
+    // double EMP3 = Emp_3[0]+Emp_3[1]+Emp_3[2];
+    // std::cout << "E3_pp = " << Emp_3[0] << "  E3_hh = " << Emp_3[1] << " E3_ph = " << Emp_3[2] << "   EMP3 = " << EMP3 << std::endl;
+    // std::cout << "To 3rd order, E = " << HNO.ZeroBody + EMP2 + EMP3 + EMP2_3B << std::endl;
   }
 
 
@@ -997,6 +1002,7 @@ if (opff.file2name != "") {
   Commutator::SetUseReduced232Impl(reduced_232_impl);
   Commutator::SetUseIMSRG3_MP4(imsrg3_mp4);
   Commutator::SetIMSRG3Noqqq(imsrg3_no_qqq);
+  Commutator::SetIMSRG3CommutatorDepth(imsrg3_commutator_depth);
   if (use_brueckner_bch)
   {
     std::cout << "Using Brueckner flavor of BCH" << std::endl;
@@ -1479,12 +1485,20 @@ if (opff.file2name != "") {
 
       op = imsrgsolver.Transform(op);
 
+      // Unclear whether we should do NO2B here as well...
       std::cout << "Before renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;
       if (renormal_order) 
       {
+	      if (IMSRG3) {
+      		      rw.Write_NaiveVS3B(intfile + opname + ".vs3b", op);
+		      op.SetNumberLegs(4);
+		      op.SetParticleRank(2);
+	      }
         op = op.UndoNormalOrdering();
         op.SetModelSpace(ms2);
         op = op.DoNormalOrdering();
+        rw.Write_NaiveVS1B(intfile + opname + ".vs1b", op);
+        rw.Write_NaiveVS2B(intfile + opname + ".vs2b", op);
       }
 //      std::cout << " (" << ops[i].ZeroBody << " ) " << std::endl;
       std::cout << "   IMSRG: " << op.ZeroBody << std::endl;
@@ -1605,7 +1619,7 @@ if (opff.file2name != "") {
        std::ostringstream inputfile,outputfile;
        inputfile << scratch << "/OMEGA_" << std::setw(6) << std::setfill('0') << getpid() << std::setw(3) << std::setfill('0') << i;
        outputfile << intfile << "_Omega_" << i;
-       rw.CopyFile( inputfile.str(), outputfile.str() );
+       // rw.CopyFile( inputfile.str(), outputfile.str() );
     }
 //    rw.WriteOmega(intfile,scratch, imsrgsolver.n_omega_written);
 

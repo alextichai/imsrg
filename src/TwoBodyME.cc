@@ -726,7 +726,7 @@ void TwoBodyME::PrintAllMatrices() const
 
 
 
-int TwoBodyME::Dimension()
+int TwoBodyME::Dimension() const
 {
    int dim = 0;
    for ( auto& itmat : MatEl )

@@ -162,7 +162,7 @@ class TwoBodyME
   void Eye();
   void PrintAllMatrices() const;
   void PrintMatrix(size_t chbra,size_t chket) const { MatEl.at({chbra,chket}).print();};
-  int Dimension();
+  int Dimension() const;
   int size();
 
   void WriteBinary(std::ofstream&);

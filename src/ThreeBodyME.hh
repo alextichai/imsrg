@@ -169,6 +169,7 @@ class ThreeBodyME
   std::vector<size_t>& Get_ch_dim();
 
   double Norm() const;
+  size_t Dimension() const;
   void Erase(); // set all three-body terms to zero
   void Deallocate();
   size_t size();

@@ -453,6 +453,10 @@ double ThreeBodyME::Norm() const
    return threebody_storage->Norm();
 }
 
+size_t ThreeBodyME::Dimension() const {
+	return threebody_storage->Dimension();
+}
+
 
 void ThreeBodyME::Erase()
 {

@@ -203,6 +203,9 @@ class Operator
   double OneBodyNorm() const;
   double TwoBodyNorm() const;
   double ThreeBodyNorm() const;
+  size_t OneBodyDimension() const;
+  size_t TwoBodyDimension() const;
+  size_t ThreeBodyDimension() const;
   double OneLegNorm() const;
   double ThreeLegNorm() const;
 

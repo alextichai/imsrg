@@ -43,7 +43,7 @@ void Print(std::string prefix, const T &val, const T &val2) {
 namespace comm331 {
 
 void comm331ss_expand_impl(const Operator &X, const Operator &Y, Operator &Z) {
-  std::cout << "In comm331_expand\n";
+  // std::cout << "In comm331_expand\n";
   double tstart = omp_get_wtime();
   Z.modelspace->PreCalculateSixJ();
 

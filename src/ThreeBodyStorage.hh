@@ -151,6 +151,7 @@ class ThreeBodyStorage
   virtual void Erase() =0; // set all three-body terms to zero
   virtual void Deallocate() =0;
   virtual size_t size() const =0;
+  virtual size_t Dimension() const { return 0UL;};
   virtual void WriteBinary(std::ofstream& f){NotImplemented(__func__);};
   virtual void ReadBinary(std::ifstream& f){NotImplemented(__func__);};
   virtual void WriteFile(std::vector<std::string>& StringInputs, std::vector<int>& IntInputs ){NotImplemented(__func__);};

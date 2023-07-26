@@ -45,6 +45,8 @@ class HFMBPT : public HartreeFock
     void DensityMatrixPH(Operator& H);
     void DiagonalizeRho();
     void PrintOccupation();
+    // Replace hole states with HF and reorthogonalize rest of basis
+    void UseHFForHoleStates();
     Operator TransformHFToNATBasis(Operator& OpIn);
     Operator TransformHOToNATBasis(Operator& OpIn);
     Operator GetNormalOrderedHNAT(int particle_rank=2);

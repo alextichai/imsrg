@@ -52,6 +52,7 @@ namespace Commutator{
   extern double bch_product_threshold;
   extern double threebody_threshold;
   extern double imsrg3_dE6max;
+  extern int imsrg3_commutator_depth;
 
   extern std::map<std::string,bool> comm_term_on; // This allows turning on/off individual IMSRG(3) commutator terms for testing.
 
@@ -68,6 +69,7 @@ namespace Commutator{
   void SetBCHSkipiEq1(bool tf);
   void SetIMSRG3Noqqq(bool tf);
   void SetIMSRG3valence2b(bool tf);
+  void SetIMSRG3CommutatorDepth(int depth);
 
   void TurnOffTerm( std::string term ) ;
   void TurnOnTerm( std::string term ) ;

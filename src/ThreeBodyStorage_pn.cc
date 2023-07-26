@@ -274,7 +274,7 @@ double ThreeBodyStorage_pn::Norm() const
 {
   double norm = 0;
   for (auto me : MatEl)  norm += me*me;
-  return norm;
+  return sqrt(norm);
 }
 
 
