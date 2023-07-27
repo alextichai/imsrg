@@ -341,6 +341,7 @@ if (opff.file2name != "") {
 //  std::cout << __LINE__ << "  constructed modelspace " << std::endl;
   modelspace.SetE3max(E3max);
   modelspace.SetLmax(lmax);
+
 //  std::cout << __LINE__ << "  done setting E3max and lmax " << std::endl;
 
 
@@ -934,6 +935,13 @@ if (opff.file2name != "") {
     }
   }
 
+  const int emax_reference = std::max(modelspace_imsrg.e_fermi.at(-1), modelspace_imsrg.e_fermi.at(1));
+  const int emax_3b_reference = std::min(modelspace_imsrg.GetEMax3Body(), emax_reference);
+  const int e3max_reference = std::min(3 * emax_3b_reference, modelspace_imsrg.GetE3max());
+  const std::string emax_ref_string = "_e_" + std::to_string(emax_reference);
+  const std::string emax3b_ref_string = "_e_" + std::to_string(emax_3b_reference);
+  const std::string e3max_ref_string = "_E3_" + std::to_string(e3max_reference);
+
  // After truncating, get the perturbative energies again to see how much things changed.
   if (eMax_imsrg != eMax)
   {
@@ -1214,9 +1222,9 @@ if (opff.file2name != "") {
     {
       rw.Write_NaiveVS3B(intfile + ".vs3b", HNO);
       // Use emax=3 because we are interested in pf shell systems
-      rw.Write_me1j(intfile + "_ENO.me1j", HNO, 3, 3);
-      rw.Write_me2jp(intfile + "_ENO.me2jp", HNO, 3, 6, 3);
-      rw.Write_me3jp(intfile + "_ENO.me3jp", HNO, 3, 6, 9);
+      rw.Write_me1j(intfile + "_ENO" + emax_ref_string + ".me1j", HNO, emax_reference, emax_reference);
+      rw.Write_me2jp(intfile + "_ENO" + emax_ref_string + ".me2jp", HNO, emax_reference, 2 * emax_reference, emax_reference);
+      rw.Write_me3jp(intfile + "_ENO" + emax3b_ref_string + e3max_ref_string + ".me3jp", HNO, emax_3b_reference, 2 * emax_3b_reference, e3max_reference);
       std::cout << "Re-normal-ordering wrt the core. For now, we just throw away the 3N at this step." << std::endl;
       HNO.SetNumberLegs(4);
       HNO.SetParticleRank(2);
@@ -1230,8 +1238,8 @@ if (opff.file2name != "") {
     rw.Write_NaiveVS1B(intfile + ".vs1b", HNO);
     rw.Write_NaiveVS2B(intfile + ".vs2b", HNO);
     // Use emax=3 because we are interested in pf shell systems
-    rw.Write_me1j(intfile + "_coreNO.me1j", HNO, 3, 3);
-    rw.Write_me2jp(intfile + "_coreNO.me2jp", HNO, 3, 6, 3);
+    rw.Write_me1j(intfile + "_coreNO" + emax_ref_string + ".me1j", HNO, emax_reference, emax_reference);
+    rw.Write_me2jp(intfile + "_coreNO" + emax_ref_string + ".me2jp", HNO, emax_reference, 2 * emax_reference, emax_reference);
 
     imsrgsolver.FlowingOps[0] = HNO;
 
@@ -1490,6 +1498,9 @@ if (opff.file2name != "") {
       if (renormal_order) 
       {
 	      if (IMSRG3) {
+		      rw.Write_me1j(intfile + opname + "_ENO" + emax_ref_string + ".me1j", op, emax_reference, emax_reference);
+		      rw.Write_me2jp(intfile + opname + "_ENO" + emax_ref_string + ".me2jp", op, emax_reference, 2 * emax_reference, emax_reference);
+		      rw.Write_me3jp(intfile + opname + "_ENO" + emax3b_ref_string + e3max_ref_string + ".me3jp", op, emax_3b_reference, 2 * emax_3b_reference, e3max_reference);
       		      rw.Write_NaiveVS3B(intfile + opname + ".vs3b", op);
 		      op.SetNumberLegs(4);
 		      op.SetParticleRank(2);
@@ -1499,6 +1510,8 @@ if (opff.file2name != "") {
         op = op.DoNormalOrdering();
         rw.Write_NaiveVS1B(intfile + opname + ".vs1b", op);
         rw.Write_NaiveVS2B(intfile + opname + ".vs2b", op);
+	    rw.Write_me1j(intfile + opname + "_coreNO" + emax_ref_string + ".me1j", op, emax_reference, emax_reference);
+	    rw.Write_me2jp(intfile + opname + "_coreNO" + emax_ref_string + ".me2jp", op, emax_reference, 2 * emax_reference, emax_reference);
       }
 //      std::cout << " (" << ops[i].ZeroBody << " ) " << std::endl;
       std::cout << "   IMSRG: " << op.ZeroBody << std::endl;
