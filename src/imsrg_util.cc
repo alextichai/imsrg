@@ -64,7 +64,12 @@ namespace imsrg_util
       else if (opname == "R2_n1")         theop =  R2_1body_Op(modelspace,"neutron") ;
       else if (opname == "R2_n2")         theop =  R2_2body_Op(modelspace,"neutron") ;
       else if (opname == "Rp2")           theop =  Rp2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rp2b")          theop =  Rp2b_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rp2c")          theop =  Rp2c_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
       else if (opname == "Rn2")           theop =  Rn2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rn2b")          theop =  Rn2b_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rn2c")          theop =  Rn2c_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rso2")          theop =  Rso2_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
       else if (opname == "Rm2")           theop =  Rm2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
       else if (opname == "Rm2lab")        theop =  RSquaredOp(modelspace) ;
       else if (opname == "ISM")           theop =  MultipoleResponseOp(modelspace,2,0,0) ; // Isoscalar monopole (see PRC97(2018)054306 ) --added by bhu
@@ -186,6 +191,38 @@ namespace imsrg_util
         int Z_rp;
         std::istringstream(opnamesplit[1]) >> Z_rp;
         theop =  Rn2_corrected_Op(modelspace,modelspace.GetTargetMass(),Z_rp) ;
+      }
+      else if (opnamesplit[0] == "FM0p") 
+      {
+        // M form factor for protons
+        // momentum transfer q in MeV, e.g. FM0p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FMp0_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FM0n") 
+      {
+        // M form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FM0n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FMn0_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FPhipp0p") 
+      {
+        // Phipp form factor for protons
+        // momentum transfer q in MeV, e.g. FPhipp0p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FPhippp0_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FPhipp0n") 
+      {
+        // Phipp form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FPhipp0n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FPhippn0_Op(modelspace, rr);
       }
       else if (opnamesplit[0] == "rhop") // point proton  density at position r, e.g. rhop_1.25
       {
@@ -1204,6 +1241,107 @@ Operator KineticEnergy_RelativisticCorr(ModelSpace& modelspace)
    if (Z==A) return 0.0*KineticEnergy_Op(modelspace);
    return R2CM_Op(modelspace) + (A-2.0)/(A*(A-Z))*R2_1body_Op(modelspace,"neutron")
                                    - 4./(A*(A-Z))*R2_2body_Op(modelspace,"neutron");
+ }
+
+
+/// Point proton radius squared
+/// Returns
+/// \f[ 
+/// R_p^{2} = \frac{1}{Z} \sum_{p}\left(\vec{r}_{p}\right)^2
+/// \f]
+/// evaluated in the oscillator basis.
+ Operator Rp2b_Op(ModelSpace& modelspace, int A, int Z)
+ {
+   if (Z==0) return 0.0*KineticEnergy_Op(modelspace);
+   
+  //  Operator ret = R2CM_Op(modelspace);
+  //  ret += (A-2.0)/(A*Z)*R2_1body_Op(modelspace,"proton");
+  //  ret -= 4./(A*Z)*R2_2body_Op(modelspace,"proton");
+  //  ret += 1./Z * RpSpinOrbitCorrection(modelspace);
+   return (1.0 / Z) * R2_1body_Op(modelspace, "proton");
+  //  return R2CM_Op(modelspace) + (A-2.0)/(A*Z)*R2_1body_Op(modelspace,"proton")
+  //                                  - 4./(A*Z)*R2_2body_Op(modelspace,"proton")
+  //                                  + 1./Z * RpSpinOrbitCorrection(modelspace);
+ }
+
+
+/// Point neutron radius squared
+/// Returns
+/// \f[ 
+/// R_n^{2} = \frac{1}{N} \sum_{n}\left(\vec{r}_{n}\right)^2
+/// \f]
+/// evaluated in the oscillator basis.
+ Operator Rn2b_Op(ModelSpace& modelspace, int A, int Z)
+ {
+   if (Z==A) return 0.0*KineticEnergy_Op(modelspace);
+   return (1.0 / (A - Z)) * R2_1body_Op(modelspace, "neutron");
+ }
+
+
+/// Intrinsic point proton radius squared
+/// Returns
+/// \f[ 
+/// R_p^{2} = \frac{1}{Z} \sum_{p}\left(\vec{r}_{p}-\vec{R}_{CM}\right)^2 =
+/// R^2_{CM} + \frac{A-2}{AZ} \sum_{p}r_{p}^{2} - \frac{4}{AZ}\sum_{i<j}\vec{r}_i\cdot\vec{r}_j  
+/// \f]
+/// evaluated in the oscillator basis.
+ Operator Rp2c_Op(ModelSpace& modelspace, int A, int Z)
+ {
+   if (Z==0) return 0.0*KineticEnergy_Op(modelspace);
+   Operator ret = R2CM_Op(modelspace);
+   ret += (A-2.0)/(A*Z)*R2_1body_Op(modelspace,"proton");
+   ret -= 4./(A*Z)*R2_2body_Op(modelspace,"proton");
+  //  ret += 1./Z * RpSpinOrbitCorrection(modelspace);
+   return ret;
+  //  return R2CM_Op(modelspace) + (A-2.0)/(A*Z)*R2_1body_Op(modelspace,"proton")
+  //                                  - 4./(A*Z)*R2_2body_Op(modelspace,"proton")
+  //                                  + 1./Z * RpSpinOrbitCorrection(modelspace);
+ }
+
+/// Intrinsic point neutron radius squared
+/// Returns
+/// \f[ 
+/// R_n^{2} = \frac{1}{Z} \sum_{n}\left(\vec{r}_{n}-\vec{R}_{CM}\right)^2
+/// \f]
+/// evaluated in the oscillator basis.
+ Operator Rn2c_Op(ModelSpace& modelspace, int A, int Z)
+ {
+   if (Z==A) return 0.0*KineticEnergy_Op(modelspace);
+   int N = A - Z;
+   Operator ret = R2CM_Op(modelspace);
+   ret += (A-2.0)/(A*N)*R2_1body_Op(modelspace,"neutron");
+   ret -= 4./(A*N)*R2_2body_Op(modelspace,"neutron");
+   return ret;
+  //  return R2CM_Op(modelspace) + (A-2.0)/(A*(A-Z))*R2_1body_Op(modelspace,"neutron")
+  //                                  - 4./(A*(A-Z))*R2_2body_Op(modelspace,"neutron");
+ }
+
+
+/// Spin-orbit correction to charge radius
+/// evaluated in the oscillator basis.
+ Operator Rso2_Op(ModelSpace& modelspace, int A, int Z)
+ {
+  return (1./Z) * RpSpinOrbitCorrection(modelspace);
+ }
+
+ Operator FMp0_Op(ModelSpace& modelspace, double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::M(modelspace, "p", 0, q);
+ }
+
+ Operator FMn0_Op(ModelSpace& modelspace, double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::M(modelspace, "n", 0, q);
+ }
+
+ Operator FPhippp0_Op(ModelSpace& modelspace, double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Phipp(modelspace, "p", 0, q);
+ }
+
+ Operator FPhippn0_Op(ModelSpace& modelspace,double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Phipp(modelspace, "n", 0, q);
  }
 
  Operator Rm2_corrected_Op(ModelSpace& modelspace, int A, int Z)
