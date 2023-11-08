@@ -334,30 +334,30 @@ Operator CommutatorScalarScalar( const Operator& X, const Operator& Y)
    else if (Z.IsAntiHermitian() )
       Z.AntiSymmetrize();
 
-   std::cout 
-	   << std::setprecision(6) 
-	   << "Norm(Z) from IMSRG(3): 0B = " 
-	   << std::setw(12)
-	   << Z.ZeroBody 
-	   << ", 1B = "
-	   << std::setw(12)
-	   << Z.OneBodyNorm() 
-	   << " / " 
-	   << std::setw(12)
-	   << Z.OneBodyDimension() 
-	   << ", 2B = " 
-	   << std::setw(12)
-	   << Z.TwoBodyNorm() 
-	   << " / " 
-	   << std::setw(12)
-	   << Z.TwoBodyDimension() 
-	   << ", 3B = " 
-	   << std::setw(12)
-	   << Z.ThreeBodyNorm() 
-	   << " / " 
-	   << std::setw(12)
-	   << Z.ThreeBodyDimension() 
-	   << "\n";
+  //  std::cout 
+	//    << std::setprecision(6) 
+	//    << "Norm(Z) from IMSRG(3): 0B = " 
+	//    << std::setw(12)
+	//    << Z.ZeroBody 
+	//    << ", 1B = "
+	//    << std::setw(12)
+	//    << Z.OneBodyNorm() 
+	//    << " / " 
+	//    << std::setw(12)
+	//    << Z.OneBodyDimension() 
+	//    << ", 2B = " 
+	//    << std::setw(12)
+	//    << Z.TwoBodyNorm() 
+	//    << " / " 
+	//    << std::setw(12)
+	//    << Z.TwoBodyDimension() 
+	//    << ", 3B = " 
+	//    << std::setw(12)
+	//    << Z.ThreeBodyNorm() 
+	//    << " / " 
+	//    << std::setw(12)
+	//    << Z.ThreeBodyDimension() 
+	//    << "\n";
 
    } // if use imsrg3
 
@@ -406,30 +406,30 @@ Operator CommutatorScalarScalar( const Operator& X, const Operator& Y)
 
 
 
-   std::cout 
-	   << std::setprecision(6) 
-	   << "Norm(Z) from IMSRG(*): 0B = " 
-	   << std::setw(12)
-	   << Z.ZeroBody 
-	   << ", 1B = "
-	   << std::setw(12)
-	   << Z.OneBodyNorm() 
-	   << " / " 
-	   << std::setw(12)
-	   << Z.OneBodyDimension() 
-	   << ", 2B = " 
-	   << std::setw(12)
-	   << Z.TwoBodyNorm() 
-	   << " / " 
-	   << std::setw(12)
-	   << Z.TwoBodyDimension() 
-	   << ", 3B = " 
-	   << std::setw(12)
-	   << Z.ThreeBodyNorm() 
-	   << " / " 
-	   << std::setw(12)
-	   << Z.ThreeBodyDimension() 
-	   << "\n";
+  //  std::cout 
+	//    << std::setprecision(6) 
+	//    << "Norm(Z) from IMSRG(*): 0B = " 
+	//    << std::setw(12)
+	//    << Z.ZeroBody 
+	//    << ", 1B = "
+	//    << std::setw(12)
+	//    << Z.OneBodyNorm() 
+	//    << " / " 
+	//    << std::setw(12)
+	//    << Z.OneBodyDimension() 
+	//    << ", 2B = " 
+	//    << std::setw(12)
+	//    << Z.TwoBodyNorm() 
+	//    << " / " 
+	//    << std::setw(12)
+	//    << Z.TwoBodyDimension() 
+	//    << ", 3B = " 
+	//    << std::setw(12)
+	//    << Z.ThreeBodyNorm() 
+	//    << " / " 
+	//    << std::setw(12)
+	//    << Z.ThreeBodyDimension() 
+	//    << "\n";
 
    X.profiler.timer["CommutatorScalarScalar"] += omp_get_wtime() - t_css;
    X.profiler.counter["N_ScalarCommutators"] += 1;
@@ -548,7 +548,7 @@ Operator BCH_Transform(  const Operator& OpIn, const Operator& Omega)
 /// with all commutators truncated at the two-body level.
 Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
 {
-		std::cout << "BCH_Expansion\n";
+		// std::cout << "BCH_Expansion\n";
 //   std::cout << "!!! " << __func__ << " !!!   particles ranks are " << OpIn.GetParticleRank() << "  and  " << Omega.GetParticleRank() 
 //             << "  PN mode is " << OpIn.ThreeBody.GetStorageMode() << "   and  " << Omega.ThreeBody.GetStorageMode()  << std::endl;
 	const auto _save_use_imsrg3 = use_imsrg3;
@@ -707,7 +707,7 @@ Operator Brueckner_BCH_Transform( const Operator& OpIn, const Operator& Omega)
 //*****************************************************************************************
 Operator BCH_Product(  Operator& X, Operator& Y)
 {
-	std::cout << "Magnus_Expansion\n";
+	// std::cout << "Magnus_Expansion\n";
 //   std::cout << "!!! " << __func__ << " !!! " << std::endl;
    double tstart = omp_get_wtime();
    double nx = X.Norm();

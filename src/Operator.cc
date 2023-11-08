@@ -410,7 +410,7 @@ Operator Operator::DoNormalOrdering() const
 
 Operator Operator::UndoNormalOrdering() const
 {
-  std::cout << " IN " << __func__ << "   legs = " << legs << std::endl;
+  // std::cout << " IN " << __func__ << "   legs = " << legs << std::endl;
   if (legs%2>0)
     return DoNormalOrderingDagger(-1, modelspace->holes);
 //    return UndoNormalOrderingDagger();
