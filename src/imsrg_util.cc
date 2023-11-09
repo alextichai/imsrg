@@ -70,6 +70,7 @@ namespace imsrg_util
       else if (opname == "Rn2b")          theop =  Rn2b_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
       else if (opname == "Rn2c")          theop =  Rn2c_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
       else if (opname == "Rso2")          theop =  Rso2_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rso2w")         theop =  Rso2w_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
       else if (opname == "Rm2")           theop =  Rm2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
       else if (opname == "Rm2lab")        theop =  RSquaredOp(modelspace) ;
       else if (opname == "ISM")           theop =  MultipoleResponseOp(modelspace,2,0,0) ; // Isoscalar monopole (see PRC97(2018)054306 ) --added by bhu
@@ -1324,6 +1325,13 @@ Operator KineticEnergy_RelativisticCorr(ModelSpace& modelspace)
   return (1./Z) * RpSpinOrbitCorrection(modelspace);
  }
 
+/// Wrong spin-orbit correction to charge radius
+/// evaluated in the oscillator basis.
+ Operator Rso2w_Op(ModelSpace& modelspace, int A, int Z)
+ {
+  return (1./Z) * RpSpinOrbitCorrectionWrong(modelspace);
+ }
+
  Operator FMp0_Op(ModelSpace& modelspace, double q) {
   const double norm = sqrt(4 * M_PI);
   return norm * DM_NREFT::M(modelspace, "p", 0, q);
@@ -1712,6 +1720,22 @@ Operator RpSpinOrbitCorrection(ModelSpace& modelspace)
     //   also seen in Bertozzi et al., Phys. Lett. 41, 408 (1972)
     // )
     dr_so.OneBody(i,i) = -mu_i/M2*(2 * kappa+1);
+  }
+  return dr_so;
+}
+
+
+Operator RpSpinOrbitCorrectionWrong(ModelSpace& modelspace)
+{
+  Operator dr_so(modelspace,0,0,0,2);
+  double M2 = M_NUCLEON*M_NUCLEON/(HBARC*HBARC);
+  int norb = modelspace.GetNumberOrbits();
+  for (int i=0;i<norb;i++)
+  {
+    Orbit& oi = modelspace.GetOrbit(i);
+    double mu_i = oi.tz2<0 ? 1.79 : -1.91;
+    int kappa = oi.j2 < 2*oi.l ? oi.l : -(oi.l+1);
+    dr_so.OneBody(i,i) = -mu_i/M2*(kappa+1);
   }
   return dr_so;
 }

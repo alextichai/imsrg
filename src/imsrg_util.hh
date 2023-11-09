@@ -70,6 +70,7 @@ namespace imsrg_util
  Operator Rp2c_Op(ModelSpace& modelspace, int A, int Z);
  Operator Rn2c_Op(ModelSpace& modelspace, int A, int Z);
  Operator Rso2_Op(ModelSpace& modelspace, int A, int Z);
+ Operator Rso2w_Op(ModelSpace& modelspace, int A, int Z);
  Operator FMp0_Op(ModelSpace& modelspace, double q);
  Operator FMn0_Op(ModelSpace& modelspace, double q);
  Operator FPhippp0_Op(ModelSpace& modelspace, double q);
@@ -84,6 +85,7 @@ namespace imsrg_util
 // Operator ProtonDensityAtR(ModelSpace& modelspace, double R);
 // Operator NeutronDensityAtR(ModelSpace& modelspace, double R);
  Operator RpSpinOrbitCorrection(ModelSpace& modelspace);
+ Operator RpSpinOrbitCorrectionWrong(ModelSpace& modelspace);
  //Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::vector<index_t> index_list);
  Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::set<index_t> index_list);
 
