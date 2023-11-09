@@ -1712,14 +1712,14 @@ Operator RpSpinOrbitCorrection(ModelSpace& modelspace)
   for (int i=0;i<norb;i++)
   {
     Orbit& oi = modelspace.GetOrbit(i);
-    double mu_i = oi.tz2<0 ? 1.79 : -1.91;
-    int kappa = oi.j2 < 2*oi.l ? oi.l : -(oi.l+1);
-    // (kappa + 1) -> (2 kappa + 1) fixes error in Ong et al.
+    // mu_i -> mu_i + Q_i / 2 fixes error in Ong et al.
     // (
     //   solution from M. Hoferichter,
     //   also seen in Bertozzi et al., Phys. Lett. 41, 408 (1972)
     // )
-    dr_so.OneBody(i,i) = -mu_i/M2*(2 * kappa+1);
+    double mu_i = oi.tz2<0 ? 1.79 + 0.5 : -1.91;
+    int kappa = oi.j2 < 2*oi.l ? oi.l : -(oi.l+1);
+    dr_so.OneBody(i,i) = -mu_i/M2*(kappa+1);
   }
   return dr_so;
 }
