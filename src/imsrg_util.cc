@@ -241,53 +241,53 @@ namespace imsrg_util
         std::istringstream(opnamesplit[1]) >> rr;
         theop =  FSigma0n_Op(modelspace, rr);
       }
-      else if (opnamesplit[0] == "FSigmap0p") 
+      else if (opnamesplit[0] == "FSigmap1p") 
       { 
         // Sigmap form factor for protons 
-        // momentum transfer q in MeV, e.g. FSigmap0p_200.0
+        // momentum transfer q in MeV, e.g. FSigmap1p_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FSigmap0p_Op(modelspace, rr);
+        theop =  FSigmap1p_Op(modelspace, rr);
       }
-      else if (opnamesplit[0] == "FSigmap0n") 
+      else if (opnamesplit[0] == "FSigmap1n") 
       { 
         // Sigmap form factor for neutrons 
-        // momentum transfer q in MeV, e.g. FSigmap0n_200.0
+        // momentum transfer q in MeV, e.g. FSigmap1n_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FSigmap0n_Op(modelspace, rr);
+        theop =  FSigmap1n_Op(modelspace, rr);
       }
-      else if (opnamesplit[0] == "FSigmapp0p") 
+      else if (opnamesplit[0] == "FSigmapp1p") 
       { 
         // Sigmapp form factor for protons 
-        // momentum transfer q in MeV, e.g. FSigmapp0p_200.0
+        // momentum transfer q in MeV, e.g. FSigmapp1p_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FSigmapp0p_Op(modelspace, rr);
+        theop =  FSigmapp1p_Op(modelspace, rr);
       }
-      else if (opnamesplit[0] == "FSigmapp0n") 
+      else if (opnamesplit[0] == "FSigmapp1n") 
       { 
         // Sigmapp form factor for neutrons 
-        // momentum transfer q in MeV, e.g. FSigmapp0n_200.0
+        // momentum transfer q in MeV, e.g. FSigmapp1n_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FSigmapp0n_Op(modelspace, rr);
+        theop =  FSigmapp1n_Op(modelspace, rr);
       }
-      else if (opnamesplit[0] == "FDelta0p") 
+      else if (opnamesplit[0] == "FDelta1p") 
       { 
         // Delta form factor for protons 
-        // momentum transfer q in MeV, e.g. FDelta0p_200.0
+        // momentum transfer q in MeV, e.g. FDelta1p_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FDelta0p_Op(modelspace, rr);
+        theop =  FDelta1p_Op(modelspace, rr);
       }
-      else if (opnamesplit[0] == "FDelta0n") 
+      else if (opnamesplit[0] == "FDelta1n") 
       { 
         // Delta form factor for neutrons 
-        // momentum transfer q in MeV, e.g. FDelta0n_200.0
+        // momentum transfer q in MeV, e.g. FDelta1n_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FDelta0n_Op(modelspace, rr);
+        theop =  FDelta1n_Op(modelspace, rr);
       }
       else if (opnamesplit[0] == "rhop") // point proton  density at position r, e.g. rhop_1.25
       {
@@ -1426,34 +1426,34 @@ Operator FSigma0n_Op(ModelSpace& modelspace,double q) {
   return norm * DM_NREFT::Sigma(modelspace, "n", 0, q); 
 }
 
-Operator FSigmap0p_Op(ModelSpace& modelspace,double q) {
+Operator FSigmap1p_Op(ModelSpace& modelspace,double q) {
   const double norm = sqrt(4 * M_PI);
-  return norm * DM_NREFT::Sigmap(modelspace, "p", 0, q); 
+  return norm * DM_NREFT::Sigmap(modelspace, "p", 1, q); 
 }
 
-Operator FSigmap0n_Op(ModelSpace& modelspace,double q) {
+Operator FSigmap1n_Op(ModelSpace& modelspace,double q) {
   const double norm = sqrt(4 * M_PI);
-  return norm * DM_NREFT::Sigmap(modelspace, "n", 0, q); 
+  return norm * DM_NREFT::Sigmap(modelspace, "n", 1, q); 
 }
 
-Operator FSigmapp0p_Op(ModelSpace& modelspace,double q) {
+Operator FSigmapp1p_Op(ModelSpace& modelspace,double q) {
   const double norm = sqrt(4 * M_PI);
-  return norm * DM_NREFT::Sigmapp(modelspace, "p", 0, q); 
+  return norm * DM_NREFT::Sigmapp(modelspace, "p", 1, q); 
 }
 
-Operator FSigmapp0n_Op(ModelSpace& modelspace,double q) {
+Operator FSigmapp1n_Op(ModelSpace& modelspace,double q) {
   const double norm = sqrt(4 * M_PI);
-  return norm * DM_NREFT::Sigmapp(modelspace, "n", 0, q); 
+  return norm * DM_NREFT::Sigmapp(modelspace, "n", 1, q); 
 }
 
-Operator FDelta0p_Op(ModelSpace& modelspace,double q) {
+Operator FDelta1p_Op(ModelSpace& modelspace,double q) {
   const double norm = sqrt(4 * M_PI);
-  return norm * DM_NREFT::Delta(modelspace, "p", 0, q); 
+  return norm * DM_NREFT::Delta(modelspace, "p", 1, q); 
 }
 
-Operator FDelta0n_Op(ModelSpace& modelspace,double q) {
+Operator FDelta1n_Op(ModelSpace& modelspace,double q) {
   const double norm = sqrt(4 * M_PI);
-  return norm * DM_NREFT::Delta(modelspace, "n", 0, q); 
+  return norm * DM_NREFT::Delta(modelspace, "n", 1, q); 
 }
 
  Operator Rm2_corrected_Op(ModelSpace& modelspace, int A, int Z)

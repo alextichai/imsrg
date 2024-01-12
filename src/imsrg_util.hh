@@ -77,12 +77,12 @@ namespace imsrg_util
  Operator FPhippn0_Op(ModelSpace& modelspace, double q);
  Operator FSigma0p_Op(ModelSpace& modelspace, double q);
  Operator FSigma0n_Op(ModelSpace& modelspace, double q);
- Operator FSigmap0p_Op(ModelSpace& modelspace, double q);
- Operator FSigmap0n_Op(ModelSpace& modelspace, double q);
- Operator FSigmapp0p_Op(ModelSpace& modelspace, double q);
- Operator FSigmapp0n_Op(ModelSpace& modelspace, double q);
- Operator FDelta0p_Op(ModelSpace& modelspace, double q);
- Operator FDelta0n_Op(ModelSpace& modelspace, double q);
+ Operator FSigmap1p_Op(ModelSpace& modelspace, double q);
+ Operator FSigmap1n_Op(ModelSpace& modelspace, double q);
+ Operator FSigmapp1p_Op(ModelSpace& modelspace, double q);
+ Operator FSigmapp1n_Op(ModelSpace& modelspace, double q);
+ Operator FDelta1p_Op(ModelSpace& modelspace, double q);
+ Operator FDelta1n_Op(ModelSpace& modelspace, double q);
  Operator Rm2_corrected_Op(ModelSpace& modelspace, int A, int Z);
  Operator R2_p1_Op(ModelSpace& modelspace);
  Operator R2_1body_Op(ModelSpace& modelspace, std::string option);
