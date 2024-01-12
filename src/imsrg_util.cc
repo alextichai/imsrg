@@ -225,6 +225,70 @@ namespace imsrg_util
         std::istringstream(opnamesplit[1]) >> rr;
         theop =  FPhippn0_Op(modelspace, rr);
       }
+      else if (opnamesplit[0] == "FSigma0p") 
+      { 
+        // Sigma form factor for protons 
+        // momentum transfer q in MeV, e.g. FSigma0p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FSigma0p_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FSigma0n") 
+      { 
+        // Sigma form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FSigma0n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FSigma0n_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FSigmap0p") 
+      { 
+        // Sigmap form factor for protons 
+        // momentum transfer q in MeV, e.g. FSigmap0p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FSigmap0p_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FSigmap0n") 
+      { 
+        // Sigmap form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FSigmap0n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FSigmap0n_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FSigmapp0p") 
+      { 
+        // Sigmapp form factor for protons 
+        // momentum transfer q in MeV, e.g. FSigmapp0p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FSigmapp0p_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FSigmapp0n") 
+      { 
+        // Sigmapp form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FSigmapp0n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FSigmapp0n_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FDelta0p") 
+      { 
+        // Delta form factor for protons 
+        // momentum transfer q in MeV, e.g. FDelta0p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FDelta0p_Op(modelspace, rr);
+      }
+      else if (opnamesplit[0] == "FDelta0n") 
+      { 
+        // Delta form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FDelta0n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  FDelta0n_Op(modelspace, rr);
+      }
       else if (opnamesplit[0] == "rhop") // point proton  density at position r, e.g. rhop_1.25
       {
         double rr;
@@ -1351,6 +1415,46 @@ Operator KineticEnergy_RelativisticCorr(ModelSpace& modelspace)
   const double norm = sqrt(4 * M_PI);
   return norm * DM_NREFT::Phipp(modelspace, "n", 0, q);
  }
+
+ Operator FSigma0p_Op(ModelSpace& modelspace,double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Sigma(modelspace, "p", 0, q); 
+}
+
+Operator FSigma0n_Op(ModelSpace& modelspace,double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Sigma(modelspace, "n", 0, q); 
+}
+
+Operator FSigmap0p_Op(ModelSpace& modelspace,double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Sigmap(modelspace, "p", 0, q); 
+}
+
+Operator FSigmap0n_Op(ModelSpace& modelspace,double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Sigmap(modelspace, "n", 0, q); 
+}
+
+Operator FSigmapp0p_Op(ModelSpace& modelspace,double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Sigmapp(modelspace, "p", 0, q); 
+}
+
+Operator FSigmapp0n_Op(ModelSpace& modelspace,double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Sigmapp(modelspace, "n", 0, q); 
+}
+
+Operator FDelta0p_Op(ModelSpace& modelspace,double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Delta(modelspace, "p", 0, q); 
+}
+
+Operator FDelta0n_Op(ModelSpace& modelspace,double q) {
+  const double norm = sqrt(4 * M_PI);
+  return norm * DM_NREFT::Delta(modelspace, "n", 0, q); 
+}
 
  Operator Rm2_corrected_Op(ModelSpace& modelspace, int A, int Z)
  {
