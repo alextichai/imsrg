@@ -1458,10 +1458,11 @@ if (opff.file2name != "") {
       }
       else if ( basis == "NAT")
       {
-        Operator op_2b = hf.TransformHOToNATBasis(op);
-        op_2b.SetParticleRank(2);
+        op = hf.TransformHOToNATBasis(op).DoNormalOrdering();
+        // Operator op_2b = hf.TransformHOToNATBasis(op);
+        // op_2b.SetParticleRank(2);
 
-        op = hf.GetNormalOrdered3BOperator(op) + op_2b.DoNormalOrdering();
+        // op = hf.GetNormalOrdered3BOperator(op) + op_2b.DoNormalOrdering();
       }
       std::cout << std::setprecision(10) << "   HF: " << op.ZeroBody << std::endl;
 
