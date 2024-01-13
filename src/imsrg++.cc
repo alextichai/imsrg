@@ -1509,10 +1509,12 @@ if (opff.file2name != "") {
         op = op.UndoNormalOrdering();
         op.SetModelSpace(ms2);
         op = op.DoNormalOrdering();
+        if ((op.GetJRank() == 0) && (op.GetTRank() == 0) && (op.GetParity() == 0)) {
         rw.Write_NaiveVS1B(intfile + opname + ".vs1b", op);
         rw.Write_NaiveVS2B(intfile + opname + ".vs2b", op);
 	    rw.Write_me1j(intfile + opname + "_coreNO" + emax_ref_string + ".me1j", op, emax_reference, emax_reference);
 	    rw.Write_me2jp(intfile + opname + "_coreNO" + emax_ref_string + ".me2jp", op, emax_reference, 2 * emax_reference, emax_reference);
+        }
       }
 //      std::cout << " (" << ops[i].ZeroBody << " ) " << std::endl;
       std::cout << "   IMSRG: " << op.ZeroBody << std::endl;
