@@ -5810,7 +5810,7 @@ void ReadWrite::WriteTensorTokyo(std::string filename, Operator& op)
        double obme = op.OneBody(a,b);
        if(std::abs(obme) < 1e-7) continue;
        outfile << std::setw(wint) << a_ind << std::setw(wint) << b_ind
-           << std::setw(wdouble) << std::setiosflags(std::ios::scientific) << std::setprecision(pdouble) << obme
+           << std::setw(wdouble) << " " << std::setiosflags(std::ios::scientific) << std::setprecision(pdouble) << obme
            << std::endl;
      }
    }
