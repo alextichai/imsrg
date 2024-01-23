@@ -115,6 +115,9 @@ namespace imsrg_util
       else if (opname == "Sigma")         theop =  Sigma_Op(modelspace);
       else if (opname == "Sigma_p")       theop =  Sigma_Op_pn(modelspace,"proton");
       else if (opname == "Sigma_n")       theop =  Sigma_Op_pn(modelspace,"neutron");
+      else if (opname == "L")             theop =  L_Op(modelspace);
+      else if (opname == "L_p")           theop =  L_Op_pn(modelspace,"proton");
+      else if (opname == "L_n")           theop =  L_Op_pn(modelspace,"neutron");
       else if (opname == "L2rel")         theop =  L2rel_Op(modelspace); // Untested...
       else if (opname == "QdotQ")         theop =  QdotQ_Op(modelspace); // Untested...
       else if (opname == "VCoul")         theop =  VCoulomb_Op(modelspace); // Untested...
@@ -2580,6 +2583,45 @@ Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::set<i
    } 
    return Sig;
  }
+
+Operator L_Op(ModelSpace& modelspace) {
+  return L_Op_pn(modelspace, "both");
+}
+
+Operator L_Op_pn(ModelSpace &modelspace, std::string pn) {
+  Operator theLOp(modelspace, 1, 0, 0, 2);
+  theLOp.SetHermitian();
+  size_t norbits = modelspace.GetNumberOrbits();
+  for (size_t i = 0; i < norbits; ++i) {
+    Orbit &oi = modelspace.GetOrbit(i);
+    const auto li = oi.l;
+    const auto jji = oi.j2;
+    const auto tti = oi.tz2;
+    const auto ni = oi.n;
+    if (pn == "proton" and tti > 0)
+      continue;
+    if (pn == "neutron" and tti < 0)
+      continue;
+    for (auto j : theLOp.OneBodyChannels[{li, jji, tti}]) {
+      Orbit &oj = modelspace.GetOrbit(j);
+      const auto lj = oj.l;
+      const auto jjj = oj.j2;
+      const auto ttj = oj.tz2;
+      const auto nj = oj.n;
+      if ((ni != nj) || (li != lj) || (tti != ttj))
+        continue;
+
+      const double sixj =
+          modelspace.GetSixJ(li, lj, 1, jjj / 2.0, jji / 2.0, 0.5);
+      const double factor = sqrt(jji + 1) * sqrt(jjj + 1) *
+                            sqrt(li * (li + 1) * (2 * li + 1)) *
+                            modelspace.phase(li + (jjj + 3) / 2);
+      const double M_L = factor * sixj;
+      theLOp.OneBody(i, j) = M_L;
+    }
+  }
+  return theLOp;
+}
 
   void Reduce(Operator& X)
   {
