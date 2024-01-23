@@ -1425,37 +1425,44 @@ Operator KineticEnergy_RelativisticCorr(ModelSpace& modelspace)
 }
 
 Operator FSigma0n_Op(ModelSpace& modelspace,double q) {
-  const double norm = sqrt(4 * M_PI);
+  // const double norm = sqrt(4 * M_PI);
+  const double norm = 1.0;
   return norm * DM_NREFT::Sigma(modelspace, "n", 0, q); 
 }
 
 Operator FSigmap1p_Op(ModelSpace& modelspace,double q) {
-  const double norm = sqrt(4 * M_PI);
+  // const double norm = sqrt(4 * M_PI);
+  const double norm = 1.0;
   return norm * DM_NREFT::Sigmap(modelspace, "p", 1, q); 
 }
 
 Operator FSigmap1n_Op(ModelSpace& modelspace,double q) {
-  const double norm = sqrt(4 * M_PI);
+  // const double norm = sqrt(4 * M_PI);
+  const double norm = 1.0;
   return norm * DM_NREFT::Sigmap(modelspace, "n", 1, q); 
 }
 
 Operator FSigmapp1p_Op(ModelSpace& modelspace,double q) {
-  const double norm = sqrt(4 * M_PI);
+  // const double norm = sqrt(4 * M_PI);
+  const double norm = 1.0;
   return norm * DM_NREFT::Sigmapp(modelspace, "p", 1, q); 
 }
 
 Operator FSigmapp1n_Op(ModelSpace& modelspace,double q) {
-  const double norm = sqrt(4 * M_PI);
+  // const double norm = sqrt(4 * M_PI);
+  const double norm = 1.0;
   return norm * DM_NREFT::Sigmapp(modelspace, "n", 1, q); 
 }
 
 Operator FDelta1p_Op(ModelSpace& modelspace,double q) {
-  const double norm = sqrt(4 * M_PI);
+  // const double norm = sqrt(4 * M_PI);
+  const double norm = 1.0;
   return norm * DM_NREFT::Delta(modelspace, "p", 1, q); 
 }
 
 Operator FDelta1n_Op(ModelSpace& modelspace,double q) {
-  const double norm = sqrt(4 * M_PI);
+  // const double norm = sqrt(4 * M_PI);
+  const double norm = 1.0;
   return norm * DM_NREFT::Delta(modelspace, "n", 1, q); 
 }
 
