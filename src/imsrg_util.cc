@@ -202,7 +202,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FM0p_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FMp0_Op(modelspace, rr);
+        theop =  sqrt(4 * M_PI) * DM_NREFT::M(modelspace, "p", 0, rr);
+      }
+      else if (opnamesplit[0] == "FM2p") 
+      {
+        // M form factor for protons
+        // momentum transfer q in MeV, e.g. FM2p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  sqrt(4 * M_PI) * DM_NREFT::M(modelspace, "p", 2, rr);
+      }
+      else if (opnamesplit[0] == "FM4p") 
+      {
+        // M form factor for protons
+        // momentum transfer q in MeV, e.g. FM4p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  sqrt(4 * M_PI) * DM_NREFT::M(modelspace, "p", 4, rr);
       }
       else if (opnamesplit[0] == "FM0n") 
       {
@@ -210,7 +226,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FM0n_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FMn0_Op(modelspace, rr);
+        theop =  sqrt(4 * M_PI) * DM_NREFT::M(modelspace, "n", 0, rr);
+      }
+      else if (opnamesplit[0] == "FM2n") 
+      {
+        // M form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FM2n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  sqrt(4 * M_PI) * DM_NREFT::M(modelspace, "n", 2, rr);
+      }
+      else if (opnamesplit[0] == "FM4n") 
+      {
+        // M form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FM4n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  sqrt(4 * M_PI) * DM_NREFT::M(modelspace, "n", 4, rr);
       }
       else if (opnamesplit[0] == "FPhipp0p") 
       {
@@ -218,7 +250,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FPhipp0p_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FPhippp0_Op(modelspace, rr);
+        theop =  sqrt(4 * M_PI) * DM_NREFT::Phipp(modelspace, "p", 0, rr);
+      }
+      else if (opnamesplit[0] == "FPhipp2p") 
+      {
+        // Phipp form factor for protons
+        // momentum transfer q in MeV, e.g. FPhipp2p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  sqrt(4 * M_PI) * DM_NREFT::Phipp(modelspace, "p", 2, rr);
+      }
+      else if (opnamesplit[0] == "FPhipp4p") 
+      {
+        // Phipp form factor for protons
+        // momentum transfer q in MeV, e.g. FPhipp4p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  sqrt(4 * M_PI) * DM_NREFT::Phipp(modelspace, "p", 4, rr);
       }
       else if (opnamesplit[0] == "FPhipp0n") 
       {
@@ -226,7 +274,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FPhipp0n_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FPhippn0_Op(modelspace, rr);
+        theop =  sqrt(4 * M_PI) * DM_NREFT::Phipp(modelspace, "n", 0, rr);
+      }
+      else if (opnamesplit[0] == "FPhipp2n") 
+      {
+        // Phipp form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FPhipp2n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  sqrt(4 * M_PI) * DM_NREFT::Phipp(modelspace, "n", 2, rr);
+      }
+      else if (opnamesplit[0] == "FPhipp4n") 
+      {
+        // Phipp form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FPhipp4n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  sqrt(4 * M_PI) * DM_NREFT::Phipp(modelspace, "n", 4, rr);
       }
       else if (opnamesplit[0] == "FSigma0p") 
       { 
@@ -250,7 +314,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FSigmap1p_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FSigmap1p_Op(modelspace, rr);
+        theop =  DM_NREFT::Sigmap(modelspace, "p", 1, rr);
+      }
+      else if (opnamesplit[0] == "FSigmap3p") 
+      { 
+        // Sigmap form factor for protons 
+        // momentum transfer q in MeV, e.g. FSigmap3p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Sigmap(modelspace, "p", 3, rr);
+      }
+      else if (opnamesplit[0] == "FSigmap5p") 
+      { 
+        // Sigmap form factor for protons 
+        // momentum transfer q in MeV, e.g. FSigmap5p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Sigmap(modelspace, "p", 5, rr);
       }
       else if (opnamesplit[0] == "FSigmap1n") 
       { 
@@ -258,7 +338,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FSigmap1n_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FSigmap1n_Op(modelspace, rr);
+        theop =  DM_NREFT::Sigmap(modelspace, "n", 1, rr);
+      }
+      else if (opnamesplit[0] == "FSigmap3n") 
+      { 
+        // Sigmap form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FSigmap3n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Sigmap(modelspace, "n", 3, rr);
+      }
+      else if (opnamesplit[0] == "FSigmap5n") 
+      { 
+        // Sigmap form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FSigmap5n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Sigmap(modelspace, "n", 5, rr);
       }
       else if (opnamesplit[0] == "FSigmapp1p") 
       { 
@@ -266,7 +362,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FSigmapp1p_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FSigmapp1p_Op(modelspace, rr);
+        theop =  DM_NREFT::Sigmapp(modelspace, "p", 1, rr);
+      }
+      else if (opnamesplit[0] == "FSigmapp3p") 
+      { 
+        // Sigmapp form factor for protons 
+        // momentum transfer q in MeV, e.g. FSigmapp3p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Sigmapp(modelspace, "p", 3, rr);
+      }
+      else if (opnamesplit[0] == "FSigmapp5p") 
+      { 
+        // Sigmapp form factor for protons 
+        // momentum transfer q in MeV, e.g. FSigmapp5p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Sigmapp(modelspace, "p", 5, rr);
       }
       else if (opnamesplit[0] == "FSigmapp1n") 
       { 
@@ -274,7 +386,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FSigmapp1n_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FSigmapp1n_Op(modelspace, rr);
+        theop =  DM_NREFT::Sigmapp(modelspace, "n", 1, rr);
+      }
+      else if (opnamesplit[0] == "FSigmapp3n") 
+      { 
+        // Sigmapp form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FSigmapp3n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Sigmapp(modelspace, "n", 3, rr);
+      }
+      else if (opnamesplit[0] == "FSigmapp5n") 
+      { 
+        // Sigmapp form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FSigmapp5n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Sigmapp(modelspace, "n", 5, rr);
       }
       else if (opnamesplit[0] == "FDelta1p") 
       { 
@@ -282,7 +410,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FDelta1p_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FDelta1p_Op(modelspace, rr);
+        theop =  DM_NREFT::Delta(modelspace, "p", 1, rr);
+      }
+      else if (opnamesplit[0] == "FDelta3p") 
+      { 
+        // Delta form factor for protons 
+        // momentum transfer q in MeV, e.g. FDelta3p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Delta(modelspace, "p", 3, rr);
+      }
+      else if (opnamesplit[0] == "FDelta5p") 
+      { 
+        // Delta form factor for protons 
+        // momentum transfer q in MeV, e.g. FDelta5p_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Delta(modelspace, "p", 5, rr);
       }
       else if (opnamesplit[0] == "FDelta1n") 
       { 
@@ -290,7 +434,23 @@ namespace imsrg_util
         // momentum transfer q in MeV, e.g. FDelta1n_200.0
         double rr;
         std::istringstream(opnamesplit[1]) >> rr;
-        theop =  FDelta1n_Op(modelspace, rr);
+        theop =  DM_NREFT::Delta(modelspace, "n", 1, rr);
+      }
+      else if (opnamesplit[0] == "FDelta3n") 
+      { 
+        // Delta form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FDelta3n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Delta(modelspace, "n", 3, rr);
+      }
+      else if (opnamesplit[0] == "FDelta5n") 
+      { 
+        // Delta form factor for neutrons 
+        // momentum transfer q in MeV, e.g. FDelta5n_200.0
+        double rr;
+        std::istringstream(opnamesplit[1]) >> rr;
+        theop =  DM_NREFT::Delta(modelspace, "n", 5, rr);
       }
       else if (opnamesplit[0] == "rhop") // point proton  density at position r, e.g. rhop_1.25
       {
