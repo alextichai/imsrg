@@ -185,6 +185,12 @@ Operator CommutatorScalarScalar( const Operator& X, const Operator& Y)
    if ( use_imsrg3 )  z_particlerank = std::max(z_particlerank, 3);
    ModelSpace& ms = *(Y.GetModelSpace());
    Operator Z( ms, z_Jrank, z_Trank, z_parity, z_particlerank );
+   if (X.Norm() == 0) {
+    return Z;
+   }
+   if (Y.Norm() == 0) {
+    return Z;
+   }
 
 
    if ( (X.IsHermitian() and Y.IsHermitian()) or (X.IsAntiHermitian() and Y.IsAntiHermitian()) ) Z.SetAntiHermitian();
@@ -448,6 +454,12 @@ Operator CommutatorScalarTensor( const Operator& X, const Operator& Y)
    Z.EraseZeroBody();
    Z.EraseOneBody();
    Z.EraseTwoBody();
+   if (X.Norm() == 0) {
+    return Z;
+   }
+   if (Y.Norm() == 0) {
+    return Z;
+   }
 
    if ( (X.IsHermitian() and Y.IsHermitian()) or (X.IsAntiHermitian() and Y.IsAntiHermitian()) ) Z.SetAntiHermitian();
    else if ( (X.IsHermitian() and Y.IsAntiHermitian()) or (X.IsAntiHermitian() and Y.IsHermitian()) ) Z.SetHermitian();
@@ -558,6 +570,9 @@ Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
    double nx = OpIn.Norm();
    double ny = Omega.Norm();
    Operator OpOut = OpIn;
+   if (Omega.Norm() == 0.0) {
+    return OpOut;
+   }
    if ( (OpOut.GetNumberLegs()%2==0) and OpOut.GetParticleRank()<2 )
    {
      OpOut.SetParticleRank(2);
