@@ -1465,6 +1465,7 @@ if (opff.file2name != "") {
         // op = hf.GetNormalOrdered3BOperator(op) + op_2b.DoNormalOrdering();
       }
       std::cout << std::setprecision(24) << "   HF: " << op.ZeroBody << std::endl;
+      std::cout << opname << "_HF: " << op.ZeroBody << std::endl;
 
       if ( (eMax_imsrg != -1) or (e2Max_imsrg != -1) or (e3Max_imsrg) != -1)
       {
