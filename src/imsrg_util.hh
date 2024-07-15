@@ -66,7 +66,7 @@ namespace imsrg_util
  Operator Rp2_corrected_Op(ModelSpace& modelspace, int A, int Z);
  Operator Rn2_corrected_Op(ModelSpace& modelspace, int A, int Z);
  Operator R2o_Op_FromString(ModelSpace& modelspace, std::string op_string);
- Operator R2o_Op(ModelSpace& modelspace, int l, int tz, int jj);
+ Operator R2o_Op(ModelSpace& modelspace, int l, int tz2, int jj);
  Operator Rp2b_Op(ModelSpace& modelspace, int A, int Z);
  Operator Rn2b_Op(ModelSpace& modelspace, int A, int Z);
  Operator Rp2c_Op(ModelSpace& modelspace, int A, int Z);

@@ -6,6 +6,7 @@
 #include "DarkMatterNREFT.hh"
 #include "M0nu.hh"
 #include "omp.h"
+#include <cstdlib>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_sf_bessel.h> // to use bessel functions
 #include <gsl/gsl_sf_laguerre.h>
@@ -195,6 +196,9 @@ namespace imsrg_util
         int Z_rp;
         std::istringstream(opnamesplit[1]) >> Z_rp;
         theop =  Rn2_corrected_Op(modelspace,modelspace.GetTargetMass(),Z_rp) ;
+      }
+      else if (opnamesplit[0] == "R2o") {
+        theop = R2o_Op_FromString(modelspace, opname);
       }
       else if (opnamesplit[0] == "FM0p") 
       {
@@ -1471,6 +1475,100 @@ Operator KineticEnergy_RelativisticCorr(ModelSpace& modelspace)
                                    - 4./(A*(A-Z))*R2_2body_Op(modelspace,"neutron");
  }
 
+ Operator R2o_Op_FromString(ModelSpace &modelspace, std::string op_string) {
+   // split std::string on _ into a vector of std::string so that,
+   // e.g. "R2_p1"  =>  {"R2", "p1"}
+   std::vector<std::string> opnamesplit = split_string(op_string, "_");
+
+   if (opnamesplit.size() != 2) {
+     std::cout << "ERROR: Invalid string for orbital radius operator: "
+               << op_string << "\n";
+     std::cout << "Failed on splitting string: expected form "
+                  "R2o_[p/n][s/p/d/f/g/h/i][jj]\n";
+     exit(EXIT_FAILURE);
+   }
+
+   if (opnamesplit[1].size() < 3) {
+     std::cout << "ERROR: Invalid string for orbital radius operator: "
+               << opnamesplit[1] << "\n";
+     std::cout << "Failed on length: expected form [p/n][s/p/d/f/g/h/i][jj] "
+                  "(at least 3 characters)\n";
+     exit(EXIT_FAILURE);
+   }
+
+   std::map<char, int> tz2_lookup = {{'p', -1}, {'n', 1}};
+   int tz2 = 0;
+   {
+     const auto result = tz2_lookup.find(opnamesplit[1][0]);
+     if (result != tz2_lookup.end()) {
+       tz2 = result->second;
+     } else {
+       std::cout << "ERROR: Invalid string for orbital radius operator: "
+                 << opnamesplit[1] << "\n";
+       std::cout << "Failed on parsing isospin: expected form "
+                    "[p/n][s/p/d/f/g/h/i][jj]\n";
+       exit(EXIT_FAILURE);
+     }
+   }
+
+   std::map<char, int> l_lookup = {{'s', 0}, {'p', 1}, {'d', 2}, {'f', 3},
+                                   {'g', 4}, {'h', 5}, {'i', 6}};
+   int l = -1;
+   {
+     const auto result = l_lookup.find(opnamesplit[1][1]);
+     if (result != l_lookup.end()) {
+       l = result->second;
+     } else {
+       std::cout << "ERROR: Invalid string for orbital radius operator: "
+                 << opnamesplit[1] << "\n";
+       std::cout << "Failed on parsing orbital angular momentum: expected form "
+                    "[p/n][s/p/d/f/g/h/i][jj]\n";
+       exit(EXIT_FAILURE);
+     }
+   }
+
+   const auto jj_string = opnamesplit[1].substr(2, opnamesplit[1].size());
+   const int jj = std::stoi(jj_string);
+
+   return R2o_Op(modelspace, l, tz2, jj);
+ }
+
+/// Single orbital radius squared
+Operator R2o_Op(ModelSpace &modelspace, int l, int tz2, int jj) {
+  Operator r2(modelspace);
+  double oscillator_b =
+      (HBARC * HBARC / M_NUCLEON / modelspace.GetHbarOmega());
+
+  std::set<index_t> orbitlist;
+  orbitlist.insert(modelspace.neutron_orbits.begin(),
+                  modelspace.neutron_orbits.end());
+  orbitlist.insert(modelspace.proton_orbits.begin(),
+                  modelspace.proton_orbits.end());
+
+  for (unsigned int a : orbitlist) {
+    Orbit &oa = modelspace.GetOrbit(a);
+
+    if ((oa.l != l) || (oa.tz2 != tz2) || (oa.j2 != jj)) {
+      continue;
+    }
+
+    r2.OneBody(a, a) = (2 * oa.n + oa.l + 1.5);
+    for (unsigned int b : r2.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) {
+      if (b < a)
+        continue;
+      Orbit &ob = modelspace.GetOrbit(b);
+      {
+        if (oa.n == ob.n + 1)
+          r2.OneBody(a, b) = -sqrt((oa.n) * (oa.n + oa.l + 0.5));
+        else if (oa.n == ob.n - 1)
+          r2.OneBody(a, b) = -sqrt((ob.n) * (ob.n + ob.l + 0.5));
+        r2.OneBody(b, a) = r2.OneBody(a, b);
+      }
+    }
+  }
+  r2.OneBody *= oscillator_b;
+  return r2;
+}
 
 /// Point proton radius squared
 /// Returns
