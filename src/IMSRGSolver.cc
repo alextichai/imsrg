@@ -95,8 +95,8 @@ void IMSRGSolver::GatherOmega()
   std::cout << "gathering Omega. "  << std::endl;
   if (Omega.size()<2)
   {
-    auto& last = Omega.back();
-    Omega.emplace_back( last );
+    Omega.emplace_back( Eta );
+    Omega.back().Erase();
   }
   // the last omega in the list is the hunter. the one just preceeding it is the gatherer.
   auto& hunter = Omega.back();
