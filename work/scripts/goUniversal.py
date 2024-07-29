@@ -24,7 +24,7 @@ elif call('type '+'srun', shell=True, stdout=PIPE, stderr=PIPE) == 0: BATCHSYS =
 
 ### The code uses OpenMP and benefits from up to at least 24 threads
 NTHREADS=12
-exe = '%s/bin/imsrg++'%(environ['HOME'])
+exe = '/Users/alexandertichai/Work/Code/imsrg/src/build/imsrg++'
 
 ### Flag to swith between submitting to the scheduler or running in the current shell
 batch_mode=False
@@ -32,7 +32,7 @@ batch_mode=False
 if 'terminal' in argv[1:]: batch_mode=False
 
 ### Don't forget to change this. I don't want emails about your calculations...
-mail_address = 'sstroberg@triumf.ca'
+mail_address = 'a_tichai@theorie.ikp.physik.tu-darmstadt.de'
 
 ### This comes in handy if you want to loop over Z
 ELEM = ['n','H','He','Li','Be','B','C','N',
@@ -111,20 +111,23 @@ time srun %s
 if not path.exists('imsrg_log'): mkdir('imsrg_log')
 
 ### Loop over multiple jobs to submit
-for Z in range(16,17):
- A=32
+for Z in range(8,9):
+ A=16
  for reference in ['%s%d'%(ELEM[Z],A)]:
   ARGS['reference'] = reference
-  print 'Z = ',Z
-  for e in [2]:
-   for hw in [13]:
+  print('Z = ', Z)
+  for e in [4]:
+   for hw in [20]:
 
      ARGS['emax'] = '%d'%e
      ARGS['e3max'] = '14'
 
-     ARGS['2bme'] = 'input/chi2b_srg0625_eMax14_lMax10_hwHO0%d.me2j.gz'%(hw)
-     ARGS['3bme'] = 'input/me3j/chi2b3b400cD-02cE0098_hwconv036_srg0625ho40J_eMax14_EMax14_hwHO0%d.me3j.gz'%(hw)
-     ARGS['LECs'] = 'srg0625'
+     ARGS['2bme'] = '/Users/alexandertichai/Work/Matrixelements/ME2J/chi2b_srg0800_eMax04_hwHO020.me2j.gz'
+    #  ARGS['3bme'] = 'input/me3j/chi2b3b400cD-02cE0098_hwconv036_srg0625ho40J_eMax14_EMax14_hwHO0%d.me3j.gz'%(hw)
+    #  ARGS['LECs'] = 'srg0625'
+
+     ARGS['3bme'] = ''
+     ARGS['LECs'] = ''
 
 #     ARGS['2bme'] = 'input/usdbpn.int'
 #     ARGS['3bme'] = 'none'
@@ -148,9 +151,9 @@ for Z in range(16,17):
      ARGS['emax'] = '%d'%e
 #     ARGS['method'] = method
 
-     ARGS['Operators'] = ''    # Operators to consistenly transform, separated by commas.
+    #  ARGS['Operators'] = ''    # Operators to consistenly transform, separated by commas.
 #     ARGS['Operators'] = 'Rp2'
-#     ARGS['Operators'] = 'Rp2,Rn2'
+     ARGS['Operators'] = 'Rp2,Rn2,RdotR'
 #     ARGS['Operators'] = 'E2'
 #     ARGS['Operators'] = 'E2,M1'
 #     ARGS['Operators'] = 'E2,M1,GamowTeller'

@@ -87,6 +87,7 @@ namespace imsrg_util
           std::istringstream( opnamesplit[1] ) >> Rms ;
           theop =  ISDipoleOp(modelspace,3,1,Rms) ;
       }
+      else if (opname == "RdotR")         theop =  RdotR(modelspace) ;
       else if (opname == "E1")            theop =  ElectricMultipoleOp(modelspace,1) ;
       else if (opname == "E2")            theop =  ElectricMultipoleOp(modelspace,2) ;
       else if (opname == "E3")            theop =  ElectricMultipoleOp(modelspace,3) ;
@@ -2373,6 +2374,45 @@ Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::set<i
       }
     }
     return EL;
+  }
+
+  Operator RdotR(ModelSpace& modelspace)
+  {
+    Operator rad = R2_1body_Op(modelspace,"matter");
+
+    Operator op(modelspace,0,0,0,2);
+
+    op.OneBody = rad.OneBody * rad.OneBody.t();
+
+    for (int ch=0; ch<op.nChannels; ++ch) {
+      TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
+
+      index_t nbras = tbc.GetNumberKets();
+      index_t nkets = tbc.GetNumberKets();
+      int J = tbc.J;
+      for (index_t ibra=0;ibra<nbras;++ibra) {
+        Ket& bra = tbc.GetKet(ibra);
+        index_t i = bra.p;
+        index_t j = bra.q;        
+        for (index_t iket=0;iket<nkets;++iket) {
+          Ket& ket = tbc.GetKet(iket);
+          index_t k = ket.p;
+          index_t l = ket.q;
+          double me = 0.;
+          me += rad.OneBody(i,k) * rad.OneBody(j,l);
+          me -= AngMom::phase((bra.op->j2 + bra.oq->j2)/2 + J) * rad.OneBody(i,l) * rad.OneBody(j,k);
+
+          me *= 2;
+
+          if(i==j) me /= PhysConst::SQRT2;
+          if(k==l) me /= PhysConst::SQRT2;
+
+          op.TwoBody.SetTBME(ch,bra,ket,me);
+        }
+      }
+    }
+
+    return op; 
   }
 
   /// Returns a reduced electric multipole operator with units \f$ e\f$ fm\f$^{\lambda} \f$
