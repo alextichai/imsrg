@@ -625,12 +625,13 @@ Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
           OpNested.OneBody += chi_last;  // add the chi from the previous step to OpNested.
         }
         
-        OpNested = Commutator(Omega,OpNested); // the ith nested commutator
+        OpNested = Commutator(Omega,OpNested); // the ith nested commutator        
 
-        factorial_denom /= i;
+        factorial_denom /= i;        
 
         OpOut += factorial_denom * OpNested;
   
+        std::cout << OpOut.ZeroBody << std::endl;
 
         if (OpOut.rank_J > 0)
         {
@@ -650,6 +651,29 @@ Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
    OpIn.profiler.timer["BCH_Transform"] += omp_get_wtime() - t_start;
    return OpOut;
 }
+
+void EvaluateCommutatorSumRule(const Operator& A, const Operator& B, int k)
+{
+  Operator OpNested = BuildCommutatorFixedNesting(A,B,k);
+
+  double moment_k = 1./2. * pow(-1,k);// * A.ZeroBody;//OpNested.ZeroBody;
+
+  std::cout << "Moment evaluation for 'k = " << k << "' :  " << moment_k << std::endl;
+}
+
+Operator BuildCommutatorFixedNesting(const Operator& A, const Operator& B, int nesting)
+{
+  Operator OpNested = Commutator(A,B);
+
+  int n=1;
+  while(n < nesting){
+    OpNested = Commutator(A,OpNested);
+    n++;
+  }
+  return OpNested;
+}
+
+
 
 
 //  Update the auxiliary one-body operator chi, using Omega and the ith nested commutator

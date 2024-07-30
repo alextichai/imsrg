@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.27)
 
 option(IMSRG_BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 
@@ -44,7 +44,7 @@ add_subdirectory(half)
 
 add_subdirectory(boost_src)
 
-add_subdirectory(profiling)
+# add_subdirectory(profiling)
 
 
 if(IMSRG_BUILD_PYTHON_BINDINGS)

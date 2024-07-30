@@ -24,7 +24,7 @@ elif call('type '+'srun', shell=True, stdout=PIPE, stderr=PIPE) == 0: BATCHSYS =
 
 ### The code uses OpenMP and benefits from up to at least 24 threads
 NTHREADS=12
-exe = '/Users/alexandertichai/Work/Code/imsrg/src/build/imsrg++'
+exe = '/Users/alexandertichai/Work/Code/imsrg++/src/build/imsrg++'
 
 ### Flag to swith between submitting to the scheduler or running in the current shell
 batch_mode=False
@@ -153,7 +153,8 @@ for Z in range(8,9):
 
     #  ARGS['Operators'] = ''    # Operators to consistenly transform, separated by commas.
 #     ARGS['Operators'] = 'Rp2'
-     ARGS['Operators'] = 'Rp2,Rn2,RdotR'
+    #  ARGS['Operators'] = 'Rp2,Rn2,RdotR'
+     ARGS['Operators'] = 'RdotR'
 #     ARGS['Operators'] = 'E2'
 #     ARGS['Operators'] = 'E2,M1'
 #     ARGS['Operators'] = 'E2,M1,GamowTeller'

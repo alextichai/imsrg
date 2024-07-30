@@ -1495,6 +1495,8 @@ if (opff.file2name != "") {
 
       op = imsrgsolver.Transform(op);
 
+      Commutator::EvaluateCommutatorSumRule(op,imsrgsolver.GetH_s(),3);
+
       // Unclear whether we should do NO2B here as well...
       // std::cout << "Before renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;
       if (renormal_order) 
