@@ -154,7 +154,7 @@ for Z in range(8,9):
     #  ARGS['Operators'] = ''    # Operators to consistenly transform, separated by commas.
 #     ARGS['Operators'] = 'Rp2'
     #  ARGS['Operators'] = 'Rp2,Rn2,RdotR'
-     ARGS['Operators'] = 'RdotR'
+     ARGS['Operators'] = 'Rm2lab'
 #     ARGS['Operators'] = 'E2'
 #     ARGS['Operators'] = 'E2,M1'
 #     ARGS['Operators'] = 'E2,M1,GamowTeller'
@@ -179,7 +179,7 @@ for Z in range(8,9):
      if 'core_generator' in ARGS: jobname += '_' + ARGS['core_generator']
      if 'BetaCM' in ARGS: jobname += '_' + ARGS['BetaCM']
      ARGS['flowfile'] = 'output/BCH_' + jobname + '.dat'
-     ARGS['intfile']  = 'output/' + jobname
+     ARGS['intfile']  = '/Users/alexandertichai/Work/Projects/IMSRG/' + jobname
 
      cmd = ' '.join([exe] + ['%s=%s'%(x,ARGS[x]) for x in ARGS])
 

@@ -759,10 +759,8 @@ if (opff.file2name != "") {
      std::cout << std::endl;
    }
 
-//  for (auto& op : ops)
    for (size_t i=0;i<ops.size();++i)
    {
-//     std::cout << "Before transforming  " << opnames[i] << " has 3b norm " << ops[i].ThreeBodyNorm() << std::endl;
       // We don't transform a DaggerHF, because we want the a^dagger to already refer to the HF basis.
      if ((basis == "HF") and (opnames[i].find("DaggerHF") == std::string::npos)  )
      {
@@ -772,9 +770,7 @@ if (opff.file2name != "") {
      {
        ops[i] = hf.TransformHOToNATBasis(ops[i]);
      }
-//     std::cout << "After transforming  " << opnames[i] << " has 3b norm " << ops[i].ThreeBodyNorm() << std::endl;
      ops[i] = ops[i].DoNormalOrdering();
-//     std::cout << "Before normal ordering  " << opnames[i] << " has 3b norm " << ops[i].ThreeBodyNorm() << std::endl;
        std::cout << basis << " expectation value  " << opnames[i] << "  " << ops[i].ZeroBody << std::endl;
      if (method == "MP3")
      {
@@ -789,8 +785,12 @@ if (opff.file2name != "") {
       std::cout << " HF point proton radius = " << sqrt( Rp2 ) << std::endl;
       std::cout << " HF charge radius = " << ( abs(Rp2)<1e-6 ? 0.0 : sqrt( Rp2 + PROTON_RCH2 + NEUTRON_RCH2*(A-Z)/Z + DARWIN_FOLDY) ) << std::endl;
     }
+
+    Commutator::EvaluateCommutatorSumRule(ops[i],HNO,9);
+
    }// for ops.size
 
+   exit(-1);
 
 
 
@@ -960,7 +960,7 @@ if (opff.file2name != "") {
   {
     HNO.PrintTimes();
     return 0;
-  }
+  }  
 
   std::cout << " " << __FILE__ << " line " << __LINE__ << "noperators = " << HNO.profiler.counter["N_Operators"] << std::endl;
 
@@ -1212,6 +1212,15 @@ if (opff.file2name != "") {
 
     HNO = imsrgsolver.GetH_s();
 
+    // TODO:
+    // if() {
+      // int emax_imsrg = emax_reference;
+      // std::string emax_imsrg_string = std::to_string(emax_imsrg);
+      // rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", HNO, emax_imsrg, emax_imsrg);
+      // rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", HNO, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
+      // exit(-1);
+    // }
+
 //    int nOmega = imsrgsolver.GetOmegaSize() + imsrgsolver.GetNOmegaWritten();
 //    std::cout << "Undoing NO wrt A=" << modelspace.GetAref() << " Z=" << modelspace.GetZref() << std::endl;
     std::cout << "Undoing NO wrt A=" << modelspace_imsrg.GetAref() << " Z=" << modelspace_imsrg.GetZref() << std::endl;
@@ -1448,28 +1457,17 @@ if (opff.file2name != "") {
 
 
 
-      if ( basis == "oscillator" or opname=="OccRef")
-      {
+      if ( basis == "oscillator" or opname=="OccRef") {
         op = op.DoNormalOrdering();
-      }
-      else if ( basis == "HF")
-      {
+      } else if ( basis == "HF") {
         op = hf.TransformToHFBasis(op).DoNormalOrdering();
-      }
-      else if ( basis == "NAT")
-      {
+      } else if ( basis == "NAT") {
         op = hf.TransformHOToNATBasis(op).DoNormalOrdering();
-        // Operator op_2b = hf.TransformHOToNATBasis(op);
-        // op_2b.SetParticleRank(2);
-
-        // op = hf.GetNormalOrdered3BOperator(op) + op_2b.DoNormalOrdering();
       }
       std::cout << std::setprecision(24) << "   HF: " << op.ZeroBody << std::endl;
       std::cout << opname << "_HF: " << op.ZeroBody << std::endl;
 
-      if ( (eMax_imsrg != -1) or (e2Max_imsrg != -1) or (e3Max_imsrg) != -1)
-      {
-//     ModelSpace modelspace_imsrg = modelspace;
+      if ( (eMax_imsrg != -1) or (e2Max_imsrg != -1) or (e3Max_imsrg) != -1) {
         std::cout << "Truncating modelspace for IMSRG calculation: emax e2max e3max  ->  " << eMax_imsrg << " " << e2Max_imsrg << " " << e3Max_imsrg << std::endl;
         op = op.Truncate(modelspace_imsrg);
       }
@@ -1490,12 +1488,15 @@ if (opff.file2name != "") {
         }
       }
 
-
-
-
       op = imsrgsolver.Transform(op);
 
-      Commutator::EvaluateCommutatorSumRule(op,imsrgsolver.GetH_s(),3);
+      Commutator::EvaluateCommutatorSumRule(op,imsrgsolver.GetH_s(),9);
+
+      int emax_imsrg = eMax;
+      std::string emax_imsrg_string = std::to_string(emax_imsrg);
+      rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", HNO, emax_imsrg, emax_imsrg);
+      rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", HNO, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
+      exit(-1);
 
       // Unclear whether we should do NO2B here as well...
       // std::cout << "Before renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;
@@ -1524,8 +1525,7 @@ if (opff.file2name != "") {
       std::cout << opname << "_IMSRG: " << op.ZeroBody << std::endl;
 //      rw.WriteOperatorHuman(ops[i],intfile+opnames[i]+"_step2.op");
 //      std::cout << "After renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;
-
-
+       
 
     std::cout << "      " << op.GetJRank() << " " << op.GetTRank() << " " << op.GetParity() << "   " << op.GetNumberLegs() << std::endl;
     if ( ((op.GetJRank()+op.GetTRank()+op.GetParity())<1) and (op.GetNumberLegs()%2==0) )

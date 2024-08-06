@@ -630,8 +630,6 @@ Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
         factorial_denom /= i;        
 
         OpOut += factorial_denom * OpNested;
-  
-        std::cout << OpOut.ZeroBody << std::endl;
 
         if (OpOut.rank_J > 0)
         {
@@ -652,29 +650,40 @@ Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
    return OpOut;
 }
 
-void EvaluateCommutatorSumRule(const Operator& A, const Operator& B, int k)
+void EvaluateCommutatorSumRule(Operator& F, Operator& H, int kMax)
 {
-  Operator OpNested = BuildCommutatorFixedNesting(A,B,k);
+  std::cout << "Evaluating IMSRG sum rules up to kMax = " << kMax << std::endl;
 
-  double moment_k = 1./2. * pow(-1,k);// * A.ZeroBody;//OpNested.ZeroBody;
+  H.ZeroBody = 0.;
 
-  std::cout << "Moment evaluation for 'k = " << k << "' :  " << moment_k << std::endl;
-}
+  std::map<int,double> m_k;  
 
-Operator BuildCommutatorFixedNesting(const Operator& A, const Operator& B, int nesting)
-{
-  Operator OpNested = Commutator(A,B);
+  // initialize nesting with external operator F
+  Operator OpNested = F;
 
-  int n=1;
-  while(n < nesting){
-    OpNested = Commutator(A,OpNested);
-    n++;
+  int n = 1;  
+  while(n <= kMax){
+    OpNested = Commutator(H,OpNested);     
+    
+    if(n%2 == 1) {
+      Operator C = Commutator(OpNested,F);
+
+      m_k[n] = - 1./2. * C.ZeroBody;;
+    }
+    
+    n++;   
   }
-  return OpNested;
+
+  printf("Moments \n");
+  for(int k=1;k<=kMax;k+=2){
+    printf("m_%i =  % 2.6f \n",k,m_k[k]);
+  }
+
+  printf("Ratios \n");
+  for(int k=3;k<=kMax;k+=2){
+    printf("m_%i / m_%i =  % 2.6f \n",k,k-2,m_k[k]/m_k[k-2]);
+  }
 }
-
-
-
 
 //  Update the auxiliary one-body operator chi, using Omega and the ith nested commutator
 //  This has not been tested for tensor commutators, but it *should* work.

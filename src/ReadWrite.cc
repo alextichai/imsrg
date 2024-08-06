@@ -3204,6 +3204,7 @@ void ReadWrite::Write_me3jp( std::string ofilename, Operator& Hbare, int E1max, 
 void ReadWrite::Write_me1j(std::string outfilename, Operator &Hbare, int emax,
                            int lmax) {
   std::ofstream outfile(outfilename);
+  std::cout << "writing file: " << outfilename << std::endl;
   if (!outfile.good()) {
     std::cerr << "************************************" << std::endl
               << "**    Trouble opening file  !!!   **" << std::endl
