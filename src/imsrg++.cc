@@ -784,16 +784,8 @@ if (opff.file2name != "") {
       int A = modelspace.GetTargetMass();
       std::cout << " HF point proton radius = " << sqrt( Rp2 ) << std::endl;
       std::cout << " HF charge radius = " << ( abs(Rp2)<1e-6 ? 0.0 : sqrt( Rp2 + PROTON_RCH2 + NEUTRON_RCH2*(A-Z)/Z + DARWIN_FOLDY) ) << std::endl;
-    }
-
-    Commutator::EvaluateCommutatorSumRule(ops[i],HNO,9);
-
+    }    
    }// for ops.size
-
-   exit(-1);
-
-
-
   }// if method != "magnus"
 
 
@@ -960,7 +952,7 @@ if (opff.file2name != "") {
   {
     HNO.PrintTimes();
     return 0;
-  }  
+  }   
 
   std::cout << " " << __FILE__ << " line " << __LINE__ << "noperators = " << HNO.profiler.counter["N_Operators"] << std::endl;
 
@@ -1488,9 +1480,25 @@ if (opff.file2name != "") {
         }
       }
 
-      op = imsrgsolver.Transform(op);
+      Operator H_HF = *(imsrgsolver.H_0);
 
+      std::cout << "Operator: " << opnames[i] << std::endl;
+
+      // HF values for op and H
+      std::cout << "Mean field values for sum rules" << std::endl;
+      Commutator::EvaluateCommutatorSumRule(op,H_HF,9);
+
+      H_HF.UndoNormalOrdering();
+
+      op = imsrgsolver.Transform(op);      
+
+      // transformed values for op and H
+      std::cout << "IMSRG values for sum rules" << std::endl;
       Commutator::EvaluateCommutatorSumRule(op,imsrgsolver.GetH_s(),9);
+
+      HNO = imsrgsolver.GetH_s();
+
+      HNO.UndoNormalOrdering();
 
       int emax_imsrg = eMax;
       std::string emax_imsrg_string = std::to_string(emax_imsrg);

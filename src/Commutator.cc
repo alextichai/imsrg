@@ -668,7 +668,7 @@ void EvaluateCommutatorSumRule(Operator& F, Operator& H, int kMax)
     if(n%2 == 1) {
       Operator C = Commutator(OpNested,F);
 
-      m_k[n] = - 1./2. * C.ZeroBody;;
+      m_k[n] = - 1./2. * C.ZeroBody;
     }
     
     n++;   
@@ -676,12 +676,12 @@ void EvaluateCommutatorSumRule(Operator& F, Operator& H, int kMax)
 
   printf("Moments \n");
   for(int k=1;k<=kMax;k+=2){
-    printf("m_%i =  % 2.6f \n",k,m_k[k]);
+    printf("m_%i =  % 2.6e \n",k,m_k[k]);
   }
 
   printf("Ratios \n");
   for(int k=3;k<=kMax;k+=2){
-    printf("m_%i / m_%i =  % 2.6f \n",k,k-2,m_k[k]/m_k[k-2]);
+    printf("m_%i / m_%i =  % 2.6e \n",k,k-2,m_k[k]/m_k[k-2]);
   }
 }
 
