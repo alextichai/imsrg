@@ -23,8 +23,9 @@ if call('type '+'qsub', shell=True, stdout=PIPE, stderr=PIPE) == 0: BATCHSYS = '
 elif call('type '+'srun', shell=True, stdout=PIPE, stderr=PIPE) == 0: BATCHSYS = 'SLURM'
 
 ### The code uses OpenMP and benefits from up to at least 24 threads
-NTHREADS=12
+NTHREADS=24
 exe = '/Users/alexandertichai/Work/Code/imsrg++/src/build/imsrg++'
+exe = '/home/tichai/code/imsrg/src/build_preset/intel/imsrg++'
 
 ### Flag to swith between submitting to the scheduler or running in the current shell
 batch_mode=False
@@ -54,7 +55,7 @@ ARGS['dsmax'] = '0.5'
 ARGS['omega_norm_max'] = '0.25'
 
 ### Model space parameters used for reading Darmstadt-style interaction files
-ARGS['file2e1max'] = '14 file2e2max=28 file2lmax=10'
+ARGS['file2e1max'] = '12 file2e2max=24 file2lmax=12'
 ARGS['file3e1max'] = '14 file3e2max=28 file3e3max=14'
 
 ### Name of a directory to write Omega operators so they don't need to be stored in memory. If not given, they'll just be stored in memory.
@@ -97,6 +98,7 @@ elif BATCHSYS == 'SLURM':
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=%d
+#SBATCH --partition=fast
 #SBATCH --output=imsrg_log/%s.%%j
 #SBATCH --time=%s
 #SBATCH --mail-user=%s
@@ -111,35 +113,30 @@ time srun %s
 if not path.exists('imsrg_log'): mkdir('imsrg_log')
 
 ### Loop over multiple jobs to submit
-for Z in range(8,9):
- A=16
+for Z in range(28,29):
+ A=78
  for reference in ['%s%d'%(ELEM[Z],A)]:
   ARGS['reference'] = reference
   print('Z = ', Z)
-  for e in [4]:
-   for hw in [20]:
+  for e in [6,8,10,12]:
+   for hw in [16]:
 
      ARGS['emax'] = '%d'%e
-     ARGS['e3max'] = '14'
+     ARGS['e3max'] = '24'
 
-     ARGS['2bme'] = '/Users/alexandertichai/Work/Matrixelements/ME2J/chi2b_srg0800_eMax04_hwHO020.me2j.gz'
-    #  ARGS['3bme'] = 'input/me3j/chi2b3b400cD-02cE0098_hwconv036_srg0625ho40J_eMax14_EMax14_hwHO0%d.me3j.gz'%(hw)
-    #  ARGS['LECs'] = 'srg0625'
+     #ARGS['2bme'] = '/Users/alexandertichai/Work/Matrixelements/ME2J/chi2b_srg0800_eMax12_hwHO020.me2j.gz'
+     #ARGS['3bme'] = 'input/me3j/chi2b3b400cD-02cE0098_hwconv036_srg0625ho40J_eMax14_EMax14_hwHO0%d.me3j.gz'%(hw)
+     #ARGS['LECs'] = 'srg0625'
+     #ARGS['3bme'] = ''
 
-     ARGS['3bme'] = ''
+     ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N3LO_EM500_srg1.8_hw%i_emax18_e2max36.me2j.gz'%(hw)
+     ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_EM1.8_2.0_3NFJmax15_IS_hw%i_ms18_36_24.stream.bin'%(hw)    
+     ARGS['LECs'] = ''
+     ARGS['3bme_type'] = 'no2b'
+
+
      ARGS['LECs'] = ''
 
-#     ARGS['2bme'] = 'input/usdbpn.int'
-#     ARGS['3bme'] = 'none'
-#     ARGS['LECs'] = 'usdb'
-#     ARGS['fmt2'] = 'nushellx'
-#     ARGS['basis'] = 'oscillator'
-
-#     ARGS['2bme'] = '/work/hda21/hda215/ME_share/vnn_hw%d.00_kvnn10_lambda1.80_mesh_kmax_7.0_100_pc_R15.00_N15.dat_to_me2j.gz'%(hw)
-#     ARGS['3bme'] = '/work/hda21/hda215/ME_share/jsTNF_Nmax_16_J12max_8_hbarOmega_%d.00_Fit_cutoff_2.00_nexp_4_c1_1.00_c3_1.00_c4_1.00_cD_1.00_cE_1.00_2pi_0.00_2pi1pi_0.00_2picont_0.00_rings_0.00_J3max_9_new_E3_16_e_14_ant_EM1.8_2.0.h5_to_me3j.gz'%(hw)
-#     ARGS['2bme'] = '/itch/exch/me2j/chi2b_srg0625_eMax14_lMax10_hwHO0%d.me2j.gz'%(hw)
-#     ARGS['3bme'] = '/itch/exch/me3j/new/chi2b3b400cD-02cE0098_hwconv036_srg0625ho40J_eMax14_EMax14_hwHO0%d.me3j.gz'%(hw)
-#     ARGS['LECs'] = 'srg0625'
 
      ARGS['hw'] = '%d'%hw
      ARGS['A'] = '%d'%A
