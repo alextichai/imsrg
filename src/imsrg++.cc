@@ -1482,28 +1482,34 @@ if (opff.file2name != "") {
 
       Operator H_HF = *(imsrgsolver.H_0);
 
+      Operator Hs = imsrgsolver.GetH_s();
+
       std::cout << "Operator: " << opnames[i] << std::endl;
 
       // HF values for op and H
       std::cout << "Mean field values for sum rules" << std::endl;
       Commutator::EvaluateCommutatorSumRule(op,H_HF,9);
 
-      H_HF.UndoNormalOrdering();
+      Commutator::EvaluateCommutatorSumRuleSymmetric(op,H_HF,9);
+
+      H_HF = H_HF.UndoNormalOrdering();
 
       op = imsrgsolver.Transform(op);      
 
       // transformed values for op and H
       std::cout << "IMSRG values for sum rules" << std::endl;
-      Commutator::EvaluateCommutatorSumRule(op,imsrgsolver.GetH_s(),9);
+      Commutator::EvaluateCommutatorSumRule(op,Hs,9);
 
-      HNO = imsrgsolver.GetH_s();
+      std::cout << "Zero-body part: " << Hs.ZeroBody << std::endl;
 
-      HNO.UndoNormalOrdering();
+      Hs = Hs.UndoNormalOrdering();
+
+      std::cout << "Zero-body part [after undo:NO]: " << Hs.ZeroBody << std::endl;
 
       int emax_imsrg = eMax;
       std::string emax_imsrg_string = std::to_string(emax_imsrg);
-      rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", HNO, emax_imsrg, emax_imsrg);
-      rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", HNO, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
+      rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", Hs, emax_imsrg, emax_imsrg);
+      rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", Hs, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
       exit(-1);
 
       // Unclear whether we should do NO2B here as well...

@@ -154,7 +154,9 @@ namespace Commutator{
 
   Operator GooseTankUpdate( const Operator& Omega, const Operator& Nested);
 
-  void EvaluateCommutatorSumRule(Operator& F, Operator& H, int kMax);
+  void EvaluateCommutatorSumRule(const Operator& F, const Operator& H, int kMax);
+
+  void EvaluateCommutatorSumRuleSymmetric(const Operator& F, const Operator& H, int kMax);
 
 // scalar-tensor commutators
 

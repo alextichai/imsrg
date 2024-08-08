@@ -650,11 +650,9 @@ Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
    return OpOut;
 }
 
-void EvaluateCommutatorSumRule(Operator& F, Operator& H, int kMax)
+void EvaluateCommutatorSumRule(const Operator& F,const Operator& H, int kMax)
 {
   std::cout << "Evaluating IMSRG sum rules up to kMax = " << kMax << std::endl;
-
-  H.ZeroBody = 0.;
 
   std::map<int,double> m_k;  
 
@@ -683,6 +681,54 @@ void EvaluateCommutatorSumRule(Operator& F, Operator& H, int kMax)
   for(int k=3;k<=kMax;k+=2){
     printf("m_%i / m_%i =  % 2.6e \n",k,k-2,m_k[k]/m_k[k-2]);
   }
+}
+
+
+void EvaluateCommutatorSumRuleSymmetric(const Operator& F, const Operator& H, int kMax)
+{
+  std::cout << "Evaluating symmetric sum rules up to kMax = " << kMax << std::endl;
+
+  std::map<int,double> m_k;  
+
+  std::map<int,Operator> commutators;
+
+  Operator C0 = F;
+  Operator C1 = Commutator(H,C0);
+  Operator C2 = Commutator(H,C1);
+  Operator C3 = Commutator(H,C2);
+
+  Operator C30 = Commutator(C3,C0);
+  Operator C21 = Commutator(C2,C1);
+  Operator C12 = Commutator(C1,C2);
+  Operator C03 = Commutator(C0,C3);
+
+  printf("C30 =  % 2.6e \n",-1./2. * C30.ZeroBody);
+  printf("C21 =  % 2.6e \n",+1./2. * C21.ZeroBody);
+  printf("C12 =  % 2.6e \n",+1./2. * C12.ZeroBody);
+  printf("C03 =  % 2.6e \n",+1./2. * C03.ZeroBody);
+  
+
+
+  // int iMax = int(kMax/2)+1;
+
+  // for(int k=1;k<kMax;k++){
+  //   commutators[k] = Commutator(H,commutators[k-1]);
+  // }
+
+  // for(int k=1;k<kMax;k++){
+  //     Operator C = Commutator(commutators[k],commutators[k-1]);
+  //     m_k[2*k-1] = - 1./2. * C.ZeroBody;
+  // }
+
+  // printf("Moments \n");
+  // for(int k=1;k<=kMax;k+=2){
+  //   printf("m_%i =  % 2.6e \n",k,m_k[k]);
+  // }
+
+  // printf("Ratios \n");
+  // for(int k=3;k<=kMax;k+=2){
+  //   printf("m_%i / m_%i =  % 2.6e \n",k,k-2,m_k[k]/m_k[k-2]);
+  // }
 }
 
 //  Update the auxiliary one-body operator chi, using Omega and the ith nested commutator
