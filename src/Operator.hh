@@ -187,6 +187,8 @@ class Operator
 
   Operator Truncate(ModelSpace& ms_new); ///< Returns the operator trunacted to the new model space
 
+  Operator Transform(arma::mat&); ///< Returns the operator in the basis defined by the input matrix, e.g. hf.C.t() 
+
 
   // In principle, these methods should probably be factorized out, but I don't know where to put them...
   double GetMP2_Energy();

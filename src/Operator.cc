@@ -449,7 +449,6 @@ Operator Operator::DoNormalOrderingCore() const
       return DoNormalOrdering2(+1, modelspace->core);
 }
 
-
 //*************************************************************
 ///  Normal ordering of a 2body operator
 ///  set up for scalar or tensor operators, but
@@ -557,6 +556,58 @@ Operator Operator::DoNormalOrdering2(int sign, std::set<index_t> occupied ) cons
    return opNO;
 }
 
+Operator Operator::Transform(arma::mat& C)
+{
+   double start_time = omp_get_wtime();
+
+   Operator Hout = Operator(*modelspace,0,0,0,particle_rank);
+
+   Hout.ZeroBody = ZeroBody;
+   Hout.OneBody  = C.t() * OneBody * C;
+
+   int nchan = modelspace->GetNumberTwoBodyChannels();
+   
+   for (int ch=0;ch<nchan;++ch)
+   {
+     TwoBodyChannel& tbc = modelspace->GetTwoBodyChannel(ch);
+
+     int J   = tbc.J;
+     int npq = tbc.GetNumberKets();
+
+     arma::mat D(npq,npq,arma::fill::zeros);  // <ij|ab> = <ji|ba>
+
+#pragma omp parallel for schedule(dynamic,1)  // confirmed that this improves performance
+     for (int i=0; i<npq; ++i)
+     {
+       Ket & bra = tbc.GetKet(i);
+       int e2bra = 2*bra.op->n + bra.op->l + 2*bra.oq->n + bra.oq->l;
+       for (int j=0; j<npq; ++j)
+       {
+         Ket & ket = tbc.GetKet(j);
+         int e2ket = 2*ket.op->n + ket.op->l + 2*ket.oq->n + ket.oq->l;
+
+         D(i,j) = C(bra.p,ket.p) * C(bra.q,ket.q);
+
+         if (bra.p!=bra.q)
+         {
+           D(i,j) += C(bra.q,ket.p) * C(bra.p,ket.q) * bra.Phase(J);
+         }
+
+         if (bra.p==bra.q)    D(i,j) *= PhysConst::SQRT2;
+         if (ket.p==ket.q)    D(i,j) /= PhysConst::SQRT2;
+       }
+     }
+
+     auto& V2  =  TwoBody.GetMatrix(ch);
+     auto& OUT =  Hout.TwoBody.GetMatrix(ch);
+     
+     OUT  =    D.t() * V2 * D;
+   }// for ch
+
+   profiler.timer["HF_GetNormalOrderedH"] += omp_get_wtime() - start_time;
+
+   return Hout;
+}
 
 
 //*******************************************************************************

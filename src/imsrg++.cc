@@ -1521,17 +1521,20 @@ if (opff.file2name != "") {
       // int emax_imsrg = eMax;
       // std::string emax_imsrg_string = std::to_string(emax_imsrg);
 
-      // // O(s): generate vacuum represetation and write to file
-      // op = op.UndoNormalOrdering();
-      // rw.Write_me1j(intfile + "_" + opnames[i] + "_" + emax_imsrg_string + ".me1j", op, emax_imsrg, emax_imsrg);
-      // if(op.rank_J == 0){
-      //   rw.Write_me2jp(intfile + "_" + opnames[i] + "_" + emax_imsrg_string + ".me2jp", op, emax_imsrg, 2* emax_imsrg, emax_imsrg);
-      // }
+      // H(s): generate vacuum represetation and write to file
+      Hs = Hs.UndoNormalOrdering();
+      
+      //rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", Hs, emax_imsrg, emax_imsrg);
+      //rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", Hs, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
 
-      // // H(s): generate vacuum represetation and write to file
-      // Hs = Hs.UndoNormalOrdering();
-      // rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", Hs, emax_imsrg, emax_imsrg);
-      // rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", Hs, emax_imsrg, 2 * emax_imsrg, emax_imsrg);      
+      arma::mat CHO  = hf.C;
+      arma::mat CHOt = CHO.t(); // Transformation from HF to HO basis
+
+      // Transform H(s) from the HF to the HO basis and write to file
+      Operator Hs_HO = Hs.Transform(CHOt);
+
+      rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j_A", Hs_HO, emax_imsrg, emax_imsrg);
+      rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp_A", Hs_HO, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
 
       // Unclear whether we should do NO2B here as well...
       // std::cout << "Before renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;
