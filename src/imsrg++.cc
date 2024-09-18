@@ -1518,11 +1518,12 @@ if (opff.file2name != "") {
         Commutator::EvaluateCommutatorSumRuleSymmetric(op,Hs,9);
       }
 
-      // int emax_imsrg = eMax;
-      // std::string emax_imsrg_string = std::to_string(emax_imsrg);
+      int emax_imsrg = eMax;
+      std::string emax_imsrg_string = std::to_string(emax_imsrg);
 
       // H(s): generate vacuum represetation and write to file
-      Hs = Hs.UndoNormalOrdering();
+      Operator H_loc = Hs;
+      H_loc = H_loc.UndoNormalOrdering();
       
       //rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", Hs, emax_imsrg, emax_imsrg);
       //rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", Hs, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
@@ -1531,10 +1532,13 @@ if (opff.file2name != "") {
       arma::mat CHOt = CHO.t(); // Transformation from HF to HO basis
 
       // Transform H(s) from the HF to the HO basis and write to file
-      Operator Hs_HO = Hs.Transform(CHOt);
+      Operator Hs_HO = H_loc.Transform(CHOt);
 
-      rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j_A", Hs_HO, emax_imsrg, emax_imsrg);
-      rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp_A", Hs_HO, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
+      std::string filename1b = intfile + "_" + emax_imsrg_string + "_HO.me1j";
+      std::string filename2b = intfile + "_" + emax_imsrg_string + "_HO.me2jp";
+
+      rw.Write_me1j(filename1b, Hs_HO, emax_imsrg, emax_imsrg);
+      rw.Write_me2jp(filename2b, Hs_HO, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
 
       // Unclear whether we should do NO2B here as well...
       // std::cout << "Before renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;
