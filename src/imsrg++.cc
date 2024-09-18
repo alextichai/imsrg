@@ -1482,38 +1482,56 @@ if (opff.file2name != "") {
 
       // fetch Hamiltonian
       Operator H_HF = *(imsrgsolver.H_0);
-      Operator Hs = imsrgsolver.GetH_s();
+      // Operator Hs = imsrgsolver.GetH_s();
 
       bool sum_rule = false;
 
       std::cout << "Operator: " << opnames[i] << std::endl;      
 
-      op = imsrgsolver.Transform(op);
+      Operator op_HF = op;
+
+      std::cout << "Zero-body part: " << op.ZeroBody << std::endl;
+
+      // Operator op_s = imsrgsolver.Transform(op_HF);  
+
+      op = imsrgsolver.Transform(op_HF); 
+      Operator Hs = imsrgsolver.Transform(H_HF);        
+
+      std::cout << "Zero-body part of H(s): " << Hs.ZeroBody << std::endl;
 
       // sum rules at HF and IMSRG level
       if(op.rank_J == 0){
         std::cout << "Mean field values for sum rules" << std::endl;
-        Commutator::EvaluateCommutatorSumRule(op,H_HF,9);
-        Commutator::EvaluateCommutatorSumRuleSymmetric(op,H_HF,9);
+        std::cout << "Zero-body part of op: " << op_HF.ZeroBody << std::endl;
+        std::cout << "Zero-body part of H : " << H_HF.ZeroBody << std::endl;
+
+        Commutator::EvaluateCommutatorSumRule(op_HF,H_HF,9);
+        Commutator::EvaluateCommutatorSumRuleSymmetric(op_HF,H_HF,9);
+
+        std::cout << "Zero-body part of op: " << op_HF.ZeroBody << std::endl;
+        std::cout << "Zero-body part of H : " << H_HF.ZeroBody << std::endl;
+
+        printf("\n\n\n\n");
 
         std::cout << "IMSRG values for sum rules" << std::endl;
         Commutator::EvaluateCommutatorSumRule(op,Hs,9);
+        Commutator::EvaluateCommutatorSumRuleSymmetric(op,Hs,9);
       }
 
-      int emax_imsrg = eMax;
-      std::string emax_imsrg_string = std::to_string(emax_imsrg);
+      // int emax_imsrg = eMax;
+      // std::string emax_imsrg_string = std::to_string(emax_imsrg);
 
-      // O(s): generate vacuum represetation and write to file
-      op = op.UndoNormalOrdering();
-      rw.Write_me1j(intfile + "_" + opnames[i] + "_" + emax_imsrg_string + ".me1j", op, emax_imsrg, emax_imsrg);
-      if(op.rank_J == 0){
-        rw.Write_me2jp(intfile + "_" + opnames[i] + "_" + emax_imsrg_string + ".me2jp", op, emax_imsrg, 2* emax_imsrg, emax_imsrg);
-      }
+      // // O(s): generate vacuum represetation and write to file
+      // op = op.UndoNormalOrdering();
+      // rw.Write_me1j(intfile + "_" + opnames[i] + "_" + emax_imsrg_string + ".me1j", op, emax_imsrg, emax_imsrg);
+      // if(op.rank_J == 0){
+      //   rw.Write_me2jp(intfile + "_" + opnames[i] + "_" + emax_imsrg_string + ".me2jp", op, emax_imsrg, 2* emax_imsrg, emax_imsrg);
+      // }
 
-      // H(s): generate vacuum represetation and write to file
-      Hs = Hs.UndoNormalOrdering();
-      rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", Hs, emax_imsrg, emax_imsrg);
-      rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", Hs, emax_imsrg, 2 * emax_imsrg, emax_imsrg);      
+      // // H(s): generate vacuum represetation and write to file
+      // Hs = Hs.UndoNormalOrdering();
+      // rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", Hs, emax_imsrg, emax_imsrg);
+      // rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", Hs, emax_imsrg, 2 * emax_imsrg, emax_imsrg);      
 
       // Unclear whether we should do NO2B here as well...
       // std::cout << "Before renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;

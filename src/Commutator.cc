@@ -652,7 +652,7 @@ Operator Standard_BCH_Transform( const Operator& OpIn, const Operator &Omega)
 
 void EvaluateCommutatorSumRule(const Operator& F,const Operator& H, int kMax)
 {
-  std::cout << "Evaluating IMSRG sum rules up to kMax = " << kMax << std::endl;
+  std::cout << "Evaluating sum rules up to kMax = " << kMax << std::endl;
 
   std::map<int,double> m_k;  
 
@@ -666,21 +666,22 @@ void EvaluateCommutatorSumRule(const Operator& F,const Operator& H, int kMax)
     if(n%2 == 1) {
       Operator C = Commutator(OpNested,F);
 
-      m_k[n] = - 1./2. * C.ZeroBody;
+      m_k[n] = pow(-1,n) *  1./2. * C.ZeroBody;
     }
     
     n++;   
   }
 
-  printf("Moments \n");
+  printf("\n   Moments \n");
   for(int k=1;k<=kMax;k+=2){
-    printf("m_%i =  % 2.6e \n",k,m_k[k]);
+    printf("   m_%i =  % 2.6e \n",k,m_k[k]);
   }
 
-  printf("Ratios \n");
+  printf("\n   Ratios \n");
   for(int k=3;k<=kMax;k+=2){
-    printf("m_%i / m_%i =  % 2.6e \n",k,k-2,m_k[k]/m_k[k-2]);
-  }
+    printf("   m_%i / m_%i = % 2.6e --- E_GMR =  %2.6f \n",k,k-2,m_k[k]/m_k[k-2],sqrt(m_k[k]/m_k[k-2]));
+  }  
+  printf("\n");
 }
 
 
@@ -690,22 +691,43 @@ void EvaluateCommutatorSumRuleSymmetric(const Operator& F, const Operator& H, in
 
   std::map<int,double> m_k;  
 
-  std::map<int,Operator> commutators;
-
   Operator C0 = F;
   Operator C1 = Commutator(H,C0);
   Operator C2 = Commutator(H,C1);
   Operator C3 = Commutator(H,C2);
+  Operator C4 = Commutator(H,C3);
+  Operator C5 = Commutator(H,C4);
 
-  Operator C30 = Commutator(C3,C0);
+  Operator C10 = - Commutator(C1,C0);
+
+  Operator C30 = - Commutator(C3,C0);
   Operator C21 = Commutator(C2,C1);
-  Operator C12 = Commutator(C1,C2);
+  Operator C12 = - Commutator(C1,C2);
   Operator C03 = Commutator(C0,C3);
 
-  printf("C30 =  % 2.6e \n",-1./2. * C30.ZeroBody);
-  printf("C21 =  % 2.6e \n",+1./2. * C21.ZeroBody);
-  printf("C12 =  % 2.6e \n",+1./2. * C12.ZeroBody);
-  printf("C03 =  % 2.6e \n",+1./2. * C03.ZeroBody);
+  Operator C50 = - Commutator(C5,C0);
+  Operator C41 = Commutator(C4,C1);
+  Operator C32 = - Commutator(C3,C2);
+
+  printf("C50 =  % 2.6e \n",C50.ZeroBody);
+  printf("C41 =  % 2.6e \n",C41.ZeroBody);
+  printf("C32 =  % 2.6e \n",C32.ZeroBody);
+
+  printf("C30 =  % 2.6e \n",C30.ZeroBody);
+  printf("C21 =  % 2.6e \n",C21.ZeroBody);
+  printf("C12 =  % 2.6e \n",C12.ZeroBody);
+  printf("C03 =  % 2.6e \n",C03.ZeroBody);
+
+  double m1   = 1./2. * C10.ZeroBody;
+  double m3_a = 1./2. * C21.ZeroBody;
+  double m3_b = 1./2. * C30.ZeroBody;
+
+  printf("m1      =  %2.6f \n",m1);
+  printf("m3 [21] =  %2.6f \n",m3_a);
+  printf("m3 [30] =  %2.6f \n",m3_b);
+
+  printf("m3/m1 [21] =  %2.6f --- E_GMR = % 2.6f \n",m3_a/m1,sqrt(m3_a/m1));
+  printf("m3/m1 [30] =  %2.6f --- E_GMR = % 2.6f \n",m3_b/m1,sqrt(m3_b/m1));
   
 
 
