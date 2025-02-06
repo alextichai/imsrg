@@ -1,0 +1,885 @@
+[33mc3543bf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32msum_rules[m[33m)[m Added imsrg_log to .gitignore
+[33m78d9791[m[33m ([m[1;31morigin/sum_rules[m[33m)[m Transformation to HO basis
+[33m09f4d57[m -cleaned imsrg executable to sum rule evaluation and operator writeout
+[33mcc4b25b[m -minor changes to python script
+[33m8337d1a[m -added const qualifier to sum rule evaluation -bugfix in UndoNormalOrdering call in main executable
+[33meafb294[m -prepare writeout of flowing Hamiltonian -improved printout in sum rules
+[33me36395d[m -rewriting of sum-rule implementation
+[33m8165fb6[m -added basic implementation of commutator-based sum rule
+[33m20ce03c[m -added implementation of RdotR for sum rules
+[33m6fcaad0[m[33m ([m[1;31morigin/bleeding_edge[m[33m)[m Fix bug in hunter-gatherer implementation
+[33m1ac0ab1[m Add orbital radius operators
+[33m3db0939[m Add headers for new operators
+[33m25c88ed[m Update required CXX std version to 14 because new Boost requires CXX14 features
+[33m79e9330[m Add parseable HF log
+[33med6a99c[m Improve IMSRG treatment of smax=0 calculations
+[33m8a25ca8[m Implement higher multipoles for responses
+[33m8afeca0[m Fix normalization of responses
+[33m1b77569[m Add L operator
+[33m11f89d7[m Fix output problems for tensor ops in Tokyo format
+[33md27150c[m Avoid logic causing problems for tensor ops
+[33m60be3b1[m Atttempt to fix bug with tensor ops and NAT basis
+[33ma769ff1[m Update form factors to be J=1
+[33m16eb22c[m Add more scalar multipoles
+[33m1e4bc16[m Improve documentation of SO fix
+[33md37293b[m Implement proper spin-orbit correction
+[33m63cbffe[m Add back old spin-orbit correction to test things
+[33mcab6503[m New operators for ergonomics
+[33me755bc1[m Reduced debug logging
+[33m0e7ad76[m Fix precision in output format
+[33maf31a78[m Fix Ong et al error in spin-orbit
+[33m062cc1c[m Add a bit more dynamic logic to what output files we generate.
+[33maf94d68[m Add some changes to logging and NAT orbitals
+[33mb772ba2[m Add M0nu from Antoine
+[33m61f01eb[m[33m ([m[1;31morigin/optim_331[m[33m)[m Add new parameter to evove other operators with omega up to 2-body level
+[33m974b64d[m Fix error in ME3JP routine
+[33m8312e2f[m Make radius operator use less memory
+[33m353ed75[m Try to avoid overaggressive allocation
+[33mbc05c93[m Attempt to fix normal ordering of 3B part
+[33m16f6743[m Add normal ordering for 3B operator
+[33mdf9fde8[m Add normal ordering of NO2B 3B operator
+[33m7a675eb[m Allow 2B to be empty
+[33mca3fc4d[m Attempt to bring in ability to evaluate 3N force topologies
+[33m29e713d[m Write out matrix elements (emax=3 for now) at the end of VSIMSRG calc
+[33m9b3f55b[m Add naive output format for VS matrix elements
+[33mc3acbdd[m Add ME2JP/ME3JP/ME1J to Write methods
+[33md7aa2c3[m Improve logging output for parsability
+[33m761ade8[m Make consistent operator transformation compatible with magnus backoff
+[33m46c3074[m Add switch to swap between 232 versions
+[33m7143e16[m Swap to 331ss_expand
+[33m48aac47[m Be more conservative with thread number to save memory
+[33m0d0d06e[m Parallelize on three-body channels
+[33m8035eeb[m Make interfaces in ModelSpace const correct
+[33mafb8f74[m Swap to new impl for profiling
+[33m23a13e7[m Full implement 331 commutator
+[33mcd746fb[m Extract out the core work loop
+[33mcbc1314[m Flatten loop
+[33mc268cb2[m Some quick renaming
+[33m0198f28[m Prestore basis information separately
+[33m692599b[m Bring contraction out into its own function
+[33m9adfe1f[m Remove PPHHH block again for performance tweaks
+[33m5393dac[m Get PPHHH diagram correct
+[33me36b736[m Get HHPPP diagram right
+[33m4017fed[m Fix yet another nasty bug in 3B basis factory methods
+[33m53ec7bb[m Add docstring to generate3bmatrix
+[33m473f4b9[m Fix nasty bug with 3B basis factory method
+[33m3ef8b7b[m Add method to extract expanded 3B matrices
+[33m4d4b127[m Print only 3B matrix size
+[33ma53f74c[m Include abalpha basis in 331
+[33mfa02297[m Add new "minimal" 3B basis
+[33mb9ee818[m Add occupations factors to 3B basis
+[33m8d45905[m Change constructors to also include information about normalization and occupation numbers
+[33m32cbea6[m Add methods to construct bases constrained to pp/hh
+[33mbd9a2ec[m Break 331 implementations out into their own functions
+[33mdfae707[m Add basic structure for 331
+[33m552f4eb[m Fixed mistake in 331 commutator found by Matthias Heinz.
+[33m375ac42[m Remove unneeded ChannelPair data structure
+[33m1a40492[m Merge pull request #7 from cheshyre/imsrg3_mp4
+[33mf199402[m Improve 132 parallelism in hope that it scales better on big computers
+[33ma00f49b[m Add e3max cut to implementation
+[33m8017bff[m Add cuts on emax_3body
+[33mbee579b[m Expose more parallelism in 331 commutator
+[33ma29344c[m Make comm232ss default to comm232ss_expand_full
+[33m9ed3a70[m Add some comments about the 232 variants
+[33m41f93e6[m Split comm232ss out into an "alias" function that just calls a specific implementation
+[33m4f67de4[m Profile comm232ss_new
+[33mafd857b[m Improve parallelism for comm232ss_new
+[33m956bcea[m Add new setter for TBMEs
+[33m15858f7[m Remove vestigial methods from old 232 impl
+[33m8a5f972[m Rip out old slow implementation
+[33m14d20ba[m Add two separate implementations
+[33m6c11a68[m Break things out into full
+[33m1580ee9[m Break things up into full and reduced impl
+[33m5188540[m Profile the expanded version
+[33m39f5363[m Change 232 implementation to be correct with emax!=emax_3body
+[33mb9d56b3[m Profile comm232ss_new in tests
+[33mba5eaf3[m Bring in fixes into comm232ss_new
+[33m27ae140[m Extend unit test to include all n^7 comms again
+[33m05a6cd3[m Swap comm232 to use old optimized version
+[33mf9bfd7d[m Add timing to Comm232
+[33m7ec7211[m Swap unit test to check against ref impl
+[33m7aa122a[m Implement fix for old optimized 232 commutator (as found by Ragnar)
+[33m6978787[m Implement better scheduling
+[33m9ee6ce9[m Remove garbage in inner loop
+[33mfb3dfa2[m Parallelize core work loop
+[33m81e0690[m Implement changes in remaining diagrams
+[33m17d84aa[m Transition diagram1 to parallel form
+[33m076c0d0[m Add temp matrices for parallel output
+[33m92896da[m Prestore sixjs
+[33ma08b64c[m Flatten loop over nested 2B channels
+[33m3e9e0d0[m Optimize basis generation
+[33m28f49d8[m Implement final 232 diagram
+[33mc209106[m Implement diagram 3
+[33md48c77a[m Implement diagram 2
+[33mcc015d9[m Fix unfortunate copy
+[33m969f359[m Clarify index order for stored sixjs
+[33m42841a9[m Add second diagram 1
+[33mba6d3ae[m Clean things up
+[33m09023bc[m Fix performance problem with recoupling prestore
+[33mee29eec[m Prestore bases as early as possible without blowing up storage
+[33m58bc181[m Bring some expensive stuff into outer loops
+[33mb1ce1d4[m Optimize the calculation of 6j symbols
+[33m0b0d176[m Add small optimization to determination of 3B states
+[33m09d30d3[m Fix linking order problems on GCC
+[33md786160[m Remove clang-specific include
+[33m115394a[m Add new version of comm232 that leverages something close to mat mul
+[33m538410c[m Break Comm232 into its own file
+[33mf1982bf[m Refactor 232 into clean functions
+[33mc437204[m Change comm232 in profiling
+[33m66104d2[m Extend unit test binary
+[33me94d8a6[m Add new 232 commutator implementation that passes unit test
+[33m9acb4c7[m Extend the 6j hash table to include more symbols
+[33m47505a4[m Add new setter for TwoBMEs
+[33mc73e76e[m Add unit test binary
+[33me2f9a37[m Add benchmark scripts for remaining IMSRG(3)-N^7 commutators
+[33m5386de9[m Reset some solver params when we switch to shell model generator
+[33m7187a1a[m Rename backoff phase flag to soft landing flag
+[33m05111e9[m Adjust backoff_solver to work with VS-IMSRG
+[33meccf4a9[m Attempt to get to a better result in 133 via fine-grained parallelism.
+[33ma579228[m Parallelize 133 again
+[33mc79079e[m Add profiling scripts for the most expensive 2B commutators
+[33m0221833[m Add 133 comm profiling script
+[33m1b630bc[m Add support for IMSRG(3)-MP4 truncation
+[33m82fabc0[m Attempt to fix stupid memory allocation pattern
+[33mf1b828c[m Use std::endl to flush to file
+[33mfce71d9[m Add functioning 223 benchmark executable
+[33m029ed1c[m Fix 232 profile executable post refactor
+[33m98c3db6[m Tweaked Minnesota potential again.
+[33m6c5fed8[m Tweaked splashscreen with extra space for aesthetics.
+[33mfdb931d[m Exposed some more physical constants to the python bindings, at Baishan's request
+[33m8e9b518[m Modified comm232ss to properly handle various E3max etc truncations. Now it agrees with the reference implementation with those cuts
+[33mf42bedd[m Modifications made by Baishan Hu to enable writing and reading of NAT basis transformation
+[33m8430c5b[m Fixed typo in python bindings for individual commutator unit tests.
+[33m898a6cd[m Added python bindings for unit tests of specific commutator expressions
+[33md689493[m Removed redundant lines spotted by Bingcheng He.
+[33m71c3117[m Modified the perturbative triples so we don't need to allocate a 3body storage structure
+[33mca53dd2[m Fixed bug in UnitTest::RandomOp which tried to symmetrize when it shouldn't
+[33mc4c6ff6[m Added access to C_HO2NAT and C_HF2NAT in the python bindings
+[33m22c3655[m Added Operator::ReadBinary and WriteBinary to facilitate scripts that might want to read in Omegas from a previous calculation
+[33m49d7b9a[m Updates to some DarkMatterNREFT and multipole response operators from Baishan Hu
+[33m80f493f[m Tweaks to make left-multiplication of operators by a double work in python
+[33m0015279[m Added TwoBodyME::GetTBME_norm to pyIMSRG
+[33m963c972[m Modifications to TViolatingPotential_Op according to extra factors found by Jon Engel
+[33mecf939c[m Trying to optimize parallelism in comm133ss
+[33m5824f6c[m Merge branch 'devel' of ssh://github.com/ragnarstroberg/imsrg into devel
+[33m24293ee[m moving Matthias' version of comm232ss to be the default one
+[33m294d12a[m Now make test also runs a check of the commutator expressions at emax=2 up to IMSRG(3n7), and emax=1 for full IMSRG(3).
+[33m7b13291[m Moved Matthias' new solver into IMSRGSolver::Solve_magnus_backoff() to maintain the default behavior
+[33m90240ee[m Tweaked comm330ss to improve load balancing; not that it was in any way the bottleneck...
+[33mb104558[m Comments and small tweaks in IMSRGSolver, and removed parallel pragma in comm133ss to give the threads to the mat mult.
+[33m1574be9[m Renamed comm232ss_new by Matthias to comm232ss and commented out the old version. Still some work to do on tidying this version up, or we may want to start over from scratch...
+[33mf16dcc9[m Fixed dumb bug in comm332_pphhss. I had sixj_ji mistyped as sixj_ij, which made the answer wrong.
+[33m76a2b8b[m After merge with Matthias pull request. Needed to fix some stuff in ReferenceImplementations
+[33me481acb[m Merge pull request #5 from cheshyre/solver_tests
+[33m0ddd4e1[m Merge branch 'devel' into solver_tests
+[33m698ce9c[m Merge pull request #6 from cheshyre/reduced_3body_emax
+[33m627a80d[m Small tweaks to Operator::PrintTwoBody, the underlying implementation in TwoBodyME and the pythong bindings
+[33mefaf50f[m Adjust FillMatrices to have better parallelism and hopefully work distribution
+[33m7fbf7be[m Add debug for lookup prestore
+[33m739fe98[m Add even more timers
+[33m7bc674e[m Add timer for mat mul
+[33m2faa52f[m Add just a little bit more output
+[33mc6afaa8[m Add script to profile comm232 for specific model space sizes
+[33m2784d20[m Ignore CMakeUserPresets
+[33m439ca97[m Add more profiling information
+[33m2f22256[m Make PrintTimes more robust to long profile names
+[33m356989f[m Parallelize ComputeRequiredRecouplings
+[33mef635ba[m Parallelize GenerateRequiredRecouplings
+[33m1fbc1b3[m Parallelize FillMatrices with OpenMP
+[33mf09d5df[m Fix apparent issues when using boost with nonstandard compiler
+[33m0435da7[m Switch ch_start to proper hashmap.
+[33ma959902[m Switch to unordered set for 50% speed up
+[33m0799c57[m Break up 232 commutator for profiling and optimization
+[33m3ca5d72[m Fix prohibited implicit cast in initializer list
+[33mbbf6720[m Add emax_3body truncations to 232ss
+[33m9111238[m Apply emax_3body cut in 132ss
+[33mf903d68[m Add emax_3body cuts in 231
+[33mdb6e7d7[m Add ability to check single orbit for emax_3body
+[33md1c5392[m Implement "or" approach to three-body threshold
+[33m6e33394[m Disable warnings and provide option to disable Python bindings in CMake build
+[33m4bf9228[m Improve solver to actually implement backoff properly
+[33m2a51ce2[m Change backoff strategy to be based on absolute MP2 energies
+[33m8e3ef8d[m Make default build Release to avoid random low-perf builds
+[33m12beab6[m Reinclude half CMake module
+[33m8d6c592[m Implement ramp and backoff strategy for IMSRG solver
+[33m591baa0[m Fixed bug in TwoBodyME setters that tried to set the wrong bra/ket channel in the hermitian case
+[33m2273abf[m Added TViolatingPotential_Op. This hasn't been checked yet.
+[33m83edffe[m added precompute 6j loop in comm332_pphhss, and some other small optimizations
+[33maae2208[m tweaked makefile for CRC machines at ND
+[33m9b7a52f[m Added timing call to comm110ss and comm220ss
+[33mec154c5[m Tried to improve load balancing for AddInversePandyaTransformation
+[33m5d0a880[m Fixed up merge of comm223ss in Commutator.cc
+[33m6e41f45[m First steps in collapsing loops for load balancing in comm223ss
+[33me8f3a2d[m Implement "or" approach to three-body threshold
+[33m985fc4a[m Disable warnings and provide option to disable Python bindings in CMake build
+[33mbfac169[m Improve solver to actually implement backoff properly
+[33m1f41740[m Change backoff strategy to be based on absolute MP2 energies
+[33m26764f9[m Make default build Release to avoid random low-perf builds
+[33m6dd38a7[m Reinclude half CMake module
+[33m8c554a5[m Implement ramp and backoff strategy for IMSRG solver
+[33m0493353[m Fixed bug which lead to wrong Zcore and Ncore when using NAT orbits with NAT occupations. Thanks Bingcheng!
+[33me96c13f[m Cleaned up diagnostic printouts in comm233ss
+[33m5932ba7[m Tried collapsing the outer loops in comm223ss
+[33m8cd31c6[m Now all IMSRG(3) commutators are present in ReferenceImplementations. Some are very slow still. Also added a bounds check in ModelSpace::GetThreeBodyChannel
+[33md6cbc2f[m Added comm232ss to ReferenceImplementations (just copied from Commutator::comm232ss_slow)
+[33mf702014[m Removed debugging printout in comm232_phss
+[33mec9c24f[m merging
+[33m59581b0[m Some work on reference implementations of commutators
+[33m1f27119[m Fixed 3body part of RandomOp, added comm233_phss to ReferenceImplementations, and added a thread-checker for ModelSpace::GetNineJ()
+[33mb04241a[m Fixed typo in comm333_ppp_hhhss which was also present in the unit test. Oops.
+[33mc2935b0[m Merge pull request #4 from cheshyre/devel
+[33m34641b7[m Fix horrendous bug in AngMomCache
+[33m6335686[m Merge branch 'reduced_3body_emax' into devel
+[33m6c45d3c[m Truncate the 232 implementation using 3-body emax
+[33mee114c9[m Added some more IMSRG(3) commutators to the ReferenceImplementation
+[33m3d8476b[m Adjust main binary to include the 3-body emax truncation in the truncation logic
+[33m9c771c0[m Add new parameter to Parameters for IMSRG emax 3-body truncation
+[33m3d71d7f[m Protect against invalid ME accesses in commutator implementations
+[33m634b295[m Protect matrix element accesses in GetME* using IsKetValid
+[33m4dcc6e9[m Add IsKetValid interface to ThreeBodyME
+[33m2b20f96[m Add IsKetValid to ThreeBodyStorage
+[33mc888141[m Add setter for emax_3body_
+[33m63d678f[m Implement missing move and copy operations in ModelSpace
+[33mced72ef[m Make ThreeBodyME and ThreeBodyStorage use new 3-body emax
+[33m1217ee1[m Make emax_3body_ private
+[33meefe52c[m Extend model space by some new members for 3-body emax truncation and swap Setup3bKets() to use those
+[33m7419dca[m Remove x86 intrinsic from ThreeBodyStorage_no2b
+[33m88c2911[m Add missing OpenMP include in commutator
+[33mc03874d[m Upgraded half library to version 2.2.0
+[33m9fd5a0c[m Added ReferenceImplementations of commutators. Not all IMSRG(3) expressions are implemented yet.
+[33m56c7203[m Tweaked Operator::GetOneBodyChannel to return const reference
+[33m63609c6[m Added non map version of Operator::OneBodyChannels and it speeds up the 223 commutator by 15% or so
+[33m9489b6e[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m12b134c[m Added more commutator terms to be explicitly callable in python bindings
+[33m7dcf0cb[m Merge pull request #3 from cheshyre/cmake
+[33mf0a4fe3[m[33m ([m[1;31morigin/cmake[m[33m)[m Merge branch 'devel' into cmake
+[33m202d28b[m Forgot to add version.hh to the commit
+[33m0858a9e[m Fix some problems after rebase
+[33me9451cc[m Finish CMakeLists impl to be feature equivalent to makefile
+[33mf233ead[m Add string include for version impl file
+[33m932d4c1[m Adjust version to be defined in an implementation file and to be accessed via function call
+[33med177bd[m Add CMake build support (for everything besides pyIMSRG)
+[33mc2c3b4d[m Tweaked way version is handled, and moved VectorUnion from imsrg_util.hh to Generator.hh
+[33mb327e72[m removed debugging printout
+[33m967e670[m commented out debugging printout around line 176
+[33m56016a3[m Removed leftover debugging statement
+[33m9b3bcb9[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m1fba8a0[m Small cleanups and sped up comm331ss by accessing two 3bme at the same time
+[33m6b6f847[m Refactored TwoBodyME so that both TwoBodyME and TwoBOdyME_CC inherit from a base class. Also cleared up some compiler warnings
+[33m90d08dc[m Fixed undefined behavior in constructing TwoBodyChannel_CC. Yikes.
+[33m6e3379d[m Fixed undefined behavior in constructing TwoBodyChannel_CC. Yikes.
+[33me0548e4[m Tidying and removing commented dead code
+[33m9bacda3[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33mc5e87a2[m An attempt at optimizing the 222ph commutator a bit more. Marginal success.
+[33me581c98[m Tweaks to compile on MacBook with M1 chip
+[33mc3d9d1a[m Merge pull request #2 from cheshyre/devel
+[33mcd33045[m Swap Pandya implementation to new cached 6Js
+[33m6aa6545[m Include SixJ cache in model space
+[33m16a35a2[m Add new flat SixJCache
+[33mcdd2212[m Changed some pointers in Generator to references to better play with python bindings
+[33m8a15275[m Added Generator class to pyIMSRG
+[33mc8de566[m Removed unused variables in RPA.cc
+[33m4af2968[m Fixed missing normalization term in BareDelta and Minnesota potential
+[33m224d4fd[m Fixed the mistake introduced in comm322_pphhss in commit 7ffbe...
+[33m5631ed9[m Added some debugging printouts, to be removed
+[33m60b1e4e[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m174482f[m Tracked down a bug introduced in a recent commit which screwed up TwoBodyChannel_CC, and fixed it.
+[33m5ed7f62[m Fixed typos
+[33m375f410[m Fixing up merge issue
+[33m82b06c2[m Added imsrg3_dE6max, but this is a work in progress
+[33me19e363[m Added counter for number of ThreeBodyStorage_pn currently allocated
+[33m90a51fa[m Added 3body part to Operator::Truncate
+[33m96cbab7[m Added discardXb_from_3b for testing approximations
+[33m906e7a3[m Fixed bug in BareDelta which used the wrong range for nmax
+[33m87bc16e[m Better handling of three body storage when adding/subtracting and one of the operators is not allocated
+[33mcaebd16[m After normal ordering, set 3N mode to pn
+[33ma2bc1a1[m Made tweaks to TwoBodyChannel constructors to better handle cross coupling when using single_species
+[33m33ab915[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33ma9c00b0[m finished debugging error inthree body storage
+[33mfabfabe[m Fixed bug which messed up inheritance stuff and caused compilation to fail
+[33m0cd4f22[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m8d1f739[m Playing with no_qqq cut
+[33m7ffbe1e[m Fixed typo in Commutator.cc
+[33mfb33671[m tiny tweaks to timing syntax
+[33m4706032[m Added more stuff for python bindings
+[33m893b844[m Commented out IsospinProject in pyIMSRG.cc until it's implemented
+[33m399bf4b[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m20bad04[m Fixed bug in Standard_BCH_Transform that zeroed out the 3body part of the 1st BCH term
+[33ma5bc5c2[m Doing some optimization on comm223ss, no joy so far
+[33me72aca4[m Added some functions to pyIMSRG bindings
+[33m6282cd7[m Check isospin in Pandya transformation
+[33m9840961[m Modified IMSRG3 commutators to reduce reliance on first_pass check
+[33m26a73eb[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m7d2ecb2[m no real change
+[33m7de37f9[m Optimizing the comm223ss routine, some speedup so far.
+[33m49da5c5[m Added ReadTBME_OakRidge to python bindings
+[33m9aa4596[m Added NumberOpRef which may help with error estimates.
+[33mf683f60[m Added BareDelta to imsrg_util, and removed spurious 9js in TCM left over from debugging.
+[33m08c0527[m Found a bug in ModelSpace::CountInSet which caused problems for fractionally filled orbits.
+[33madbbd85[m Added all the heavy named elements, just in case
+[33m88ed638[m Added one-body WoodsSaxon and HO traps for neutron drops
+[33m1ae9c23[m Added imsrg3_valence_2b option to Commutator. This only affects the 232 commutator at the moment. In principle, it could also be implemented for 132 and 332.
+[33m69604c2[m Added some flags for turning on/off imsrg3 commutator terms, and added imsrg3_no_qqq flag
+[33m4fa6fe5[m Tweaked handling of version.hh file. It previously only changed after a make clean, which is not the desired behavior
+[33m7dcc6c2[m Merged from laptop.
+[33mad085ae[m Added parallel loop in comm231ss
+[33m58d5740[m Fixed same bug in comm233_pp_hhss
+[33me071c00[m Fixed a bug in comm133ss, but things are still looking strange. More testing.
+[33mdfc3c06[m Added update from Antoine enabling write_HO_operators and write_HF_operators options
+[33m5446918[m Removed a debugging statement in RPA.cc
+[33m14fea80[m Doing some debugging on Oak. Answers are different.
+[33m78eb90c[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33meee2d12[m local changes on laptop
+[33m96a7187[m Fixed bug in DMNREFT functions for J=0 due to the assumption of reduced matrix element
+[33mefb6f4a[m Changes on laptop.
+[33m4a24487[m Added RPA class, and surface delta interaction
+[33mb3faaa6[m Added some more functions to pyIMSRG.cc
+[33mf345402[m Fixed dumb bug in Operator::SetNumberLegs which led to disaster
+[33m1d5f1ff[m Cleaning up and fixing compiler warnings
+[33me5b8d64[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m4260d0e[m Fixed bug where TwoBodyME wasn't properly allocated when promoting one-body operator to two-body
+[33me76bc31[m Moved some physical constants for charge radii to PhysicalConstants.hh
+[33mb225df0[m Removed some debugging printouts from HartreeFock.cc
+[33m2c30365[m Upgraded to armadillo 10.6.2
+[33m7689bd0[m Tweaked Makefile to not include libaramdillo
+[33m3993b40[m untracked imsrg++ and version.hh
+[33m8ce023b[m Moved GetMP2_Impacts from Operator to HFMBPT
+[33mf94ee94[m Merge pull request #1 from emgineering/devel
+[33m3b6d1de[m rename mp2_impact to mp2
+[33m6ff7253[m mp2_impact NAT ordering implemented (probably working)
+[33mad93ece[m Cleaned up the comments and some dead code
+[33m2ebf631[m ThreeBodyStorage_mono seems to be working now
+[33m5eb1797[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m43225cd[m Fixed some bugs in ThreeBodyStorage_mono. More debugging to do.
+[33m6d1fbd6[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m03f77e2[m Updated imsrg++.cc to write shell model files when using flow equation methods
+[33macc2168[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m234b425[m First attempt at adding ThreeBodyStorage_mono class. Still needs debugging.
+[33m78323d9[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m1141ed7[m Fixed bug which impacted FCI output for J=0 dT>0 operators like Fermi decay
+[33mda8dd60[m Tweak to DarkMatterNREFT to allow proton and neutron structure factors instead of isoscalar/isovector
+[33mf77a9b4[m Fixed a recent bug for HFMBPT::PrintSPEandWF
+[33m9ea2b51[m Added bug fix suggested by Emily Love
+[33mae0ec42[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel Changes on laptop, simultaneous with quick fix to imsrg++.cc elsehwere.
+[33m82f4a7e[m Numerous fixes to HFMBPT to allow choosing NAT basis orderings
+[33m6ac6a46[m Fixed line so we can run MP3 with emax_imsrg truncation
+[33m5b52d63[m Fixed bug in handling operators from file, and now print PT energy after eMax_imsrg truncation
+[33m596523d[m Added CP option to RPA_resummed_1b
+[33m65c71fb[m Fixed some bugs in RPA/TDA resummed 1b op
+[33m5984a82[m DarkMatterNREFT fixes and updates from Baishan
+[33m6ae757f[m Added option to resum pp and hh ladders in MBPT
+[33m8c1b2d3[m Added threebody_threshold to stop doing IMSRG(3) when operators are small
+[33m64d1ddc[m Merging changes to Commutator
+[33m7c1d68d[m Added bhc_skip_ieq1 option to Commutator for use in perturbative triples correction
+[33mdb95b57[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m95af3df[m removed a commented out debugging line
+[33m31a692f[m Tweaked imsrg_util.cc to allow for VCM operator without specifying the frequency
+[33mdcb79a1[m Fixed comment above HFMBPT::DensityMatrixPP, referring to an old bug that I already fixed
+[33m7c85361[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m5cc243e[m Trying to match to Titus' version of perturbative triples
+[33m40970b8[m Fixed some trouble in Commutator::BCH_Transform when using imsrg3 to transform a 2-body operator
+[33m41ba709[m Removed some commented out lines
+[33ma3b6777[m Some changes to imsrg++ handling of operators because I'd broken the non-magnus flow version
+[33me36953f[m Some tweaks to HartreeFock::Solve for pathological cases. Eventually give up and freeze occupations.
+[33m9963a03[m commented out debugging lines when transforming operators with Magnus
+[33mf1ff3db[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Not sure what I did on oak.
+[33mccfc472[m Local changes to imsrg++.cc on oak
+[33maf3e4ed[m Added ability to write Tokyo format in FCI mode
+[33m1de5073[m Changed declaration of WriteTokyo methods to give an indication of what the inputs mean
+[33mc96559d[m Added some more methods to the python bindings
+[33m004307d[m Oops. I'd commented out some IMSRG(3) commutator expressions for debugging. Now theyre all included.
+[33m0460861[m Added ability to switch between Epstein-Nesbet and Moller-Plesset denominators
+[33m9bb3682[m Fixed a bug in IMSRGSolver::SetHin which seems to only have caused trouble for IMSRG(3). Not sure why, but it's fixed.
+[33m4524181[m Somehow Operator::GetMP3_Energy had the wrong term in the omp reduction statement, leading to thread unsafety. Fixed it.
+[33m56f0e23[m added rhocentral operators for central density
+[33mb300ab1[m Fixed bug in Operator::Truncate
+[33md8b31fb[m Bug fix suggested by Takayuki for emax_imsrg truncation with non-naive filling
+[33m790d78a[m Switched default shell model output format to tokyo, because kshell is crackin
+[33maa06648[m An attempt at getting the emax_imsrg truncation to not break operators
+[33m5b109f9[m added a single comment in HFMBPT.cc
+[33m9659533[m Tidying up some natural orbitals stuff
+[33m76ad8d5[m Fixed bug in Operator::Truncate which is now used for emax_imsrg truncations
+[33m40693d3[m Some intermediate changes while working on natural orbital stuff
+[33m243c388[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Merging trivial(?) change on oak
+[33m5dc23f7[m Changes to imsrg++.cc on oak
+[33m27b2721[m Tweaked HFMBPT::ReorderHFMBPTCoefficients so that we don't reorder to maximize along the diagonal
+[33m257fad1[m Added emax_imsrg truncation to do IMSRG step in smaller model space
+[33mf9eabce[m Fixed bugs in HFMBPT found by Baishan
+[33m2e0cbac[m Fixed bug in ModelSpace::CalculatePandyaLookup which only caused problems for double beta decay
+[33mfa74ce7[m Added imsrg_util::FormfactorAtQ, and it looks like it's working
+[33m8819110[m Fixed a typo in ProtonDensityAtR, and an index transposition error in HartreeFock::PrintSPEandWF
+[33m2636d82[m Added the off-diagonal terms in ProtonDensityAtR
+[33mefd16a5[m Forgot to add the operator name to the printout for HF
+[33me7a8bc0[m Now we print out the expectation value of all operators for method=HF, not just charge radius
+[33mb2ddfb3[m Tweaked OperatorFromString to add some timing
+[33m9c1d943[m tweak to imsrg3_at_end bit (missing a factor of 3 multiplying efermi)
+[33mc26c252[m Made a tweak to the imsrg3_at_end option to reduce the size of the 3N storage needed
+[33m1b1e1ae[m updated some of the doxygen docs, not that anyone ever read them...
+[33m2ff510d[m Some additional tweaks to the imsrg3_at_end mode
+[33mb4c7823[m Added imsrg3_at_end option
+[33m4db4e6d[m Added some comments in imsrg_util.cc
+[33me431beb[m Fixed a bug in imsrg++ where operators were transformed to the HF basis twice
+[33m2e89121[m Removed debugging printout from Operator::DoNormalOrdering2
+[33m241ce0e[m Removed some debugging printouts in imsrg++.cc
+[33mf8caec6[m Removed a debugging printout from Operator::MP1_Eval
+[33mdc483e9[m added some things to pyIMSRG.cc
+[33mff15422[m Comments added by Antoine to soem M0nu operators
+[33ma7b7991[m Fixed bug in Operator::Eval_MP1 that caused trouble for tensor operators. Should give zero.
+[33m7247b7b[m Fixed imsrg++.cc so it again prints out the BUILDVERSION
+[33m89aceb1[m Removed a debugging line printout in imsrg++.cc
+[33m38e7e39[m Added option discard_no2b_from_3n for testing E3max convergence stuff.
+[33m98524e8[m Reverting to non-CMake build for now
+[33m269d277[m Trying Cmake build. Still needs a little shaking out
+[33m48f622f[m Added some comments and tidied up the channel selection rules in comm222_phst
+[33mee1a502[m Removed debugging printouts
+[33m2a3ca0d[m Debugging the memory issue, still some print statements in there.
+[33m3770f8e[m Fixed bug in Operator::SetUpOneBodyChannels that ruined hermiticity for isospin changing operators
+[33mc7db66e[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel
+[33m742afc1[m Fixed a bug near the end of the file, when checking number of legs for operator before writing. Should be better now.
+[33mf8c38b5[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel not sure what I changed on oak
+[33m57ca004[m Just added a commment
+[33ma07cd09[m Re-tweaked the comm222_phst routine, because the last tweak was a memory hog
+[33mcba1e9b[m Added Tokyo format read/write to python bindings
+[33m43b1e0e[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Don't remember what I did on oak
+[33m1ad3f35[m Changes on oak
+[33m888806c[m Added element access for Armadillo matrices to the python wrapper
+[33m844c783[m Tiny printout changes
+[33m3175da1[m Fixed bug found by Baishan in HFMBPT::GetNaturalOrbitals()
+[33m9ecd364[m Some rearranging to enable writing and rereading of Omegas
+[33m696261b[m Added some small changes
+[33m53a3fac[m Added Wigner-Eckart phase for isospin-reduced 3N operators in ThreeBodyStorage_iso.cc
+[33mbbf1bc0[m Changed definition of ModelSpace::SetReference in pyIMSRG.cc
+[33mcd02a84[m Additional tweaks trying to speed up comm222_ph_st for a beta decay operator
+[33m895acfc[m Tweaks to commutator routines to speed up J=0 tensor commutators
+[33mf38485c[m Added bug-fix from Antoine for M0nu.cc
+[33m0f8b607[m Updated M0nu code from Antoine to use momentum space integration.
+[33m7afa7ef[m Tweak to ModelSpace::ParseCommaSeparatedValenceSpace and ModelSpace::GetOrbitsAZ in order to not put valence orbits in the core
+[33m434754b[m Forgot to include the header file
+[33m9735fae[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel Too much editing in too many places...
+[33m5ccd04f[m Removed the storage_mode field in ThreeBodyME
+[33m7209a72[m Fixed a bug in ThreeBodyME::TransformToPN which caused trouble when nkets=0
+[33mc936349[m Commented out debugging line in UnitTest::Test_comm223ss
+[33m7ebe75f[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Editing in two places at once
+[33m147fe84[m Fixed typo bug in Operator::DoNormalOrdering3 itmat.first[0] -> itmat.first[1]
+[33mcd59857[m Added Jhat factors to ThreeBodyStorage::GetME_iso_no2b, GetME_ipn_no2b and Operator::DoNormalOrdering3  for the case of isovector operators, which we store as reduced for some reason.
+[33m0c70f79[m Changed IMSRGProfiler::CheckMem to look at /proc/self/statm on linux systems
+[33md86bc21[m Modifications to ModelSpace to add option of mixed reference, with non-integer A and Z
+[33m393239a[m Fixed typo in Operator::DoNormalOrdering3
+[33m4a6cbea[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel Not sure what changed on ReadWrite.cc
+[33m4a256c9[m local changes to ReadWrite?
+[33mf2ee93f[m Some bug fixes in Operator::DoNormalOrdering3 and implementing saner defaults in Parameters.hh
+[33m860c34d[m Fixed a bug in ThreeBodyStorage::UniquePermutations that was causing trouble in HartreeFock::GetTransformed3B, and probably elsewhere
+[33m54085df[m Changed line in imsrg++.cc so that HF calculation is not performed if oscillator basis is used.
+[33m61e6248[m Fixed bug in Operator::DoNormalOrdering3 due to a missing ampersand
+[33m2dd36fb[m Tweak to Operator::DoNormalOrdering3 so it can handle no2b storage, and to ThreeBodyStorage::NotImplemented so that it provides a more useful fail message.
+[33mec78f3e[m Tweaked Operator::GetMP3_Energy to use mat mult, and it should be much faster
+[33m1645e09[m Added Baishan's implementation of the ISM ISQ and IVD operators
+[33m94bad61[m After merging the refactor branch. The ThreeBody stuff has been reorganized.
+[33mc0c08ea[m[33m ([m[1;31morigin/refactor[m[33m)[m Some clean up of the ThreeBodyStorage_no2b files
+[33m595804b[m The half-precision seems to work as well now
+[33md4a7e97[m Implemented templated version of ThreeBodyStorage_no2b, but need to test for half
+[33m1fe5989[m Cleaned some things up in ThreeBodyStorage_no2b but still need to implement half precision stuff
+[33mec80c34[m ThreeBodyStorage_no2b seems to be working, though still more testing needed
+[33mc3c2c56[m more debugging
+[33mbdc938d[m more debugging stuff
+[33mbcfd9ce[m Some temporary debugging stuff
+[33m53e35d5[m Still debugging the no2b reading
+[33m983db47[m Crammed the NO2B structure into the form of ThreeBodyStorage. Still needs some work.
+[33mcca6f4f[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel I did something on another machine
+[33md6d533d[m Fixed a bug in the truncations in comm231
+[33m067112a[m Fixed a bug in the truncations in comm231
+[33mdd17c8b[m The new ThreeBody structure seems to be working, and the commutators pass the unit test
+[33mc7748ec[m Just changes to which 3-body commutators were included in UnitTesting
+[33m1d0ac79[m Things are looking better. Still a bug in comm231ss
+[33m88cd7d1[m debuggin the 3body refactoring stuff
+[33m7ccd371[m First commit. Still debugging
+[33m07492e0[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Maybe some changes from the laptop?
+[33m89d4a3b[m Forgot to remove a debugging line in ModelSpace::GetSixJ
+[33m050ab54[m Update README.md
+[33medd9ed3[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel Fixed a bug while working on oak.
+[33m764217c[m Fixed another bug in HartreeFock::GetTransformed3B. Now, calling that on H and then normal ordering agrees with the result of HartreeFock::GetNormalOrderedH
+[33m97f7b1e[m Fixed bug in ThreeBodyME::AccessME that caused bad mapping of isospin index
+[33m59f79f5[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel After debugging the 3b M0nu stuff
+[33m655a624[m tiny tweak to some timing checks
+[33m2b71052[m several tweaks to fix the three-body M0nu handling
+[33mc5c6015[m First attempt at transforming non-Hamiltonian 3-body operators to HF basis
+[33mb764b24[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel Should not have changed in two places at once
+[33m4ce325f[m local changes on laptop which can be overwritten
+[33m4ce26d9[m Forgot to undo a debugging line in ReadWrite.cc
+[33m466e569[m Fixed recently-introduced bug in ThreeBodyME::AccessME for isospin-changing operators.
+[33m15394c5[m Tweaked ThreeBodyMENO2B code to allow for single or half precision without needing to recompile
+[33m356630c[m changes on laptop, to be merged
+[33mf765659[m Read-in of 2b+3b M0nu matrix elements appears to be working. More testing needed.
+[33m0352f90[m Added ability to read isospin changing operator in Takayuki's format. Needs testing
+[33macf3bde[m Small style tweaks and comments
+[33mf18c7a0[m Adding capability to read in 3body M0nu operator from file
+[33me80605e[m Tiny changes to ThreeBodyMENO2B
+[33m350f9b0[m Quick fix setting default in Makefile not to use half-precision
+[33mab66114[m Added half-precision library for ThreeBMENO2B. Still needs testing
+[33m47a9cbf[m Tweaks to M0nu stuff from Antoine
+[33mbf14323[m Added M0nu stuff from Antoine
+[33m420febe[m Small tweak to Commutator.cc so it compiles with clang
+[33m193a668[m After testing HFMBPT::GetNormalOrderedHNAT and it looks good
+[33m80fc358[m First attempt at incorporating Takayukis fix for HFMBPT::GetNormalOrderedHNAT
+[33m3741ac6[m Added make test  option which calls UnitTest::SanityCheck()
+[33mad3ad86[m Fixed up the Makefile for Mox
+[33mab6252c[m Trying to fix things up on mox
+[33md2ab9b3[m Local change on Mox. Hope it doesn't break things
+[33m7c3986d[m Tweaked Makefile to revert to python-config if python2-config and python3-config aren't found
+[33mbee325a[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Not sure what I changed on oak
+[33mc5bf561[m Some tidying to the Makefile. Needs to be tested on the clusters
+[33m5aa75c0[m Tweaked makefile to check python version
+[33ma0f8d63[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Upgrade of pybind11 and slowly moving to python3
+[33m185b683[m Tweak Makefile for Cedar
+[33m47df4fd[m Some pybind11 files which hadn't been added
+[33mf171e02[m More efficient reading of NO2B file for emax < emax_file
+[33m22a1152[m Updated pybind11 and removed undefined ReadNuShellX_sp function from pyIMSRG.cc
+[33m433bd41[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Pulling updates to read new NO2B 3N file format
+[33m0156dad[m Updated ThreeBdoyMENO2B to work with Takayuki's compact NO2B file format
+[33m0e7d1dc[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Testing out changes to comm222_ph
+[33m7c017e6[m Working on comm_222_ph. Trying putting the X and Y Pandya Transformation into one routine
+[33m608d355[m Some slight restructuring of the constructors and Init routing for ModelSpace, to try to avoid explicit reference or orbit indices when setting things up, since the indices will depend on the truncations made
+[33m42b551a[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel modifications on oak
+[33m0151897[m comm223ss stores zbar as float
+[33mf828504[m Added an E3max check in the setup loop of comm223ss
+[33mafd1ec4[m Some changes to comm223ss to try to reduce memory footprint. Also removed some setter functions in ThreeBodyMEpn that aren't used and probably aren't safe
+[33m860847f[m Trying again to include all the new armadillo files
+[33m7aed118[m Upgraded Armadillo to v9.850.1 and tried out sparse matrices for comm223ss. We shall see...
+[33m2a5b88e[m Better handling of perturbative_triples for magus with splitting
+[33m7b70f71[m Tweak to comm223ss greatly reduced the number of terms included for perturbative triples
+[33m6d695dd[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Another try at the perturbative triples for larger emax
+[33m7e57da7[m added checks to comm223ss for the specific case of perturbative triples
+[33m9eb644c[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Switching back to full IMSRG(3)
+[33m633ee12[m Switched back to full IMSRG(3)
+[33m5cf7e01[m Oops accidentally left in a debugging line that breaks comm233ph. Fixed it.
+[33mc13ed19[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Minor merge
+[33m26895a6[m Turned off some IMSRG(3) commutators for testing
+[33m9925c2c[m Added ThreeBodyMEpn::GetME_pn_PN_TwoOps  and also some additional printout to IMSRGSolver::GetPerturbativeTriples
+[33m0acde7f[m Now ModelSpace::CountThreeBodyStatesInsideCut returns an array of size_t, nstates and ntotal
+[33m241d4a8[m Fixed bug from recent change to J limits in comm233_ph and comm333_pph
+[33m7319e47[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel This again.
+[33macea3cb[m added a hash table to comm333_ph
+[33mec4c002[m Added ModelSpace::CountThreeBodyStatesInsideCut
+[33mcd2dba1[m switched comm223 from maps to hash tables, and tightened the triangle condition for permutation loops
+[33m653e16b[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel I keep doing this..
+[33ma9d4ebe[m Small tweaks in comm223ss which maybe? speed up the setup loop
+[33m33828a7[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Still some unmerged stuff on oak
+[33m17e7729[m Recast comm223ss as mat mult. Still need to test if there's a benefit
+[33md8f051d[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Merging on oak.
+[33m811b5ad[m Added printout for MBPT2 contributions
+[33m60af2e4[m Rolled comm223ss into a loop over the permutations. No speedup, but should be more maintainable.
+[33m994f806[m Small tweak that speeds up comm332_pphhss
+[33mbd507c0[m uncommented a check in comm332_pphhss that avoids a few uncessesary calculations
+[33m6cfd9d4[m Recast comm333_phss and comm233_phss as mat mult, and it is faster.
+[33mc59f215[m commented out one line in ModelSpace.cc
+[33m6cbce99[m Some optimizing of comm233_phss, but not done as mat mult yet. Also retooled calculation of 3b part of eta in Generator
+[33mc772f28[m Fixed a bug in comm332_ph and retooled the Generator class to reduce code replication
+[33mc3ae34b[m Recast comm332_pphhss as mat mult via particle-hole trans. Much faster.
+[33m1f35709[m Added constructore to ThreeBodyMEpn that allows initializing non J=0 Tz=0 parity+ 3b operator
+[33m0c3088e[m Turned on the full imsrg3 commutator
+[33mbec40be[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Messing with commutator terms on mox
+[33m18d5aaf[m merging again on cougar
+[33md7dd686[m Turning on and off IMSRG3 commutator terms
+[33me3a28c8[m Added only_2b_omega option
+[33m0b26957[m merging on cougar
+[33me0642c5[m Changes made on cougar
+[33md3c894a[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Pulling in tweaks from the laptop
+[33ma67d88e[m Added dE3max cut to the 3body Eta routines
+[33m9928581[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Merging on mox
+[33m1dede13[m Merged on mox
+[33m4756c15[m put 3body eta construction in parallel loop
+[33m724700a[m Changes made on mox
+[33mae9c5ee[m Fixed a dumb bug in imsrg++ when discarding the residual 3N for imsrg3
+[33mad19652[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Messing around on mox
+[33m43d3509[m Sped up comm232ss by a factor of 2 in small tests
+[33mde1254b[m on Mox, turning on and off commutator terms
+[33m6fdb5ca[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Updating to mox
+[33m38f6df4[m Reordered some things in comm223ss. Slightly faster.
+[33mfc63b4f[m Fixed some bugs in the newer version of comm232ss
+[33m3c579e8[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Tweaking comm232ss
+[33mdd5563f[m Tried reworking comm232ss to scale more nicely. Still need to test if it actually worked
+[33m87afdd1[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel And yet again
+[33mf65d6f5[m Moved the parallel loop in comm232ss to hopefully avoid memory issues
+[33m0a030a1[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Messing around on cougar
+[33mcf96fd1[m Tweaking wich IMSRG3 commutators are active
+[33m791ae8f[m Changed some parameters in imsrg++ to be bool rather than string, added discard_residual_input3N option
+[33m824e489[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel This again
+[33mda83072[m tweaked the comm232ss routine so that the dE3max cut is consistent with all the others
+[33mddf2d4e[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Messing around on cougar
+[33me8296ec[m Tweaking which terms are included in the 3 body commutators
+[33m828d14d[m Added the dE3max cut to all IMSRG3 commutators and fixed a bug in comm332_pphhss that only showed up for fractional occupations
+[33mc60843f[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel This again
+[33me30a282[m recast com333ppp_hhh and comm332_ppph_hhhp as mat mult and they are faster
+[33m15fa3b5[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Re merging on mox
+[33mbf8f46c[m Updated comm223ss to allow for Y to have odd parity or nonzero Tz
+[33md545e0b[m Fixed ugliness in handling of commutators when Y is a 2-body but Z should be 3 body
+[33mbc4aae5[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Shouldn't be much difference here
+[33m29783da[m Commented out the more painful commutator terms
+[33m3000c59[m Fixed bug in ModelSpace::FindEFermi which caused problems in the unusual case where the fermi surface is at the edge of the large model space
+[33m7b5bc81[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel This again...
+[33mf28d5cf[m Fixed bug in comm331ss that didnt check for nonexistent channels
+[33md2d9f55[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Don't remember what changed on cougar
+[33m7ffe3ea[m changes made to Commutator.cc on cougar
+[33m2ef9817[m Fixed some bugs in IMSRG(3) which only showed up for factional filling
+[33m94f9bb7[m Added option in HFMBPT to get the residual 3N
+[33m056da41[m Fixed a bug where I deleted the TBMEs before writing a NuShellX file
+[33ma260052[m Adjusted the ordering of orbits in Ket3 to be p<=q<=r
+[33mf8f401a[m Fixed bug in comm133ss which was causing the segfault
+[33m2604863[m comm133ss is giving a segfault. need to understand that
+[33me8fbf50[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Ok really I should fix this.
+[33m548adb7[m Tweaked comm133ss to use the dE3max cut
+[33m398c852[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel It keeps happening
+[33mfa64544[m Finally just tweaked ThreeBodyMEpn to give zero when asked for something above the E3max cut
+[33mb052688[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel This is getting old. I should push back.
+[33m713a1a4[m Also needed the E3max cut in comm132ss
+[33m7d2202f[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel And yet again.
+[33m95eb1f6[m Needed an E3max check in comm231ss
+[33m7183159[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Again.
+[33mde259f9[m Tweaked ModelSpace::SetLmax so that Init is run again and everything is recomputed. Also added a check in Generator for E3max, which was causing problems
+[33m7b66219[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel This again
+[33m9f83b05[m Added a truncation scheme for the IMSRG(3) commutators, though it is not yet implemented in all commutator routines
+[33mf60f55a[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel I keep doing this...
+[33mb111335[m Fixes from last merge
+[33md939acf[m Some adjustments which hopefully speed up the comm232ss routine a bit more
+[33mda9041a[m Another in a string of tweaks on cougar
+[33m9da1fca[m Recast comm232ss as a matrix multiplication, but not sure yet if it will improve things.
+[33mf078272[m Added the parallel loop back to the 133ss commutator, because it appears to help
+[33maa48b2d[m Local changes on cougar
+[33m8a4e97b[m Recast the 133 commutator as a mat mult. Hopefully it's faster. Still need to test
+[33mf4ce5e7[m tweaked imsrg++.cc
+[33m524d8e8[m Some changes to imsrg++ to properly deal with IMSRG(3)
+[33m59cb422[m Fixed a prefactor error in the 331 commutator expression (it was present in the UnitTest mscheme formula as well
+[33md14967b[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Something dumb must have happened on cougar
+[33mf8bf28e[m One of the parallel loops in the 331 commutator wasn't thread safe
+[33mef5b3e9[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Not sure what I changed on the cougar cluster
+[33mb93e4cf[m local change on cougar cluster to imsrg_util.cc
+[33mafad387[m Some tweaks to get moderate speed up for a few of the IMSRG(3) commutator routines
+[33m82d9502[m Just some small cleanups
+[33m945a93f[m It appears that the last of the IMSRG(3) commutator expressions is correct (git add -u .git add -u .)
+[33mfa833b8[m It appears that the last of the IMSRG(3) commutator expressions is correct (git add -u .git add -u .)
+[33mdb7fd88[m The comm233_phss routine appears to be working now. Just one more to go...
+[33m19d259d[m All IMSRG3 operators benchmared except for the 233_ph and 333_pph_hhp. Those will be the worst.
+[33mac445bf[m Many, by not all of the IMSRG(3) commutator expressions implemented and unit tested
+[33m0054ce3[m Confirmed that WriteValence3body produces different matrix elements for protons and neutrons, i.e. breaks isospin, as desired
+[33mc663626[m Added WriteValence3body, but things still need testing
+[33m7c8e8f1[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Fixing Makefile for Cedar
+[33ma4d31a2[m Tweaking Makefile so that things dont break on cedar
+[33ma4b987f[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Working in two different places
+[33m9eb8568[m debugging stuff
+[33m20f61bb[m Added OneBodyDensity operator:
+[33md5d0146[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel tweaks on cougar
+[33mce53293[m Extended HartreeFock::TransformToHFBasis so that it works with dagger operators as well. Still untested.
+[33m2ff7860[m merged updates from desktop
+[33m904c5c5[m changes to imsrg_util.cc
+[33m57e0a25[m Tweaked Dagger operator to have just a column for the 1body. This appears to fix the issue of summing different n values
+[33m417a4c7[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel I'm blowing it here...
+[33m1b830e6[m Also fixed HartreeFock::FillLowestOrbits, and renamed F_trans to F_hfbasis for better clarity
+[33mc122550[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Fixed bug in PrintSPEandWF
+[33mecfb380[m Fixed bug in PrintSPEandWF -- Thanks Takayuki
+[33me297ea6[m Fixed the DaggerAlln routine to put things in the right column
+[33mac83606[m Added DaggerAlln_Op
+[33m18b3021[m Pulling remote changes while working on 3N stuff
+[33mcd6dc51[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Modifying on multiple computers again...
+[33m199e2e3[m Fixed imsrg++.cc so that we can write valence files as nushellx or tokyo format
+[33md73e12e[m Added 223 scalar commutator to the unit test. It failed miserably.
+[33mf5a72b6[m Attempt to parallelize the fock matrix update was ill-fated
+[33mf0cd05a[m Fixed small bug I introduced into ThreeBodyMENO2B ReadBinaryStream. Still trying to make HF converge more robustly
+[33m5887c53[m Tweaks to ThreeBodyMENO2B to speed up reading from binary file
+[33mab5108d[m Parallelized the Count routine in ThreeBodyMENO2B and added DIIS iterations to the HF solver
+[33m5d783f9[m Small tweaks to ThreeBodyMENO2B ReadFile stuff.
+[33me432d2b[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Much struggle
+[33md81360e[m Trying again with armadillo rollback
+[33m5744c8d[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel So much armadillo trouble
+[33mdf6222b[m Rolled back the armadillo upgrade because it disables OMP for gcc versions < 5.4 due to a gcc bug
+[33ma01eb77[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Screwed up the first attempt at upgrading armadillo
+[33mce65c50[m Updated to armadillo 9.8
+[33mdd42e40[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Not sure what changed on oak.
+[33m10ab98d[m Added more resolved timing for ThreeBodyMENO2B::ReadFile
+[33mf9f19e9[m Added DIIS option to HF::Solve to help break out of closed cycles
+[33m4a549a7[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Fixed the same blunder on two different machines
+[33mf9706bd[m Fixed MBPT3 blunder
+[33ma214f0d[m Fixed the MBPT3 ph term, and put off allocating the 3-body until we read
+[33mfcd6a09[m Tweak to make file for cedar
+[33mdf2d57d[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Updating
+[33m72ccd92[m After pulling from ragnars version
+[33m2cfc9e2[m Some cleaning up after adding ability to make more elaborate emax cuts
+[33ma5f7b12[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel I pushed when I should have pulled...
+[33m708c8e0[m Added Timing for ThreeBodyMENO2B in imsrg++.cc
+[33m391320e[m Fixed Makefile for oak
+[33me1a65bf[m Fixed Makefile for oak
+[33m64d9eef[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Merged with Takayuki's fancy version
+[33m3f59062[m Merging Takayuki's additions, in particular the ThreeBodyMENO2B class
+[33mbdc3584[m binary stream of NO2B format works propery
+[33m2490e4b[m got speed up much!
+[33m5d6cef9[m seems working properly, but slow
+[33mcb1e949[m getting better, but still doesn't wowrk
+[33maa9251b[m compiled, but it looks not working properly
+[33m2bc8f57[m need more change
+[33m36ff10c[m Tweaked Makefile for Cedar
+[33me55f5b1[m Still debugging
+[33mf867be5[m still debugging
+[33m5a6c400[m First pass at enabling more general basis truncations. Dont think its working quite yet.
+[33mb2b953b[m NO2B three-body matrix elements
+[33m62f7ad1[m Tokyo format
+[33m97bd497[m upstream merged
+[33m0ac0181[m Fixed all the compiler warnings. Very satisfying.
+[33maf6ba15[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Editing in too many places...
+[33m3f64c9c[m Tweaked ModelSpace::Init to set target mass and target Z to the A,Z of the reference
+[33m67f8c71[m Fixed some issues left in treating the dagger operators with the Magnus formulation
+[33m468a030[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel It had been a while since I merged the version on mox
+[33mddc87fd[m Added MBPT2 spectroscopic factors, but still need to test those more thoroughly
+[33m14a43c2[m Added some of the IMSRGSolver methods to pyIMSRG
+[33mcfa70be[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel THis seems to keep happening
+[33md8c9ed5[m Forgot to update ReadWrite::WriteDaggerOperator
+[33m889cd10[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel This again?
+[33mddb99d4[m Forgot to add the ThreeLegME files
+[33mc7d2ee2[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Merging with Isospin machine. Not sure why I need a merge.
+[33m0219448[m Got rid of DaggerOperator class and incorporated it back into Operator, which is nicer for looping over operators to transform, etc.
+[33m0fdccde[m Remerging with version on Isospin machine
+[33m298a9e8[m Remerging with version on Isospin machine
+[33m970f4a0[m Small printout tweaks on Isospin machine
+[33m2832f0e[m The Dagger Commutators now all pass the unit tests.
+[33mb1ef4e8[m Removed SymmMatrix, which was less efficient than storing in a plain vector
+[33m27acb9a[m Added a check to imsrg++.cc in case scratch is improperly set
+[33m3309bf3[m Moved the DaggerOperator to it's own class that inherits from Operator. The unit test looks good except for the notorious ph term.
+[33m3ce027c[m Unit testing Dagger commutators. Some work left to do yet.
+[33med19d2b[m comm231ss passed the unit test. Still having trouble with comm132ss, likely due to incorrect handling of anti-hermitian 3-body
+[33mb7531c6[m The next commutator, comm331ss, passed the unit test!
+[33m78e89db[m ThreeBodyMEpn seems to be reasonable, and comm330ss passed the unit test.
+[33m3f30d4e[m Changing the ThreeBodyMEpn storage to a single vector sped things up considerably. It's now much faster than the isospin storage, but converting from isospin is still pretty slow.
+[33me6625c8[m Tokyo format added
+[33ma7dd1ed[m Tokyo format added
+[33m0504e71[m Now the ThreeBodyMEpn appears to give consistent numbers as the old code, but retrieval of matrix elements is disappointingly slow. For now, I leave things in isospin by default.
+[33m6682459[m Commented out the ThreeBodyMEpn part for now. It still gives a slightly different answer, so it's not quite ready for prime time.
+[33m95b7b1a[m Tweaked ThreeBodyMEpn class so that it contains the isospin version ThreeBodyME as a member.
+[33m58f6674[m isospin three-body matrix element
+[33m0bc4d7b[m The isospin part of ThreeBodyMEpn is still dubious.
+[33m4d8cd27[m Still working on debugging ThreeBodyMEpn
+[33m11428af[m Things are looking a little more reasonable for ThreeBodyMEpn
+[33mc62fd3f[m Small changes, things still don't work
+[33m7de96c3[m reverted Operator.cc to use the less-broken ThreeBodyME for now
+[33m1156d66[m The ThreeBodyMEpn still doesn't work...
+[33mcafc73e[m Also forgot to add ThreeBodyChannel.cc
+[33m700e477[m Maybe forgot to add TwoBodyChannel.cc
+[33m67a9a15[m Added ThreeBodyMEpn class. Still needs some debugging
+[33m0a5e770[m Also, tweaks to UnitTest, but  things are still busted
+[33m0d0f80a[m Added SymmMatrix and ThreeBodyMEpn. Still much work to do.
+[33m1bcaaa9[m Added antisymmetrization check to UnitTest
+[33me95e529[m Still struggling with the unit test
+[33m3bdc34d[m Still working on the unit tests
+[33m376380e[m undid a tweak to ThreeBodyME that changed answers. Things should be as they were.
+[33m3903e2e[m work in progress
+[33mb0b43bc[m Merged with upstream
+[33m1906d90[m Added PhysConst namespace for storing physical constants all in one place
+[33mee4e318[m Added UnitTest class. Still needs work.
+[33mf462e09[m Replaced mutliple defines with a PhysicalConstants.hh header file so these are all in one place.
+[33mbec57ac[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Merging after I forgot to push the HFMBPT updates from another computer
+[33mf587a10[m Actually added the HFMBPT files this time
+[33mad7b041[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Should have pulled first
+[33m988d510[m Tweak to imsrg++.cc so that operators get carried along in the flow with the flow_RK4 option
+[33mcbae625[m Pilfered Takayuki's implementation of natural orbitals, and tweaked to play semi-nice with fractional occupations
+[33m35a04c4[m Still debugging the natural orbitals
+[33m7043795[m Added in natural orbitals, but they don't work yet
+[33mb93459c[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel I was working on the M0nu contact, but I fixed it on a different computer
+[33ma855588[m Fixed some bugs/blunders in the M0vBB contact
+[33m62a05ef[m Remerged stuff with Jacobi3BME
+[33mf11a1a8[m Added a return to NeutronDensityAtR in imsrg_util.cc. That was silly.
+[33m9c347e0[m Edited the Wegner generator
+[33m7738c9e[m Computation of the 3-body monopole appears to be working, but there's still some optimization yet to be done
+[33m4dc6c50[m Looks like the 3-body monopole is working (tested up to emax=2)
+[33ma943caa[m Added in ability to directly comput 3-body monopole, but it doesn't give the right answer yet
+[33m963dd7f[m Got the T coefficient working
+[33me7ffed6[m Added some totally untested Jacobi stuff to HartreeFock class. More work to be done there
+[33mf98398d[m Some brushing up
+[33mf270dee[m Added a class for dealing with jacobi basis 3b matrix elements. Still needs some work.
+[33me7fb498[m Added a class for dealing with jacobi basis 3b matrix elements. Still needs some work.
+[33m9a0b3a2[m IMSRG(3) still a work in progress...
+[33m37b8beb[m Merge branch 'devel' of github.com:ragnarstroberg/imsrg into devel No big deal
+[33m653f470[m Added timing to HartreeFock::Solve
+[33m2d4a484[m Finished first pass at implementing IMSRG(3). Totally untested and horribly ugly.
+[33m0bc66e1[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Merging different edits
+[33m96bb2c0[m Added the double beta decay contact operator
+[33m350e435[m More work on the IMSRG(3) bits. It compiles, but totally unchecked and not finished
+[33m9d40c57[m Fixed bug in GaussLaguerre.hh and added some more untested IMSRG(3)
+[33m39bdfb2[m Grinding away at the IMSRG(3) commutator expressions
+[33mc989d35[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Not sure what I did on Mox
+[33mfad9bee[m Added option to split M1 into spin and orbit
+[33m032257b[m Cleaned up some debugging printouts from IMSRG(3) development
+[33m50934a3[m Tweaked loops in AngMom::Moshinsky and sped things up by a factor of 5
+[33m073aa80[m First attempt at adding in Gauss-Laguerre quadrature for the radial integration
+[33m0a3e5a9[m Added in 4th-order fixed step size Runge-Kutta flow option
+[33m11ba157[m Added some fine structure and hyperfine structure operators. Have not tested them yet.
+[33m50fbb39[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Not sure I did anything different on Mox.
+[33m3215824[m Some attempts to make the factorials in the TalmiB coefficient behave for large emax
+[33mc19d369[m Added most, but not all 3-body commutators. Still need to debug and optimize, etc.
+[33m9da2829[m The more general s.p. basis seems to work reasonably now, but there should be a few more checks.
+[33m79dfd2e[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Small fix on office computer no. 2.
+[33m3a00940[m Fixed a type where rhon didn't actually return the operator
+[33md895bb3[m Trying to generalize the single-particle numbering. It complies and runs, but I think the answers are wrong.
+[33m2e422f6[m Merge branch 'devel' of https://github.com/ragnarstroberg/imsrg into devel Pulling on Mox, after tweaking the Makefile
+[33mebc1d7e[m Tweaked Makefile for Mox
+[33m705b6ac[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Conflicts from not pulling on office computer -SRS
+[33me9961f6[m Added it Coulomb potential, and option of doing atoms, with energies in Hartree
+[33mafce016[m The [2,2]->3 commutator compiles and runs without error. Much checking/benchmarking still to come.
+[33mc3e964a[m Work in progress on first IMSRG(3) commutator.
+[33mb3a6fb5[m Fixed stray uncommented comment.
+[33mcffbddd[m Playing with generators
+[33mcb969cb[m Screwed up file test in imsrg++.cc. Fixed now.
+[33m4f2d27f[m Added Minnesota potential, with scaled triplet channel interaction to get stable results for finite nuclei.
+[33m71cd6af[m Added Minnesota potential, with scaled triplet channel interaction to get stable results for finite nuclei.
+[33mde576f4[m Added Minnesota potential, with scaled triplet channel interaction to get stable results for finite nuclei.
+[33m23f6217[m Fixed the fix for writing to /dev/null
+[33mc18ed69[m Put in fix for writing Omegas to /dev/null
+[33mfc43dc6[m Merge branch 'devel' of http://github.com/ragnarstroberg/imsrg into devel Forgot to pull before adding in TalmiB
+[33m83bbca3[m Fixed a bug in AngMom::TalmiB. Now it reproduces numbers tabulated by Moshinsky and Brody.
+[33m4739d41[m Added TalmiB coefficient to AngMom namespace
+[33m4ac3565[m Added in error estimator for single ref. It still needs some theoretical refinement.
+[33mfb4b71e[m Added QtransferAtan generator. Seems ok.
+[33m996ee99[m Swapped out the boost gamma function calls in favor of the c++ builtin functions
+[33m97e9066[m Added relativistic correction to the kinetic energy. THis should probably be checked and tested a bit more carefully.
+[33m1e6e99d[m Added Trel to the list of operators in imsrg_util
+[33me6187d5[m Added the 1PA generator. It still doesn't work.
+[33m69aa083[m Merge branch 'refactor' into devel I think the refactored branch is sufficiently stable to share
+[33m9099a97[m Merge branch 'refactor' of http://github.com/ragnarstroberg/imsrg into refactor Note sure where the other change came from
+[33m7d482f7[m Tweak to ConstructGenerator_White tha changed Eta += H/Delta to Eta = H/Delta. This didnt affect any results, but the new way is cleaner.
+[33mfb4c302[m Added flag for RPA/TDA 1b operators to be able to do both
+[33m2e97028[m Looks like RPA resummed effective charge function works (at least compiles...)
+[33ma57444e[m Merge branch 'refactor' of http://github.com/ragnarstroberg/imsrg into refactor I don't know who else changed things.
+[33m134abb1[m In open-heart surgery mode. Committed because I want to go home...
+[33m4066227[m Added a J-dependent 2-body denominator. Doesn't seem to have much impact
+[33mddb4bc0[m I was mistaken previously. Now it appears that the ph dagger commutator is consistent. That was painful.
+[33mbbbc33c[m Normalization for dagger commutators appears to be consistent, and two different ways of evaluating ph commutator agree
+[33m438899b[m Trying to fix dagger stuff. Not done yet
+[33mb32db50[m Fixed bugs in ReadWrite::WriteDaggerOperator which caused not all of the matrix elements to be written
+[33m07e86f6[m Merge branch 'refactor' of http://github.com/ragnarstroberg/imsrg into refactor It keeps making me do this.
+[33mfd99fb2[m Added bindings for the lists of orbits in ModelSpace, e.g. core,valence etc
+[33meb624e8[m Merge branch 'refactor' of http://github.com/ragnarstroberg/imsrg into refactor Not sure why I keep having to merge.
+[33mf13f91d[m Another attempt at the convenience operator DaggerHF_valence
+[33m0bc10b5[m Merge branch 'refactor' of http://github.com/ragnarstroberg/imsrg into refactor Merging to Isospin machine
+[33m1cb5842[m We can get the valence 3b in the HF basis (no output format yet). Also added convenience operator DaggerHF_valence
+[33mf0dc66a[m Merge branch 'refactor' of http://github.com/ragnarstroberg/imsrg into refactor Not sure what changes were made on the local isospin machine.
+[33mde6f7a5[m Combined UndoNormalOrdering into DoNormalOrdering, with a minus sign passed in. Also changed some ints to size_ts to silence some compiler warnings
+[33mdec969f[m Added option for hunter-gatherer way of splitting up omega in the Magnus formulation
+[33mdc285dd[m Merged with remote version
+[33m6fa9025[m Changed GetMP3_Energy so it returns pp hh and ph contributions separately
+[33mbb5005f[m Tweaked the isospin operator to give what I hope is the right answer.
+[33m6b8dd00[m Merge branch 'refactor' of http://github.com/ragnarstroberg/imsrg into refactor Still dealing with a screwed up merge earlier... Conflicts: 	src/ReadWrite.cc 	src/imsrg_util.cc
+[33m0d82218[m Forgot to add Commutator files to be tracked
+[33ma168b43[m cleaned up some mess due to merges...
+[33mca8c056[m Merge branch 'master' into devel Fixing all those damned std::
+[33me921a49[m Found more missing std::
+[33m17f867f[m Fixed some conflicts after merge
+[33m2c55f40[m Merge branch 'master' into devel There were still some missing std:: in the master branch. Fixed it there so I want it fixed here too.
+[33mc875614[m[33m ([m[1;33mtag: [m[1;33mv0.1.2[m[33m, [m[1;33mtag: [m[1;33mv0.1.1[m[33m)[m Patched some abs to std::abs, which was causing an ambiguity on certain machines
+[33mc3689dd[m Tweaked things so the .dag files have normalized reduced matrix elements, using the Edmonds convention
+[33mcce48f0[m Added ReadWrite::WriteDaggerOperator() method
+[33m585b432[m Incorporated dagger operators as well, gives the same answer as before
+[33m7d0a4ff[m Added in scalar-dagger commutators, and it compiles, but things are looking wrong
+[33me221ab5[m Added Operator property legs
+[33m9998ab3[m Refactored version compiles without errors
+[33m75e805d[m Started the refactoring, but haven't finished cleaning things up yet.
+[33ma8d0bea[m Small tweaks in IMSRGProfiler
+[33mc65b6ca[m[33m ([m[1;33mtag: [m[1;33mv0.1[m[33m)[m Merge branch 'master' of github.com:ragnarstroberg/imsrg updating master to be current with devel
+[33maea99ce[m Merge branch 'devel' Getting master branch up to date
+[33m0cda1f4[m Over-aggressive search and replace put std:: in some undesirable points
+[33mc51443b[m Attempt at portable printing didn't work out

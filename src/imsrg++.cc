@@ -1551,6 +1551,10 @@ if (opff.file2name != "") {
       }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////
+    // Kernel function for coorelated response (Andrea, January 2025) /////////////
+    ///////////////////////////////////////////////////////////////////////////////
+
     if (kernel)
     {
       H_HF = H_HF.UndoNormalOrdering();
@@ -1669,8 +1673,6 @@ if (opff.file2name != "") {
       if (L == 0)
         mom0_s -= OpSubL.ZeroBody * OpSubR.ZeroBody;
 
-      //std::string filename = kerdir + "/L=" + std::to_string(L) + "_" + pn + "_" + std::to_string(qL) + "_" + std::to_string(qR) + ".dat";
-
       auto ss = boost::format{"%s/L=%i_%s_%.3f_%.3f.dat"} % kerdir % L % pn % qL % qR;
       std::string filename = ss.str();
 
@@ -1690,7 +1692,10 @@ if (opff.file2name != "") {
       }
     }
 
-    // Write the original and evolved Hamiltonian in the HO basis
+    ///////////////////////////////////////////////////////////////////////////////
+    // Write the original and evolved Hamiltonian in the HO basis /////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+
     if (write_H)
     {
       int emax_imsrg = eMax;
@@ -1723,7 +1728,10 @@ if (opff.file2name != "") {
       }        
     }
 
-    // Print the Magnus operator, Andrea 30/01/2025
+    ///////////////////////////////////////////////////////////////////////////////
+    // Print the Magnus operator, Andrea 30/01/2025 ///////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+
     if (write_omega_me)
     {
       std::cout << "--------- Writing Omega ---------" << std::endl; 
@@ -1758,6 +1766,29 @@ if (opff.file2name != "") {
         rw.Write_me2jp(omefile + "_" + std::to_string(i) + ".me2jp.gz", Omega_i, emax_imsrg, 2 * emax_imsrg, emax_imsrg);  // Two-body part
       }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // New project on correlated diabatic surfaces/ ///////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+
+    bool diabatic_surf = false;
+
+    if (diabatic_surf)
+    {
+      int L_dia = 2;
+      std::string pn = 'isoscalar';
+
+      Operator Q  = imsrg_util::ElectricMultipoleOp(modelspace, L, 0, pn);
+
+      Operator T = imsrg_util::KineticEnergy_Op(modelspace);
+
+      
+
+
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+
 
     for (size_t i=0;i<opnames.size();++i)
     {
@@ -1877,48 +1908,48 @@ if (opff.file2name != "") {
         if ((op.GetJRank() == 0) && (op.GetTRank() == 0) && (op.GetParity() == 0)) {
         rw.Write_NaiveVS1B(intfile + opname + ".vs1b", op);
         rw.Write_NaiveVS2B(intfile + opname + ".vs2b", op);
-	    rw.Write_me1j(intfile + opname + "_coreNO" + emax_ref_string + ".me1j", op, emax_reference, emax_reference);
-	    rw.Write_me2jp(intfile + opname + "_coreNO" + emax_ref_string + ".me2jp", op, emax_reference, 2 * emax_reference, emax_reference);
+        rw.Write_me1j(intfile + opname + "_coreNO" + emax_ref_string + ".me1j", op, emax_reference, emax_reference);
+        rw.Write_me2jp(intfile + opname + "_coreNO" + emax_ref_string + ".me2jp", op, emax_reference, 2 * emax_reference, emax_reference);
         }
       }
-//      std::cout << " (" << ops[i].ZeroBody << " ) " << std::endl;
+      //      std::cout << " (" << ops[i].ZeroBody << " ) " << std::endl;
       std::cout << "   IMSRG: " << op.ZeroBody << std::endl;
       std::cout << opname << "_IMSRG: " << op.ZeroBody << std::endl;
-//      rw.WriteOperatorHuman(ops[i],intfile+opnames[i]+"_step2.op");
-//      std::cout << "After renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;
+      //      rw.WriteOperatorHuman(ops[i],intfile+opnames[i]+"_step2.op");
+      //      std::cout << "After renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;
        
 
-    std::cout << "      " << op.GetJRank() << " " << op.GetTRank() << " " << op.GetParity() << "   " << op.GetNumberLegs() << std::endl;
-    if ( ((op.GetJRank()+op.GetTRank()+op.GetParity())<1) and (op.GetNumberLegs()%2==0) )
-    {
-       std::cout << "writing scalar files " << std::endl;
-      if (valence_file_format == "tokyo")
+      std::cout << "      " << op.GetJRank() << " " << op.GetTRank() << " " << op.GetParity() << "   " << op.GetNumberLegs() << std::endl;
+      if ( ((op.GetJRank()+op.GetTRank()+op.GetParity())<1) and (op.GetNumberLegs()%2==0) )
       {
-        rw.WriteTokyo(op,intfile+opname+".snt", "op");
+        std::cout << "writing scalar files " << std::endl;
+        if (valence_file_format == "tokyo")
+        {
+          rw.WriteTokyo(op,intfile+opname+".snt", "op");
+        }
+        else
+        {
+          rw.WriteNuShellX_op(op,intfile+opname+".int");
+        }
+      }
+      else if ( op.GetNumberLegs()%2==1) // odd number of legs -> this is a dagger operator
+      {
+  //      rw.WriteNuShellX_op(ops[i],intfile+opnames[i]+".int"); // do this for now. later make a *.dag format.
+        rw.WriteDaggerOperator( op, intfile+opname+".dag",opname);
       }
       else
       {
-        rw.WriteNuShellX_op(op,intfile+opname+".int");
+        std::cout << "writing tensor files " << std::endl;
+        if (valence_file_format == "tokyo")
+        {
+          rw.WriteTensorTokyo(intfile+opname+"_2b.snt",op);
+        }
+        else
+        {
+          rw.WriteTensorOneBody(intfile+opname+"_1b.op",op,opname);
+          rw.WriteTensorTwoBody(intfile+opname+"_2b.op",op,opname);
+        }
       }
-    }
-    else if ( op.GetNumberLegs()%2==1) // odd number of legs -> this is a dagger operator
-    {
-//      rw.WriteNuShellX_op(ops[i],intfile+opnames[i]+".int"); // do this for now. later make a *.dag format.
-      rw.WriteDaggerOperator( op, intfile+opname+".dag",opname);
-    }
-    else
-    {
-       std::cout << "writing tensor files " << std::endl;
-      if (valence_file_format == "tokyo")
-      {
-        rw.WriteTensorTokyo(intfile+opname+"_2b.snt",op);
-      }
-      else
-      {
-        rw.WriteTensorOneBody(intfile+opname+"_1b.op",op,opname);
-        rw.WriteTensorTwoBody(intfile+opname+"_2b.op",op,opname);
-      }
-    }
 
     }// for opnames
 
