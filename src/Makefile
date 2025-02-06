@@ -9,10 +9,10 @@ CXX = g++
 .PHONY: version
 ALL = version libIMSRG.so imsrg++
 INSTDIR = $(HOME)
-INCLUDE   = -I./armadillo
+INCLUDE   = -I../$(GSL_INCDIR) -I./armadillo
 FLAGS     = -O3 -march=native -std=c++11 -fopenmp -fPIC
-LIBS = -lopenblas -lgsl -lz
-#LIBS = -lblas -lgsl -lz
+#LIBS = -lopenblas -lgsl -lz
+LIBS = -L../$(GSL_LIBDIR) -lblas -lgslcblas -lgsl -lz
 
 # I assume we're running on linux
 OS = LINUX
@@ -184,7 +184,7 @@ OBJ = ModelSpace.o TwoBodyME.o ThreeBodyME.o Operator.o  ReadWrite.o\
       HartreeFock.o imsrg_util.o Generator.o IMSRGSolver.o AngMom.o AngMomCache.o\
       IMSRGProfiler.o \
 	  Commutator.o Commutator232.o Commutator331.o \
-	  HFMBPT.o  RPA.o\
+	  HFMBPT.o  RPA.o Pwd.o\
       M0nu.o DarkMatterNREFT.o Jacobi3BME.o UnitTest.o \
       TwoBodyChannel.o ThreeBodyChannel.o \
       ThreeBodyStorage.o ThreeBodyStorage_pn.o ThreeBodyStorage_iso.o \

@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libCommutator232.a CMakeFiles/Commutator232.dir/Commutator232.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libCommutator232.a

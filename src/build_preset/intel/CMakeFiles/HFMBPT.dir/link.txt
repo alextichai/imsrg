@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libHFMBPT.a CMakeFiles/HFMBPT.dir/HFMBPT.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libHFMBPT.a

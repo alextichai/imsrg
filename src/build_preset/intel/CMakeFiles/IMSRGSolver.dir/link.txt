@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libIMSRGSolver.a CMakeFiles/IMSRGSolver.dir/IMSRGSolver.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libIMSRGSolver.a

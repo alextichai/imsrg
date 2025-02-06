@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libDarkMatterNREFT.a CMakeFiles/DarkMatterNREFT.dir/DarkMatterNREFT.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libDarkMatterNREFT.a

@@ -60,11 +60,16 @@ class ReadWrite
    void Jacobi2b_Channel_UnHash(size_t key, int& S, int& T, int& Tz, int& J);
    void ReadDarmstadt_2bodyRel( std::string filename, Operator& Op );
    void Read2bCurrent_Navratil( std::string filename, Operator& Op);
-   void Write_me2j( std::string filename, Operator& op, int emax, int e2max, int lmax);
-   void Write_me3j( std::string filename, Operator& op, int E1max, int E2max, int E3max);
-   void Write_me2jp( std::string filename, Operator& op, int emax, int e2max, int lmax);
-   void Write_me3jp( std::string filename, Operator& op, int E1max, int E2max, int E3max);
-   void Write_me1j(std::string filename, Operator &op, int emax, int lmax);
+
+   void Write_me1j (std::string filename, Operator &op, int emax, int lmax);
+   void Write_me2j (std::string filename, Operator &op, int emax, int e2max, int lmax);
+   void Write_me3j (std::string filename, Operator &op, int E1max, int E2max, int E3max);
+   void Write_me2jp(std::string filename, Operator &op, int emax, int e2max, int lmax);
+   void Write_me3jp(std::string filename, Operator &op, int E1max, int E2max, int E3max);
+
+   void Read_me1j (std::string filename, Operator &op, int emax, int lmax);
+   void Read_me2jp(std::string filename, Operator &op, int emax, int e2max, int lmax);
+
    void Write_NaiveVS1B(std::string filename, Operator &op);
    void Write_NaiveVS2B(std::string filename, Operator &op);
    void Write_NaiveVS3B(std::string filename, Operator &op);

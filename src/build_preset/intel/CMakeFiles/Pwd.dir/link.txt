@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libPwd.a CMakeFiles/Pwd.dir/Pwd.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libPwd.a

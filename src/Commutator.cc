@@ -170,38 +170,32 @@ Operator Commutator( const Operator& X, const Operator& Y)
    return  0*Y;
 }
 
-
-
-
 /// Commutator where \f$ X \f$ and \f$Y\f$ are scalar operators.
 /// Should be called through Commutator()
 Operator CommutatorScalarScalar( const Operator& X, const Operator& Y) 
 {
-   double t_css = omp_get_wtime();
-   int z_Jrank = std::max( X.GetJRank(),Y.GetJRank());
-   int z_Trank = std::max( X.GetTRank(),Y.GetTRank());
-   int z_parity = (X.GetParity()+Y.GetParity())%2;
-   int z_particlerank = std::max(X.GetParticleRank(),Y.GetParticleRank());
-   if ( use_imsrg3 )  z_particlerank = std::max(z_particlerank, 3);
+   double t_css          = omp_get_wtime();
+   int    z_Jrank        = std::max(X.GetJRank(), Y.GetJRank());
+   int    z_Trank        = std::max(X.GetTRank(), Y.GetTRank());
+   int    z_parity       = (X.GetParity() + Y.GetParity()) % 2;
+   int    z_particlerank = std::max(X.GetParticleRank(), Y.GetParticleRank());
+
+   if ( use_imsrg3 ) z_particlerank = std::max(z_particlerank, 3);
+
    ModelSpace& ms = *(Y.GetModelSpace());
-   Operator Z( ms, z_Jrank, z_Trank, z_parity, z_particlerank );
-   if (X.Norm() == 0) {
-    return Z;
-   }
-   if (Y.Norm() == 0) {
-    return Z;
-   }
+   Operator Z(ms, z_Jrank, z_Trank, z_parity, z_particlerank);
 
+   if (X.Norm() == 0)
+   {return Z;}
+   if (Y.Norm() == 0)
+   {return Z;}
 
-   if ( (X.IsHermitian() and Y.IsHermitian()) or (X.IsAntiHermitian() and Y.IsAntiHermitian()) ) Z.SetAntiHermitian();
+   if ((X.IsHermitian() and Y.IsHermitian()) or (X.IsAntiHermitian() and Y.IsAntiHermitian()) ) Z.SetAntiHermitian();
    else if ( (X.IsHermitian() and Y.IsAntiHermitian()) or (X.IsAntiHermitian() and Y.IsHermitian()) ) Z.SetHermitian();
    else Z.SetNonHermitian();
 
    if ( Z.GetParticleRank() > 2 )
-   {
-     Z.ThreeBody.SwitchToPN_and_discard();
-   }
-
+   {Z.ThreeBody.SwitchToPN_and_discard();}
 
    if (use_imsrg3)
    {
@@ -214,7 +208,7 @@ Operator CommutatorScalarScalar( const Operator& X, const Operator& Y)
         
         comm133ss(X, Y, Z);  // scales as n^7, but really more like n^6
        }
-   if ((X.Norm() > threebody_threshold) || (Y.Norm() > threebody_threshold)) 
+      if ((X.Norm() > threebody_threshold) || (Y.Norm() > threebody_threshold)) 
    {
        X.profiler.counter["N_ScalarCommutators_3b"] += 1;
 
@@ -683,6 +677,25 @@ void EvaluateCommutatorSumRule(const Operator& F,const Operator& H, int kMax)
   }
 }
 
+Operator EvaluateCommutatorSumRule_op(const Operator& F,const Operator& H, int kVal)
+{
+  std::cout << "Evaluating IMSRG sum rules for k = " << kVal << std::endl;
+
+  // initialize nesting with external operator F
+  Operator OpNested = F;
+
+  int n = 1;
+  while(n <= kVal){
+    OpNested = Commutator(H,OpNested);
+
+    if(n%2 == 1 && n == kVal) {
+      Operator C = Commutator(OpNested,F);
+      return C;
+    }
+    n++;
+  }
+  return OpNested;
+}
 
 void EvaluateCommutatorSumRuleSymmetric(const Operator& F, const Operator& H, int kMax)
 {
@@ -13722,10 +13735,6 @@ void AddInversePandyaTransformation_Dagger( const std::deque<arma::mat>& Zbar, O
       } // for ibra, which is <ij|
    } // for ich, which is J etc
 }
-
-
-
-
 
 /// Product of two operators. Similar to commutator, and hopefully useful for some debugging
 //

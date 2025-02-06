@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libAngMomCache.a CMakeFiles/AngMomCache.dir/AngMomCache.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libAngMomCache.a

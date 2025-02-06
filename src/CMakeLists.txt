@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.19)
 
 option(IMSRG_BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 

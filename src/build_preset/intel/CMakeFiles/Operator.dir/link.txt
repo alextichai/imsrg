@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libOperator.a CMakeFiles/Operator.dir/Operator.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libOperator.a

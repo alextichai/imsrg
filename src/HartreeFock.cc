@@ -1163,6 +1163,63 @@ Operator HartreeFock::GetNormalOrderedH(int particle_rank)
 
 }
 
+Operator HartreeFock::GetTransformedH(arma::mat& Cin, double E0, int particle_rank)
+{
+   double start_time = omp_get_wtime();
+
+   C=Cin;
+
+   Operator Hout = Operator(*modelspace,0,0,0,particle_rank);
+
+   auto H1 = Hbare.OneBody;
+
+   Hout.ZeroBody = E0;
+   Hout.OneBody  = C.t() * H1 * C;
+
+   int nchan = modelspace->GetNumberTwoBodyChannels();
+   
+   for (int ch=0;ch<nchan;++ch)
+   {
+     TwoBodyChannel& tbc = modelspace->GetTwoBodyChannel(ch);
+
+     int J   = tbc.J;
+     int npq = tbc.GetNumberKets();
+
+     arma::mat D(npq,npq,arma::fill::zeros);  // <ij|ab> = <ji|ba>
+
+#pragma omp parallel for schedule(dynamic,1)  // confirmed that this improves performance
+     for (int i=0; i<npq; ++i)
+     {
+       Ket & bra = tbc.GetKet(i);
+       int e2bra = 2*bra.op->n + bra.op->l + 2*bra.oq->n + bra.oq->l;
+       for (int j=0; j<npq; ++j)
+       {
+         Ket & ket = tbc.GetKet(j);
+         int e2ket = 2*ket.op->n + ket.op->l + 2*ket.oq->n + ket.oq->l;
+
+         D(i,j) = C(bra.p,ket.p) * C(bra.q,ket.q);
+
+         if (bra.p!=bra.q)
+         {
+           D(i,j) += C(bra.q,ket.p) * C(bra.p,ket.q) / bra.Phase(J);
+         }
+
+         if (bra.p==bra.q)    D(i,j) /= PhysConst::SQRT2;
+         if (ket.p==ket.q)    D(i,j) *= PhysConst::SQRT2;
+       }
+     }
+
+     auto& V2  =  Hbare.TwoBody.GetMatrix(ch);
+     auto& OUT =  Hout.TwoBody.GetMatrix(ch);
+     
+     OUT  =    D.t() * V2 * D;
+   }// for ch
+
+   profiler.timer["HF_GetNormalOrderedH"] += omp_get_wtime() - start_time;
+
+   return Hout;
+}
+
 
 //**************************************************************************
 /// Not sure if this is actually helpful. Memory management is a mystery to me.

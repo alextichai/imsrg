@@ -57,75 +57,85 @@ class Parameters
 };
 
 std::map<std::string,std::string> Parameters::string_par = {
-  {"2bme",			"none"},        // name of file containing 2-body matrix elements
-  {"3bme",			"none"},        // name of file containing 3-body matrix elements
-  {"3bme_type",			"full"},        // are the 3-body matrix elements in NO2B format, or do we get all of them (full)?
-  {"no2b_precision",		"single"},      // if we use the no2b file type, do we store with single precision, or half precision?
-  {"core_generator",		"atan"},	// generator used for core part of 2-step decoupling
-  {"valence_generator",		"shell-model-atan"},	// generator used for valence decoupling and 1-step (also single-ref)
-  {"flowfile",			"default"},	// name of output flow file
-  {"intfile",			"default"},	// name of output interaction fille
-  {"fmt2",			"me2j"},	// can also be navratil or Navratil to read Petr's TBME format
-  {"fmt3",			"me3j"},	// can also be navratil or Navratil to read Petr's TBME format
-  {"input_op_fmt",		"navratil"},	// navratil means read Petr Navratil's format for 2b currents. miyagi means Takayuki Miyagi's format.
-  {"reference",			"default"},	// nucleus used for HF and normal ordering.
-  {"valence_space",		""},		// either valence space or nucleus for single reference
-  {"custom_valence_space",      ""},		// if the provided valence spaces just aren't good enough for you
-  {"basis",			"HF"},		// use HF basis or oscillator basis. HF is better.
-  {"method",			"magnus"},	// can be magnus or flow or a few other things
-  {"denominator_delta_orbit",	"none"},	// pick specific orbit to apply the delta
-  {"LECs",			"EM2.0_2.0"},	// low energy constants for the interaction, only used with Johannes' hdf5 file format
-  {"scratch",			""},		// scratch directory for writing operators in binary format
-  {"use_brueckner_bch",          "false"},	// switch to Brueckner version of BCH
-  {"valence_file_format",       "tokyo"},	// file format for valence space interaction. Can be tokyo, nushellx, or antoine (antoine fmt is buggy)
-  {"occ_file",			"none"},	// name of file containing orbit occupations
-  {"goose_tank",		"false"},	// do goose_tank correction to commutators
-  {"write_omega",		"false"},	// write omega to disk
-  {"nucleon_mass_correction",	"false"},	// include effect of proton-neutron mass splitting
-  {"hunter_gatherer",	        "false"},	// use hunter-gatherer approach to splitting omega
-  {"relativistic_correction",   "false"},       // include the p^4 relativistic correction to the kinetic energy
-  {"IMSRG3",                    "false"},       // include 3-body terms in commutators. 
-  {"imsrg3_n7",                 "false"},       // include only n^7 scaling 3-body terms in commutators. Only does something if IMSRG3=true.
-  {"reduced_232_impl",          "false"},       // use 232 implementation that uses the emax_3body cut for all indices (a cheaper approximation)
-  {"imsrg3_mp4",                 "false"},       // include only 4th order (in PT analysis) 3-body terms in commutators. Only does something if IMSRG3=true.
-  {"imsrg3_at_end",             "false"},       // After doing Magnus IMSRG(2) to obtain Omega, evaluate e^Omega H e^-Omega at the IMSRG(3) level
-  {"imsrg3_no_qqq",             "false"},       // After doing Magnus IMSRG(2) to obtain Omega, evaluate e^Omega H e^-Omega at the IMSRG(3) level
-  {"physical_system",           "nuclear"},     // treat nucleus or atom. For atom, switch units from MeV,fm to eV,nm.
-  {"freeze_occupations",        "false"},       // Should we freeze the occupations, or fill according to HF energy
-  {"discard_no2b_from_3n",      "false"},       // For diagnostics. Use the 3N, but discard the 3N contribution to the NO 2-body after HF.
-  {"use_NAT_occupations",       "false"},       // When using natural orbitals, should we use the corresponding occupations?
-  {"order_NAT_by_energy",       "false"},       // When using natural orbitals, label orbits by increasing energy? Default is decreasing occ.
-  {"NAT_order",                 "occupation"},  // When using natural orbitals, select an ordering for labeling orbits. Default is decreasing occ.
-  {"store_3bme_pn",             "false"},       // should the 3-body matrix elements be stored in proton-neutron formalism? Default is isospin.
-  {"discard_residual_input3N",  "false"},       // If we're doing IMSRG3, should we discard the residual input 3N (only keep induced)?
-  {"only_2b_eta",               "false"},       // If we're doing IMSRG3, keep eta as 2b 
-  {"only_2b_omega",             "false"},       // If we're doing IMSRG3, keep omega (the magnus operator) as 2b 
-  {"only_2b_omega_at_end",      "false"},       // If we're doing IMSRG3, evolve other operators at the IMSRG2 level
-  {"perturbative_triples",      "false"},       // Compute perturbative energy shift due to [2,2]->3 induced 3-body 
-  {"write_HO_ops",              "false"},       // Write the HO operator before doing the HF transormation ;  Added by Antoine Belley
-  {"write_HF_ops",              "false"},       // Write the HF operators before doing IMSRG transformation ; Added by Antoine Belley
-  {"denominator_partitioning",  "Epstein_Nesbet"}, // Denominators used in IMSRG generators. Can be Moller_Plesset or Epstein_Nesbet.
-  {"use_HF_reference_in_NAT",   "false"},       // Use HF reference state after constructing NAT, virtual orbitals will still approximately be NAT
+  {"1bme",			                "none"},              // name of file containing 1-body matrix elements
+  {"2bme",			                "none"},              // name of file containing 2-body matrix elements
+  {"3bme",			                "none"},              // name of file containing 3-body matrix elements
+  {"3bme_type",			            "full"},              // are the 3-body matrix elements in NO2B format, or do we get all of them (full)?
+  {"no2b_precision",		        "single"},            // if we use the no2b file type, do we store with single precision, or half precision?
+  {"core_generator",		        "atan"},	            // generator used for core part of 2-step decoupling
+  {"valence_generator",		      "shell-model-atan"},	// generator used for valence decoupling and 1-step (also single-ref)
+  {"flowfile",			            "default"},	          // name of output flow file
+  {"intfile",			              "default"},	          // name of output interaction file
+  {"omefile",			              "default"},	          // name of output Magnus file
+  {"fmt2",			                "me2j"},	            // can also be navratil or Navratil to read Petr's TBME format
+  {"fmt3",			                "me3j"},	            // can also be navratil or Navratil to read Petr's TBME format
+  {"input_op_fmt",		          "navratil"},	        // navratil means read Petr Navratil's format for 2b currents. miyagi means Takayuki Miyagi's format.
+  {"reference",			            "default"},	          // nucleus used for HF and normal ordering.
+  {"valence_space",		          ""},		              // either valence space or nucleus for single reference
+  {"custom_valence_space",      ""},		              // if the provided valence spaces just aren't good enough for you
+  {"basis",			                "HF"},		            // use HF basis or oscillator basis. HF is better.
+  {"method",			              "magnus"},	          // can be magnus or flow or a few other things
+  {"denominator_delta_orbit",	  "none"},	            // pick specific orbit to apply the delta
+  {"LECs",			                "EM2.0_2.0"},	        // low energy constants for the interaction, only used with Johannes' hdf5 file format
+  {"scratch",			              ""},		              // scratch directory for writing operators in binary format
+  {"use_brueckner_bch",         "false"},	            // switch to Brueckner version of BCH
+  {"valence_file_format",       "tokyo"},	            // file format for valence space interaction. Can be tokyo, nushellx, or antoine (antoine fmt is buggy)
+  {"occ_file",			            "none"},	            // name of file containing orbit occupations
+  {"goose_tank",		            "false"},	            // do goose_tank correction to commutators
+  {"write_omega",		            "false"},	            // write omega to disk
+  {"nucleon_mass_correction",	  "false"},	            // include effect of proton-neutron mass splitting
+  {"hunter_gatherer",	          "false"},	            // use hunter-gatherer approach to splitting omega
+  {"relativistic_correction",   "false"},             // include the p^4 relativistic correction to the kinetic energy
+  {"IMSRG3",                    "false"},             // include 3-body terms in commutators. 
+  {"imsrg3_n7",                 "false"},             // include only n^7 scaling 3-body terms in commutators. Only does something if IMSRG3=true.
+  {"reduced_232_impl",          "false"},             // use 232 implementation that uses the emax_3body cut for all indices (a cheaper approximation)
+  {"imsrg3_mp4",                 "false"},            // include only 4th order (in PT analysis) 3-body terms in commutators. Only does something if IMSRG3=true.
+  {"imsrg3_at_end",             "false"},             // After doing Magnus IMSRG(2) to obtain Omega, evaluate e^Omega H e^-Omega at the IMSRG(3) level
+  {"imsrg3_no_qqq",             "false"},             // After doing Magnus IMSRG(2) to obtain Omega, evaluate e^Omega H e^-Omega at the IMSRG(3) level
+  {"physical_system",           "nuclear"},           // treat nucleus or atom. For atom, switch units from MeV,fm to eV,nm.
+  {"freeze_occupations",        "false"},             // Should we freeze the occupations, or fill according to HF energy
+  {"discard_no2b_from_3n",      "false"},             // For diagnostics. Use the 3N, but discard the 3N contribution to the NO 2-body after HF.
+  {"use_NAT_occupations",       "false"},             // When using natural orbitals, should we use the corresponding occupations?
+  {"order_NAT_by_energy",       "false"},             // When using natural orbitals, label orbits by increasing energy? Default is decreasing occ.
+  {"NAT_order",                 "occupation"},        // When using natural orbitals, select an ordering for labeling orbits. Default is decreasing occ.
+  {"store_3bme_pn",             "false"},             // should the 3-body matrix elements be stored in proton-neutron formalism? Default is isospin.
+  {"discard_residual_input3N",  "false"},             // If we're doing IMSRG3, should we discard the residual input 3N (only keep induced)?
+  {"only_2b_eta",               "false"},             // If we're doing IMSRG3, keep eta as 2b 
+  {"only_2b_omega",             "false"},             // If we're doing IMSRG3, keep omega (the magnus operator) as 2b 
+  {"only_2b_omega_at_end",      "false"},             // If we're doing IMSRG3, evolve other operators at the IMSRG2 level
+  {"perturbative_triples",      "false"},             // Compute perturbative energy shift due to [2,2]->3 induced 3-body 
+  {"write_HO_ops",              "false"},             // Write the HO operator before doing the HF transormation ;  Added by Antoine Belley
+  {"write_HF_ops",              "false"},             // Write the HF operators before doing IMSRG transformation ; Added by Antoine Belley
+  {"denominator_partitioning",  "Epstein_Nesbet"},    // Denominators used in IMSRG generators. Can be Moller_Plesset or Epstein_Nesbet.
+  {"use_HF_reference_in_NAT",   "false"},             // Use HF reference state after constructing NAT, virtual orbitals will still approximately be NAT
+  {"moments",                   "false"},             // Evaluate the positive moments (Monopole up to now)
+  {"write_Hamiltonian",         "false"},             // Write the unevolved and IMSRG-evolved Hamiltonians in the HO basis (me1j, me2jp)
+  {"write_omega_me",            "false"},             // Write the Magnus operator in the HF basis (me1j, me2jp)
+  {"isospin_ch",                "proton"},            // Select the isospin nature of the excitation operators
+  {"kernel",                    "false"},             // Evaluate the IMSRG kernels for the multipole response (Andrea) 
+  {"kerdir",                    "default"},           // Directory where the kernels are stored (Andrea) 
 };
 
 
 std::map<std::string,double> Parameters::double_par = {
   {"hw",		20.0},
-  {"smax",		200.0},	// maximum s. If we reach this,	terminate even if we're not converged.
-  {"dsmax",		0.5},	// maximum step size
-  {"ds_0",		0.5},	// initial step size
-  {"domega",		0.2},	// max for norm of eta * ds
-  {"omega_norm_max",	0.25},  // norm of omega before we do the splitting
-  {"ode_tolerance",	1e-6},	// error tolerance for the ode solver
+  {"smax",		200.0},	          // maximum s. If we reach this,	terminate even if we're not converged.
+  {"dsmax",		0.5},	            // maximum step size
+  {"ds_0",		0.5},	            // initial step size
+  {"domega",		0.2},	          // max for norm of eta * ds
+  {"omega_norm_max",	0.25},    // norm of omega before we do the splitting
+  {"ode_tolerance",	1e-6},	    // error tolerance for the ode solver
   {"denominator_delta",	   0},	// offset added to the denominator in the generator
   {"BetaCM",               0},  // Prefactor for Lawson-Glockner term
   {"hwBetaCM",            -1},  // Oscillator frequency used in the Lawson-Glockner term. Negative value means use the frequency of the basis
   {"eta_criterion",     1e-6},  // Threshold on ||eta|| for convergence in the flow
   {"hw_trap",             -1},  // Frequency for harmonic lab-frame trap V = 1/2 M omega**2 * r**2
-  {"dE3max",		  99},  // cut on energies which limits the 3-body states considered in IMSRG(3) commutators
-  {"OccNat3Cut",	  -1},  // cut on natural orbital occupations which limits the 3-body states considered in IMSRG(3) commutators
-  {"threebody_threshold",  0},   // when the norm of A or B is below threebody_threshold, don't use IMSRG(3) in evaluating [A,B].
-
+  {"dE3max",		  99},          // cut on energies which limits the 3-body states considered in IMSRG(3) commutators
+  {"OccNat3Cut",	  -1},        // cut on natural orbital occupations which limits the 3-body states considered in IMSRG(3) commutators
+  {"threebody_threshold",  0},  // when the norm of A or B is below threebody_threshold, don't use IMSRG(3) in evaluating [A,B].
+  {"polarisability",  0},       // polarisability value H + pol * F
+  {"qL",  0.},       // left value of q
+  {"qR",  0.},       // right value of q
 };
 
 std::map<std::string,int> Parameters::int_par = {
@@ -148,6 +158,8 @@ std::map<std::string,int> Parameters::int_par = {
   {"e3max_imsrg",       -1}, // e3max for imsrg part. defaults to min(e3max,3*emax_imsrg)
   {"emax_3body_imsrg",        -1}, // emax truncation for the 3-body operators in the imsrg part (default: emax_imsrg)
   {"imsrg3_commutator_depth",        100}, // Max number of nest commutators to evaluate at IMSRG(3) level
+  {"L_MixMom",        0}, // Multipolarity for the generalised eigenvalue problem for correlated response
+  {"N_Magnus",        0}, // Number of Magnus operators to read for kernels evaluation
 };
 
 std::map<std::string,std::vector<std::string>> Parameters::vec_par = {

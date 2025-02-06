@@ -128,45 +128,61 @@ double TwoBodyME::GetTBME(int ch_bra, int ch_ket, int a, int b, int c, int d) co
    return norm * GetTBME_norm(ch_bra,ch_ket,a,b,c,d);
 }
 
-/// This returns the normalized matrix element 
+/// This returns the normalized matrix element
 double TwoBodyME::GetTBME_norm(int ch_bra, int ch_ket, int a, int b, int c, int d) const
 {
-   if (not allocated) return 0;
-   TwoBodyChannel& tbc_bra =  modelspace->GetTwoBodyChannel(ch_bra);
-   TwoBodyChannel& tbc_ket =  modelspace->GetTwoBodyChannel(ch_ket);
-   auto bra_ind = tbc_bra.GetLocalIndex(std::min(a,b),std::max(a,b));
-   auto ket_ind = tbc_ket.GetLocalIndex(std::min(c,d),std::max(c,d));
-   if (bra_ind < 0 or ket_ind < 0 or bra_ind > tbc_bra.GetNumberKets() or ket_ind > tbc_ket.GetNumberKets() )
-     return 0;
-   Ket & bra = tbc_bra.GetKet(bra_ind);
-   Ket & ket = tbc_ket.GetKet(ket_ind);
+   if (not allocated)
+      return 0;
+   TwoBodyChannel &tbc_bra = modelspace->GetTwoBodyChannel(ch_bra);
+   TwoBodyChannel &tbc_ket = modelspace->GetTwoBodyChannel(ch_ket);
+
+   auto bra_ind = tbc_bra.GetLocalIndex(std::min(a, b), std::max(a, b));
+   auto ket_ind = tbc_ket.GetLocalIndex(std::min(c, d), std::max(c, d));
+
+   if (bra_ind < 0 or ket_ind < 0 or bra_ind > tbc_bra.GetNumberKets() or ket_ind > tbc_ket.GetNumberKets())
+      return 0;
+   Ket &bra = tbc_bra.GetKet(bra_ind);
+   Ket &ket = tbc_ket.GetKet(ket_ind);
 
    double phase = 1;
-   if (a>b) phase *= bra.Phase(tbc_bra.J);
-   if (c>d) phase *= ket.Phase(tbc_ket.J);
+   if (a > b)
+      phase *= bra.Phase(tbc_bra.J);
+   if (c > d)
+      phase *= ket.Phase(tbc_ket.J);
    if (ch_bra > ch_ket)
    {
-     return phase * modelspace->phase(tbc_bra.J-tbc_ket.J) * GetMatrix(ch_ket,ch_bra)(ket_ind,bra_ind);
+      return phase * modelspace->phase(tbc_bra.J - tbc_ket.J) * GetMatrix(ch_ket, ch_bra)(ket_ind, bra_ind);
    }
-   return phase * GetMatrix(ch_bra,ch_ket)(bra_ind, ket_ind);
+   return phase * GetMatrix(ch_bra, ch_ket)(bra_ind, ket_ind);
 }
 
 void TwoBodyME::SetTBME(int ch_bra, int ch_ket, int a, int b, int c, int d, double tbme)
 {
-   if (not allocated)  return;
-   TwoBodyChannel& tbc_bra =  modelspace->GetTwoBodyChannel(ch_bra);
-   TwoBodyChannel& tbc_ket =  modelspace->GetTwoBodyChannel(ch_ket);
-   int bra_ind = tbc_bra.GetLocalIndex(std::min(a,b),std::max(a,b));
-   int ket_ind = tbc_ket.GetLocalIndex(std::min(c,d),std::max(c,d));
-   double phase = 1;
-   if (a>b) phase *= tbc_bra.GetKet(bra_ind).Phase(tbc_bra.J);
-   if (c>d) phase *= tbc_ket.GetKet(ket_ind).Phase(tbc_ket.J);
-   GetMatrix(ch_bra,ch_ket)(bra_ind,ket_ind) = phase * tbme;
-   if (ch_ket != ch_bra) return;
-   if (hermitian and ch_bra==ch_ket) GetMatrix(ch_ket,ch_bra)(ket_ind,bra_ind) = phase * tbme;
-   if (antihermitian and ch_bra==ch_ket) GetMatrix(ch_ket,ch_bra)(ket_ind,bra_ind) = - phase * tbme;
-}
+   if (not allocated)
+      return;
+   TwoBodyChannel &tbc_bra = modelspace->GetTwoBodyChannel(ch_bra);
+   TwoBodyChannel &tbc_ket = modelspace->GetTwoBodyChannel(ch_ket);
 
+   int bra_ind = tbc_bra.GetLocalIndex(std::min(a, b), std::max(a, b));
+   int ket_ind = tbc_ket.GetLocalIndex(std::min(c, d), std::max(c, d));
+
+   if (bra_ind < 0 or ket_ind < 0 or bra_ind > tbc_bra.GetNumberKets() or ket_ind > tbc_ket.GetNumberKets())
+      return;
+
+   double phase = 1;
+   if (a > b)
+      phase *= tbc_bra.GetKet(bra_ind).Phase(tbc_bra.J);
+   if (c > d)
+      phase *= tbc_ket.GetKet(ket_ind).Phase(tbc_ket.J);
+
+   GetMatrix(ch_bra, ch_ket)(bra_ind, ket_ind) = phase * tbme;
+   if (ch_ket != ch_bra)
+      return;
+   if (hermitian and ch_bra == ch_ket)
+      GetMatrix(ch_ket, ch_bra)(ket_ind, bra_ind) = phase * tbme;
+   if (antihermitian and ch_bra == ch_ket)
+      GetMatrix(ch_ket, ch_bra)(ket_ind, bra_ind) = -phase * tbme;
+}
 
 void TwoBodyME::AddToTBME(int ch_bra, int ch_ket, int a, int b, int c, int d, double tbme)
 {

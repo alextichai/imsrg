@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libJacobi3BME.a CMakeFiles/Jacobi3BME.dir/Jacobi3BME.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libJacobi3BME.a

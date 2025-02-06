@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libAngMom.a CMakeFiles/AngMom.dir/AngMom.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libAngMom.a

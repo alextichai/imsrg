@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libRPA.a CMakeFiles/RPA.dir/RPA.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libRPA.a

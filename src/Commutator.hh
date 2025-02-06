@@ -95,7 +95,7 @@ namespace Commutator{
   void DoPandyaTransformation(const Operator& Z, std::deque<arma::mat>&, std::string orientation) ;
   void DoPandyaTransformation_SingleChannel(const Operator& Z, arma::mat& X, int ch_cc, std::string orientation) ;
   void DoPandyaTransformation_SingleChannel_XandY(const Operator& X, const Operator& Y, arma::mat& X2_CC_ph, arma::mat& Y2_CC_ph, int ch_cc);
-//  void AddInversePandyaTransformation(Operator& Z, const std::deque<arma::mat>&);
+  // void AddInversePandyaTransformation(Operator& Z, const std::deque<arma::mat>&);
   void AddInversePandyaTransformation(const std::deque<arma::mat>& Zbar, Operator& Z);   // Changed from the above declaration. Not sure how this was compiling...
   void AddInversePandyaTransformation_SingleChannel(Operator& Z, arma::mat& Zbar, int ch_cc);
 
@@ -112,42 +112,41 @@ namespace Commutator{
 
 
   void ConstructScalarMpp_Mhh(const Operator& X, const Operator& Y, const Operator& Z, TwoBodyME& Mpp, TwoBodyME& Mhh);
-//  void ConstructScalarMpp_Mhh_GooseTank(const Operator& X, const Operator& Y, Operator& Z, TwoBodyME& Mpp, TwoBodyME& Mhh) ;
+  // void ConstructScalarMpp_Mhh_GooseTank(const Operator& X, const Operator& Y, Operator& Z, TwoBodyME& Mpp, TwoBodyME& Mhh) ;
 
 
-// IMSRG(3) commutators. Still a work in progress...
-  void comm330ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm331ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm331ss_srs( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm331ss_expand( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm231ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm231ss_slow( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
+  // IMSRG(3) commutators. Still a work in progress...
+  void comm330ss( const Operator& X, const Operator& Y, Operator& Z ) ;                 // implemented and tested.
+  void comm331ss( const Operator& X, const Operator& Y, Operator& Z ) ;                 // implemented and tested.
+  void comm331ss_srs( const Operator& X, const Operator& Y, Operator& Z ) ;             // implemented and tested.
+  void comm331ss_expand( const Operator& X, const Operator& Y, Operator& Z ) ;          // implemented and tested.
+  void comm231ss( const Operator& X, const Operator& Y, Operator& Z ) ;                 // implemented and tested.
+  void comm231ss_slow( const Operator& X, const Operator& Y, Operator& Z ) ;            // implemented and tested.
 
-  void comm132ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
+  void comm132ss( const Operator& X, const Operator& Y, Operator& Z ) ;                 // implemented and tested.
   size_t Hash_comm232_key( std::array<size_t,5>& kljJJ );
-  void comm232ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm232ss_srs_optimized( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm232ss_mh_optimized( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm232ss_expand_full( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm232ss_expand_reduced( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
+  void comm232ss( const Operator& X, const Operator& Y, Operator& Z ) ;                 // implemented and tested.
+  void comm232ss_srs_optimized( const Operator& X, const Operator& Y, Operator& Z ) ;   // implemented and tested.
+  void comm232ss_mh_optimized( const Operator& X, const Operator& Y, Operator& Z ) ;    // implemented and tested.
+  void comm232ss_expand_full( const Operator& X, const Operator& Y, Operator& Z ) ;     // implemented and tested.
+  void comm232ss_expand_reduced( const Operator& X, const Operator& Y, Operator& Z ) ;  // implemented and tested.
   void comm232ss_debug( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm232ss_slow( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm332_ppph_hhhpss( const Operator& X, const Operator& Y, Operator& Z ) ; // implemented and tested.
-//  void comm332_pphhss( const Operator& X, const Operator& Y, Operator& Z ) ;      // implemented and tested.
-  void comm332_pphhss( const Operator& X, const Operator& Y, Operator& Z ) ;      // implemented and tested.
+  void comm232ss_slow( const Operator& X, const Operator& Y, Operator& Z ) ;            // implemented and tested.
+  void comm332_ppph_hhhpss( const Operator& X, const Operator& Y, Operator& Z ) ;       // implemented and tested.
+  void comm332_pphhss( const Operator& X, const Operator& Y, Operator& Z ) ;            // implemented and tested.
   void comm332_pphhss_debug( const Operator& X, const Operator& Y, Operator& Z ) ;      // implemented and tested.
   
-  void comm133ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm223ss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm223ss_new( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
+  void comm133ss( const Operator& X, const Operator& Y, Operator& Z ) ;                 // implemented and tested.
+  void comm223ss( const Operator& X, const Operator& Y, Operator& Z ) ;                 // implemented and tested.
+  void comm223ss_new( const Operator& X, const Operator& Y, Operator& Z ) ;             // implemented and tested.
   void comm223ss_debug( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
-  void comm233_pp_hhss( const Operator& X, const Operator& Y, Operator& Z ) ;     // implemented and tested.
+  void comm233_pp_hhss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented and tested.
   void comm233_pp_hhss_debug( const Operator& X, const Operator& Y, Operator& Z ) ;     // implemented and tested.
-  void comm233_phss( const Operator& X, const Operator& Y, Operator& Z ) ;        // implemented and tested.
+  void comm233_phss( const Operator& X, const Operator& Y, Operator& Z ) ;              // implemented and tested.
   void comm233_phss_debug( const Operator& X, const Operator& Y, Operator& Z ) ;        // implemented and tested.
 
-  void comm333_ppp_hhhss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented. andtested.
-  void comm333_pph_hhpss( const Operator& X, const Operator& Y, Operator& Z ) ;           // implemented. and tested.
+  void comm333_ppp_hhhss( const Operator& X, const Operator& Y, Operator& Z ) ;         // implemented. andtested.
+  void comm333_pph_hhpss( const Operator& X, const Operator& Y, Operator& Z ) ;         // implemented. and tested.
   void comm333_pph_hhpss_debug( const Operator& X, const Operator& Y, Operator& Z ) ;     
 
   bool check_2b_channel_Tz_parity( const Operator& Op, Orbit& o1, Orbit&o2, Orbit& o3, Orbit& o4 );
@@ -155,10 +154,11 @@ namespace Commutator{
   Operator GooseTankUpdate( const Operator& Omega, const Operator& Nested);
 
   void EvaluateCommutatorSumRule(const Operator& F, const Operator& H, int kMax);
+  Operator EvaluateCommutatorSumRule_op(const Operator& F, const Operator& H, int kMax);
 
   void EvaluateCommutatorSumRuleSymmetric(const Operator& F, const Operator& H, int kMax);
 
-// scalar-tensor commutators
+  // Scalar-tensor commutators
 
   void DoTensorPandyaTransformation(const Operator& Z, std::map<std::array<index_t,2>,arma::mat>&) ;
   void DoTensorPandyaTransformation_SingleChannel(const Operator& Z, arma::mat& X, int ch_bra_cc, int ch_ket_cc) ;
@@ -170,10 +170,13 @@ namespace Commutator{
   void comm222_pp_hh_221st( const Operator& X, const Operator& Y, Operator& Z) ;
   void comm222_phst( const Operator& X, const Operator& Y, Operator& Z) ;
 
+  // Tensor-tensor commutators (coupling to scalar)
+  //void comm110tt( const Operator& X, const Operator& Y, Operator& Z) ; // ???
+  //void comm111tt( const Operator& X, const Operator& Y, Operator& Z) ;
+  //void comm121tt( const Operator& X, const Operator& Y, Operator& Z) ;
+  //void comm122tt( const Operator& X, const Operator& Y, Operator& Z) ;
 
-
-
-  // commutator terms involving a dagger operator. 211 means [two legs, one leg] => one leg
+  // Commutator terms involving a dagger operator. 211 means [two legs, one leg] => one leg
   // sd means scalar-dagger
   void comm211sd( const Operator& X, const Operator& Y, Operator& Z) ; 
   void comm231sd( const Operator& X, const Operator& Y, Operator& Z) ;
@@ -184,11 +187,10 @@ namespace Commutator{
   void comm433sd_ph_dumbway( const Operator& X, const Operator& Y, Operator& Z) ; // Do it with loops, not matmult. Easier to check, but much slower.
 
   void comm433_pp_hh_431sd( const Operator& X, const Operator& Y, Operator& Z ) ; 
-//  void ConstructDaggerMpp_Mhh(const Operator& X, const Operator& Y, const Operator& Z, TwoBodyME& Mpp, TwoBodyME& Mhh);
+  // void ConstructDaggerMpp_Mhh(const Operator& X, const Operator& Y, const Operator& Z, TwoBodyME& Mpp, TwoBodyME& Mhh);
   void ConstructDaggerMpp_Mhh(const Operator& X, const Operator& Y, const Operator& Z, ThreeLegME& Mpp, ThreeLegME& Mhh);
   void DoPandyaTransformation_SingleChannel_Dagger(const Operator& Z, arma::mat& X, int ch_cc) ;
   void AddInversePandyaTransformation_Dagger(const std::deque<arma::mat>& Zbar, Operator& Z );
-
 
 
   void prod110ss( const Operator& X, const Operator& Y, Operator& Z ) ; 

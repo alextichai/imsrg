@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libimsrg_util.a CMakeFiles/imsrg_util.dir/imsrg_util.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libimsrg_util.a

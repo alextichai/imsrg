@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libIMSRGBoostZip.a CMakeFiles/IMSRGBoostZip.dir/gzip.cpp.o CMakeFiles/IMSRGBoostZip.dir/zlib.cpp.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libIMSRGBoostZip.a

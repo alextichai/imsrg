@@ -1,0 +1,182 @@
+[
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -I/home/porro/imsrg/src -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/Version.dir/version.cc.o -c /home/porro/imsrg/src/build_preset/intel/version.cc",
+  "file": "/home/porro/imsrg/src/build_preset/intel/version.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -isystem /usr/local/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/AngMom.dir/AngMom.cc.o -c /home/porro/imsrg/src/AngMom.cc",
+  "file": "/home/porro/imsrg/src/AngMom.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc   -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/AngMomCache.dir/AngMomCache.cc.o -c /home/porro/imsrg/src/AngMomCache.cc",
+  "file": "/home/porro/imsrg/src/AngMomCache.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc   -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/IMSRGProfiler.dir/IMSRGProfiler.cc.o -c /home/porro/imsrg/src/IMSRGProfiler.cc",
+  "file": "/home/porro/imsrg/src/IMSRGProfiler.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -I/home/porro/imsrg/src/armadillo -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/ModelSpace.dir/ModelSpace.cc.o -c /home/porro/imsrg/src/ModelSpace.cc",
+  "file": "/home/porro/imsrg/src/ModelSpace.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -I/home/porro/imsrg/src/armadillo -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/ModelSpace.dir/TwoBodyChannel.cc.o -c /home/porro/imsrg/src/TwoBodyChannel.cc",
+  "file": "/home/porro/imsrg/src/TwoBodyChannel.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -I/home/porro/imsrg/src/armadillo -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/ModelSpace.dir/ThreeBodyChannel.cc.o -c /home/porro/imsrg/src/ThreeBodyChannel.cc",
+  "file": "/home/porro/imsrg/src/ThreeBodyChannel.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -I/home/porro/imsrg/src/armadillo -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/ThreeBodyStorage.dir/ThreeBodyStorage.cc.o -c /home/porro/imsrg/src/ThreeBodyStorage.cc",
+  "file": "/home/porro/imsrg/src/ThreeBodyStorage.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/half/include -I/home/porro/imsrg/src/armadillo -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/ThreeBodyStorage_mono.dir/ThreeBodyStorage_mono.cc.o -c /home/porro/imsrg/src/ThreeBodyStorage_mono.cc",
+  "file": "/home/porro/imsrg/src/ThreeBodyStorage_mono.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/half/include -I/home/porro/imsrg/src/armadillo -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/ThreeBodyStorage_no2b.dir/ThreeBodyStorage_no2b.cc.o -c /home/porro/imsrg/src/ThreeBodyStorage_no2b.cc",
+  "file": "/home/porro/imsrg/src/ThreeBodyStorage_no2b.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -I/home/porro/imsrg/src/armadillo -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/ThreeBodyStorage_pn.dir/ThreeBodyStorage_pn.cc.o -c /home/porro/imsrg/src/ThreeBodyStorage_pn.cc",
+  "file": "/home/porro/imsrg/src/ThreeBodyStorage_pn.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -I/home/porro/imsrg/src/armadillo -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/ThreeBodyStorage_iso.dir/ThreeBodyStorage_iso.cc.o -c /home/porro/imsrg/src/ThreeBodyStorage_iso.cc",
+  "file": "/home/porro/imsrg/src/ThreeBodyStorage_iso.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/ThreeBodyME.dir/ThreeBodyME.cc.o -c /home/porro/imsrg/src/ThreeBodyME.cc",
+  "file": "/home/porro/imsrg/src/ThreeBodyME.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -I/home/porro/imsrg/src/armadillo -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/ThreeLegME.dir/ThreeLegME.cc.o -c /home/porro/imsrg/src/ThreeLegME.cc",
+  "file": "/home/porro/imsrg/src/ThreeLegME.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -I/home/porro/imsrg/src/armadillo -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/TwoBodyME.dir/TwoBodyME.cc.o -c /home/porro/imsrg/src/TwoBodyME.cc",
+  "file": "/home/porro/imsrg/src/TwoBodyME.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/Operator.dir/Operator.cc.o -c /home/porro/imsrg/src/Operator.cc",
+  "file": "/home/porro/imsrg/src/Operator.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/Commutator331.dir/Commutator331.cc.o -c /home/porro/imsrg/src/Commutator331.cc",
+  "file": "/home/porro/imsrg/src/Commutator331.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/DarkMatterNREFT.dir/DarkMatterNREFT.cc.o -c /home/porro/imsrg/src/DarkMatterNREFT.cc",
+  "file": "/home/porro/imsrg/src/DarkMatterNREFT.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/Commutator232.dir/Commutator232.cc.o -c /home/porro/imsrg/src/Commutator232.cc",
+  "file": "/home/porro/imsrg/src/Commutator232.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/Commutator.dir/Commutator.cc.o -c /home/porro/imsrg/src/Commutator.cc",
+  "file": "/home/porro/imsrg/src/Commutator.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/HartreeFock.dir/HartreeFock.cc.o -c /home/porro/imsrg/src/HartreeFock.cc",
+  "file": "/home/porro/imsrg/src/HartreeFock.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/Jacobi3BME.dir/Jacobi3BME.cc.o -c /home/porro/imsrg/src/Jacobi3BME.cc",
+  "file": "/home/porro/imsrg/src/Jacobi3BME.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -DNO_HDF5=\\\"true\\\" -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/ReadWrite.dir/ReadWrite.cc.o -c /home/porro/imsrg/src/ReadWrite.cc",
+  "file": "/home/porro/imsrg/src/ReadWrite.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc  -isystem /usr/local/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/Pwd.dir/Pwd.cc.o -c /home/porro/imsrg/src/Pwd.cc",
+  "file": "/home/porro/imsrg/src/Pwd.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -DNO_HDF5=\\\"true\\\" -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/Generator.dir/Generator.cc.o -c /home/porro/imsrg/src/Generator.cc",
+  "file": "/home/porro/imsrg/src/Generator.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -DNO_HDF5=\\\"true\\\" -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/imsrg_util.dir/imsrg_util.cc.o -c /home/porro/imsrg/src/imsrg_util.cc",
+  "file": "/home/porro/imsrg/src/imsrg_util.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -DNO_HDF5=\\\"true\\\" -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/M0nu.dir/M0nu.cc.o -c /home/porro/imsrg/src/M0nu.cc",
+  "file": "/home/porro/imsrg/src/M0nu.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -DNO_HDF5=\\\"true\\\" -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/IMSRGSolver.dir/IMSRGSolver.cc.o -c /home/porro/imsrg/src/IMSRGSolver.cc",
+  "file": "/home/porro/imsrg/src/IMSRGSolver.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -DNO_HDF5=\\\"true\\\" -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/ReferenceImplementations.dir/ReferenceImplementations.cc.o -c /home/porro/imsrg/src/ReferenceImplementations.cc",
+  "file": "/home/porro/imsrg/src/ReferenceImplementations.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -DNO_HDF5=\\\"true\\\" -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/UnitTest.dir/UnitTest.cc.o -c /home/porro/imsrg/src/UnitTest.cc",
+  "file": "/home/porro/imsrg/src/UnitTest.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/HFMBPT.dir/HFMBPT.cc.o -c /home/porro/imsrg/src/HFMBPT.cc",
+  "file": "/home/porro/imsrg/src/HFMBPT.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/RPA.dir/RPA.cc.o -c /home/porro/imsrg/src/RPA.cc",
+  "file": "/home/porro/imsrg/src/RPA.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -DNO_HDF5=\\\"true\\\" -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/unit_test.dir/unit_test.cc.o -c /home/porro/imsrg/src/unit_test.cc",
+  "file": "/home/porro/imsrg/src/unit_test.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -DNO_HDF5=\\\"true\\\" -I/home/porro/imsrg/src/armadillo -I/home/porro/imsrg/src/half/include -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -qopenmp -std=gnu++14 -o CMakeFiles/imsrg++.dir/imsrg++.cc.o -c /home/porro/imsrg/src/imsrg++.cc",
+  "file": "/home/porro/imsrg/src/imsrg++.cc"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel/boost_src",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/IMSRGBoostZip.dir/gzip.cpp.o -c /home/porro/imsrg/src/boost_src/gzip.cpp",
+  "file": "/home/porro/imsrg/src/boost_src/gzip.cpp"
+},
+{
+  "directory": "/home/porro/imsrg/src/build_preset/intel/boost_src",
+  "command": "/opt/intel/bin/icpc -DBOOST_ALL_NO_LIB -isystem /usr/local/include -isystem /usr/include -no-multibyte-chars -DARMA_ALLOW_FAKE_GCC -O3 -DNDEBUG -std=gnu++14 -o CMakeFiles/IMSRGBoostZip.dir/zlib.cpp.o -c /home/porro/imsrg/src/boost_src/zlib.cpp",
+  "file": "/home/porro/imsrg/src/boost_src/zlib.cpp"
+}
+]

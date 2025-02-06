@@ -12,6 +12,7 @@
 #include <gsl/gsl_sf_laguerre.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <math.h>
 #include <vector>
@@ -60,77 +61,77 @@ namespace imsrg_util
       Operator theop;
       std::vector<std::string> opnamesplit = split_string( opname, "_" );  // split std::string on _ into a vector of std::string so that, e.g. "R2_p1"  =>  {"R2", "p1"}
 
-           if (opname == "R2_p1")         theop =  R2_1body_Op(modelspace,"proton") ;
-      else if (opname == "R2_p2")         theop =  R2_2body_Op(modelspace,"proton") ;
-      else if (opname == "R2_n1")         theop =  R2_1body_Op(modelspace,"neutron") ;
-      else if (opname == "R2_n2")         theop =  R2_2body_Op(modelspace,"neutron") ;
-      else if (opname == "Rp2")           theop =  Rp2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
-      else if (opname == "Rp2b")          theop =  Rp2b_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
-      else if (opname == "Rp2c")          theop =  Rp2c_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
-      else if (opname == "Rn2")           theop =  Rn2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
-      else if (opname == "Rn2b")          theop =  Rn2b_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
-      else if (opname == "Rn2c")          theop =  Rn2c_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
-      else if (opname == "Rso2")          theop =  Rso2_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
-      else if (opname == "Rso2w")         theop =  Rso2w_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
-      else if (opname == "Rm2")           theop =  Rm2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
-      else if (opname == "Rm2lab")        theop =  RSquaredOp(modelspace) ;
-      else if (opname == "ISM")           theop =  MultipoleResponseOp(modelspace,2,0,0) ; // Isoscalar monopole (see PRC97(2018)054306 ) --added by bhu
-      else if (opname == "IVM")           theop =  MultipoleResponseOp(modelspace,2,0,1) ; // Isovector monopole
-      else if (opname == "ISQ")           theop =  MultipoleResponseOp(modelspace,2,2,0) ; // Isoscalar quadrupole
-      else if (opname == "IVQ")           theop =  MultipoleResponseOp(modelspace,2,2,1) ; // Isosvector quadrupole
-      else if (opname == "ISO")           theop =  MultipoleResponseOp(modelspace,3,3,0) ; // Isoscalar octupole
-      else if (opname == "IVO")           theop =  MultipoleResponseOp(modelspace,3,3,1) ; // Isosvector octupole
-      else if (opname == "IVD")           theop =  IVDipoleOp(modelspace,1,1) ; // Isovector dipole (see PRC97(2018)054306 ) --added by bhu
+           if (opname == "R2_p1")         theop = R2_1body_Op(modelspace,"proton") ;
+      else if (opname == "R2_p2")         theop = R2_2body_Op(modelspace,"proton") ;
+      else if (opname == "R2_n1")         theop = R2_1body_Op(modelspace,"neutron") ;
+      else if (opname == "R2_n2")         theop = R2_2body_Op(modelspace,"neutron") ;
+      else if (opname == "Rp2")           theop = Rp2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rp2b")          theop = Rp2b_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rp2c")          theop = Rp2c_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rn2")           theop = Rn2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rn2b")          theop = Rn2b_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rn2c")          theop = Rn2c_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rso2")          theop = Rso2_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rso2w")         theop = Rso2w_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rm2")           theop = Rm2_corrected_Op(modelspace,modelspace.GetTargetMass(),modelspace.GetTargetZ()) ;
+      else if (opname == "Rm2lab")        theop = RSquaredOp(modelspace) ;
+      else if (opname == "ISM")           theop = MultipoleResponseOp(modelspace,2,0,0) ; // Isoscalar monopole (see PRC97(2018)054306 ) --added by bhu
+      else if (opname == "IVM")           theop = MultipoleResponseOp(modelspace,2,0,1) ; // Isovector monopole
+      else if (opname == "ISQ")           theop = MultipoleResponseOp(modelspace,2,2,0) ; // Isoscalar quadrupole
+      else if (opname == "IVQ")           theop = MultipoleResponseOp(modelspace,2,2,1) ; // Isosvector quadrupole
+      else if (opname == "ISO")           theop = MultipoleResponseOp(modelspace,3,3,0) ; // Isoscalar octupole
+      else if (opname == "IVO")           theop = MultipoleResponseOp(modelspace,3,3,1) ; // Isosvector octupole
+      else if (opname == "IVD")           theop = IVDipoleOp(modelspace,1,1) ; // Isovector dipole (see PRC97(2018)054306 ) --added by bhu
       else if (opnamesplit[0] == "ISD")  // Isoscalar dipole, the CoM term are 5/3*Rms^2*r e.g., ISD_3.2111, here Rms=3.2111  --added by bhu
       {
           double Rms ; // center-of-mass correction terms
           std::istringstream( opnamesplit[1] ) >> Rms ;
           theop =  ISDipoleOp(modelspace,3,1,Rms) ;
       }
-      else if (opname == "RdotR")         theop =  RdotR(modelspace) ;
-      else if (opname == "E1")            theop =  ElectricMultipoleOp(modelspace,1) ;
-      else if (opname == "E2")            theop =  ElectricMultipoleOp(modelspace,2) ;
-      else if (opname == "E3")            theop =  ElectricMultipoleOp(modelspace,3) ;
-      else if (opname == "E4")            theop =  ElectricMultipoleOp(modelspace,4) ;
-      else if (opname == "E5")            theop =  ElectricMultipoleOp(modelspace,5) ;
-      else if (opname == "E6")            theop =  ElectricMultipoleOp(modelspace,6) ;
-      else if (opname == "E2int")         theop =  IntrinsicElectricMultipoleOp(modelspace,2) ; // Untested
-      else if (opname == "nE2")           theop =  NeutronElectricMultipoleOp(modelspace,2) ;
-      else if (opname == "M1")            theop =  MagneticMultipoleOp(modelspace,1) ;
-      else if (opname == "M2")            theop =  MagneticMultipoleOp(modelspace,2) ;
-      else if (opname == "M3")            theop =  MagneticMultipoleOp(modelspace,3) ;
-      else if (opname == "M4")            theop =  MagneticMultipoleOp(modelspace,4) ;
-      else if (opname == "M5")            theop =  MagneticMultipoleOp(modelspace,5) ;
-      else if (opname == "M1p")           theop =  MagneticMultipoleOp_pn(modelspace,1,"proton") ;
-      else if (opname == "M1n")           theop =  MagneticMultipoleOp_pn(modelspace,1,"neutron") ;
-      else if (opname == "M1S")           theop =  MagneticMultipoleOp_pn(modelspace,1,"spin") ;
-      else if (opname == "M1L")           theop =  MagneticMultipoleOp_pn(modelspace,1,"orbit") ;
-      else if (opname == "Fermi")         theop =  AllowedFermi_Op(modelspace) ;
-      else if (opname == "GamowTeller")   theop =  AllowedGamowTeller_Op(modelspace) ;
-      else if (opname == "Iso2")          theop =  Isospin2_Op(modelspace) ;
-      else if (opname == "R2CM")          theop =  R2CM_Op(modelspace) ;
-      else if (opname == "Trel")          theop =  Trel_Op(modelspace) ;
-      else if (opname == "TCM")           theop =  TCM_Op(modelspace) ;
-      else if (opname == "Tlab")          theop =  KineticEnergy_Op(modelspace) ;
-      else if (opname == "Rso")           theop =  RpSpinOrbitCorrection(modelspace) ;
-      else if (opname == "RadialOverlap") theop =  RadialOverlap(modelspace); // Untested...
-      else if (opname == "Sigma")         theop =  Sigma_Op(modelspace);
-      else if (opname == "Sigma_p")       theop =  Sigma_Op_pn(modelspace,"proton");
-      else if (opname == "Sigma_n")       theop =  Sigma_Op_pn(modelspace,"neutron");
-      else if (opname == "L")             theop =  L_Op(modelspace);
-      else if (opname == "L_p")           theop =  L_Op_pn(modelspace,"proton");
-      else if (opname == "L_n")           theop =  L_Op_pn(modelspace,"neutron");
-      else if (opname == "L2rel")         theop =  L2rel_Op(modelspace); // Untested...
-      else if (opname == "QdotQ")         theop =  QdotQ_Op(modelspace); // Untested...
-      else if (opname == "VCoul")         theop =  VCoulomb_Op(modelspace); // Untested...
-      else if (opname == "hfsNMS")        theop =  atomic_hfs::NormalMassShift(modelspace, 1);
-      else if (opname == "hfsSMS")        theop =  atomic_hfs::SpecificMassShift(modelspace, 1);
-      else if (opname == "VCentralCoul")  theop =  VCentralCoulomb_Op(modelspace); 
-      else if (opname == "AxialCharge")   theop =  AxialCharge_Op(modelspace); // Untested...
-      else if (opname == "VMinnesota")    theop =  MinnesotaPotential( modelspace );
-      else if (opname == "VBareDelta")    theop =  BareDelta( modelspace );
-      else if (opname == "OccRef")        theop =  NumberOpRef( modelspace );
-      else if (opname == "LdotS")         theop =  LdotS_Op( modelspace);
+      else if (opname == "RdotR")         theop = RdotR(modelspace) ;
+      else if (opname == "E1")            theop = ElectricMultipoleOp(modelspace,1) ;
+      else if (opname == "E2")            theop = ElectricMultipoleOp(modelspace,2) ;
+      else if (opname == "E3")            theop = ElectricMultipoleOp(modelspace,3) ;
+      else if (opname == "E4")            theop = ElectricMultipoleOp(modelspace,4) ;
+      else if (opname == "E5")            theop = ElectricMultipoleOp(modelspace,5) ;
+      else if (opname == "E6")            theop = ElectricMultipoleOp(modelspace,6) ;
+      else if (opname == "E2int")         theop = IntrinsicElectricMultipoleOp(modelspace,2) ; // Untested
+      else if (opname == "nE2")           theop = NeutronElectricMultipoleOp(modelspace,2) ;
+      else if (opname == "M1")            theop = MagneticMultipoleOp(modelspace,1) ;
+      else if (opname == "M2")            theop = MagneticMultipoleOp(modelspace,2) ;
+      else if (opname == "M3")            theop = MagneticMultipoleOp(modelspace,3) ;
+      else if (opname == "M4")            theop = MagneticMultipoleOp(modelspace,4) ;
+      else if (opname == "M5")            theop = MagneticMultipoleOp(modelspace,5) ;
+      else if (opname == "M1p")           theop = MagneticMultipoleOp_pn(modelspace,1,"proton") ;
+      else if (opname == "M1n")           theop = MagneticMultipoleOp_pn(modelspace,1,"neutron") ;
+      else if (opname == "M1S")           theop = MagneticMultipoleOp_pn(modelspace,1,"spin") ;
+      else if (opname == "M1L")           theop = MagneticMultipoleOp_pn(modelspace,1,"orbit") ;
+      else if (opname == "Fermi")         theop = AllowedFermi_Op(modelspace) ;
+      else if (opname == "GamowTeller")   theop = AllowedGamowTeller_Op(modelspace) ;
+      else if (opname == "Iso2")          theop = Isospin2_Op(modelspace) ;
+      else if (opname == "R2CM")          theop = R2CM_Op(modelspace) ;
+      else if (opname == "Trel")          theop = Trel_Op(modelspace) ;
+      else if (opname == "TCM")           theop = TCM_Op(modelspace) ;
+      else if (opname == "Tlab")          theop = KineticEnergy_Op(modelspace) ;
+      else if (opname == "Rso")           theop = RpSpinOrbitCorrection(modelspace) ;
+      else if (opname == "RadialOverlap") theop = RadialOverlap(modelspace); // Untested...
+      else if (opname == "Sigma")         theop = Sigma_Op(modelspace);
+      else if (opname == "Sigma_p")       theop = Sigma_Op_pn(modelspace,"proton");
+      else if (opname == "Sigma_n")       theop = Sigma_Op_pn(modelspace,"neutron");
+      else if (opname == "L")             theop = L_Op(modelspace);
+      else if (opname == "L_p")           theop = L_Op_pn(modelspace,"proton");
+      else if (opname == "L_n")           theop = L_Op_pn(modelspace,"neutron");
+      else if (opname == "L2rel")         theop = L2rel_Op(modelspace); // Untested...
+      else if (opname == "QdotQ")         theop = QdotQ_Op(modelspace); // Untested...
+      else if (opname == "VCoul")         theop = VCoulomb_Op(modelspace); // Untested...
+      else if (opname == "hfsNMS")        theop = atomic_hfs::NormalMassShift(modelspace, 1);
+      else if (opname == "hfsSMS")        theop = atomic_hfs::SpecificMassShift(modelspace, 1);
+      else if (opname == "VCentralCoul")  theop = VCentralCoulomb_Op(modelspace); 
+      else if (opname == "AxialCharge")   theop = AxialCharge_Op(modelspace); // Untested...
+      else if (opname == "VMinnesota")    theop = MinnesotaPotential( modelspace );
+      else if (opname == "VBareDelta")    theop = BareDelta( modelspace );
+      else if (opname == "OccRef")        theop = NumberOpRef( modelspace );
+      else if (opname == "LdotS")         theop = LdotS_Op( modelspace);
       else if (opname == "DGT")           theop = M0nu::DGT_Op(modelspace);
       else if (opnamesplit[0] =="VGaus")
       {
@@ -815,15 +816,23 @@ namespace imsrg_util
     return rho;
  }
 
- double HO_Radial_psi(int n, int l, double hw, double r)
- {
-   double b = sqrt( (HBARC*HBARC) / (hw * M_NUCLEON) );
-   double x = r/b;
-   double Norm = 2*sqrt( gsl_sf_fact(n) * pow(2,n+l) / SQRTPI / gsl_sf_doublefact(2*n+2*l+1) / pow(b,3.0) );
-   double L = gsl_sf_laguerre_n(n,l+0.5,x*x);
-   double psi = Norm * pow(x,l) * exp(-x*x*0.5) * L;
-   return psi;
- }
+// The radial harmonic-oscillator wavefunction
+double HO_gr(int n, int l, double x)
+{
+  double Norm = sqrt(2 * tgamma(n + 1) / tgamma(n + l + 1.5));
+
+  return Norm * pow(x, l) * exp(-0.5 * x * x) * gsl_sf_laguerre_n(n, l + 0.5, x * x);
+}
+
+double HO_Radial_psi(int n, int l, double hw, double r)
+{
+  double b = sqrt((HBARC * HBARC) / (hw * M_NUCLEON));
+  double x = r / b;
+  double Norm = 2 * sqrt(gsl_sf_fact(n) * pow(2, n + l) / SQRTPI / gsl_sf_doublefact(2 * n + 2 * l + 1) / pow(b, 3.0));
+  double L = gsl_sf_laguerre_n(n, l + 0.5, x * x);
+  double psi = Norm * pow(x, l) * exp(-x * x * 0.5) * L;
+  return psi;
+}
 
  // Just do the HF transformation
  std::vector<double> GetOccupationsHF(HartreeFock& hf)
@@ -932,24 +941,24 @@ namespace imsrg_util
 /// Lab-frame kinetic energy in the oscillator basis
 Operator KineticEnergy_Op(ModelSpace& modelspace)
 {
-   Operator T(modelspace,0,0,0,2);
-   double hw = modelspace.GetHbarOmega();
-   for ( auto a : modelspace.all_orbits )
-   {
-      Orbit & oa = modelspace.GetOrbit(a);
-      T.OneBody(a,a) = 0.5 * hw * (2*oa.n + oa.l +3./2); 
-      for ( auto b : T.OneBodyChannels.at({oa.l,oa.j2,oa.tz2}) )
-      {
-         if (b<=a) continue;
-         Orbit & ob = modelspace.GetOrbit(b);
-         if (oa.n == ob.n+1)
-            T.OneBody(a,b) = 0.5 * hw * sqrt( (oa.n)*(oa.n + oa.l +1./2));
-         else if (oa.n == ob.n-1)
-            T.OneBody(a,b) = 0.5 * hw * sqrt( (ob.n)*(ob.n + ob.l +1./2));
-         T.OneBody(b,a) = T.OneBody(a,b);
-      }
-   }
-   return T;
+  Operator T(modelspace,0,0,0,2);
+  double hw = modelspace.GetHbarOmega();
+  for ( auto a : modelspace.all_orbits )
+  {
+    Orbit & oa = modelspace.GetOrbit(a);
+    T.OneBody(a,a) = 0.5 * hw * (2*oa.n + oa.l +3./2); 
+    for ( auto b : T.OneBodyChannels.at({oa.l,oa.j2,oa.tz2}) )
+    {
+      if (b<=a) continue;
+      Orbit & ob = modelspace.GetOrbit(b);
+      if (oa.n == ob.n+1)
+        T.OneBody(a,b) = 0.5 * hw * sqrt( (oa.n)*(oa.n + oa.l +1./2));
+      else if (oa.n == ob.n-1)
+        T.OneBody(a,b) = 0.5 * hw * sqrt( (ob.n)*(ob.n + ob.l +1./2));
+      T.OneBody(b,a) = T.OneBody(a,b);
+    }
+  }
+  return T;
 }
 
 /// Relative kinetic energy, includingthe hw/A factor
@@ -1868,31 +1877,82 @@ Operator FDelta1n_Op(ModelSpace& modelspace,double q) {
 /// Returns
 /// \f[ r^2 = \sum_{i} r_{i}^2 \f]
 ///
-Operator RSquaredOp(ModelSpace& modelspace)
+Operator RSquaredOp(ModelSpace &modelspace, std::string pn)
 {
-   Operator r2 = Operator(modelspace);
-   r2.OneBody.zeros();
-   unsigned int norbits = modelspace.GetNumberOrbits();
-   double oscillator_b2 = HBARC*HBARC/M_NUCLEON/modelspace.GetHbarOmega();
-   for (unsigned int a=0;a<norbits;++a)
-   {
-      Orbit & oa = modelspace.GetOrbit(a);
-      r2.OneBody(a,a) = (2*oa.n + oa.l +1.5); 
-      for ( unsigned int b : r2.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}) )
-      {
-        if ( b < a ) continue;
-        Orbit & ob = modelspace.GetOrbit(b);
-        {
-           if (oa.n == ob.n+1)
-              r2.OneBody(a,b) = -sqrt( (oa.n)*(oa.n + oa.l +0.5));
-           else if (oa.n == ob.n-1)
-              r2.OneBody(a,b) = -sqrt( (ob.n)*(ob.n + ob.l +0.5));
-           r2.OneBody(b,a) = r2.OneBody(a,b);
-        }
-      }
-   }
-   r2.OneBody *= oscillator_b2;
-   return r2;
+  Operator r2 = Operator(modelspace);
+
+  r2.OneBody.zeros();
+
+  double oscillator_b2 = HBARC * HBARC / M_NUCLEON / modelspace.GetHbarOmega();
+
+  auto pn_list = modelspace.all_orbits;
+
+  if (pn == "proton")
+    pn_list = modelspace.proton_orbits;
+  else if (pn == "neutron")
+    pn_list = modelspace.neutron_orbits;
+
+  for (int a : pn_list)
+  {
+    Orbit &oa = modelspace.GetOrbit(a);
+
+    int iv_ch = (pn == "isovector" && oa.tz2 == 1) ? -1 : 1;
+
+    r2.OneBody(a, a) = iv_ch * (2 * oa.n + oa.l + 1.5);
+
+    for (int b : r2.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+    {
+      if (b < a)
+        continue;
+        
+      Orbit &ob = modelspace.GetOrbit(b);
+      
+      if (oa.n == ob.n + 1)
+        r2.OneBody(a, b) = -iv_ch * sqrt((oa.n) * (oa.n + oa.l + 0.5));
+      else if (oa.n == ob.n - 1)
+        r2.OneBody(a, b) = -iv_ch * sqrt((ob.n) * (ob.n + ob.l + 0.5));
+
+      r2.OneBody(b, a) = r2.OneBody(a, b);
+    }
+  }
+  r2.OneBody *= oscillator_b2;
+
+  return r2;
+}
+
+Operator BesselMonopoleOp(ModelSpace& modelspace, double q, std::string pn)
+{
+  Operator SpOp = Operator(modelspace, 0, 0, 0, 2);
+
+  SpOp.OneBody.zeros();
+
+  auto pn_list = modelspace.all_orbits;
+
+  if (pn == "proton")
+    pn_list = modelspace.proton_orbits;
+  else if (pn == "neutron")
+    pn_list = modelspace.neutron_orbits;
+
+  for (int i : pn_list)
+  {
+    Orbit &oi = modelspace.GetOrbit(i);
+
+    int iv_ch = (pn == "isovector" && oi.tz2 == 1) ? -1 : 1;
+
+    for (int j : SpOp.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
+    {
+      if (j < i)
+        continue;
+
+      Orbit &oj = modelspace.GetOrbit(j);
+
+      double r2int = RadialIntegral_Bessel(oi.n, oi.l, oj.n, oj.l, 0, q, modelspace);
+
+      SpOp.OneBody(i, j) = iv_ch * r2int;
+      SpOp.OneBody(j, i) = iv_ch * r2int;
+    }
+  }
+  return SpOp;
 }
 
 
@@ -1943,66 +2003,69 @@ Operator RSquaredOp(ModelSpace& modelspace)
    return R2_2body_Op(modelspace,"proton");
  }
 
-/// Two-body part of the proton charge radius operator.
-/// Returns
-/// \f[ 
-/// \hat{R}^{2}_{p2} = \sum_{i\neq j} e_{i}\vec{r}_i\cdot\vec{r}_j 
-/// \f]
-/// evaluated in the oscillator basis.
- Operator R2_2body_Op(ModelSpace& modelspace,std::string option)
+ /// Two-body part of the proton charge radius operator.
+ /// Returns
+ /// \f[
+ /// \hat{R}^{2}_{p2} = \sum_{i\neq j} e_{i}\vec{r}_i\cdot\vec{r}_j
+ /// \f]
+ /// evaluated in the oscillator basis.
+ Operator R2_2body_Op(ModelSpace &modelspace, std::string option)
  {
-   Operator Rp2Op(modelspace,0,0,0,2);
+   Operator Rp2Op(modelspace, 0, 0, 0, 2);
 
    std::cout << __func__ << " begin" << std::endl;
    int nchan = modelspace.GetNumberTwoBodyChannels();
-   if (option!="matter" and option!="proton" and option!="neutron") std::cout << "!!! WARNING. " << __func__ << "  BAD OPTION "  << option << std::endl;
+   if (option != "matter" and option != "proton" and option != "neutron")
+     std::cout << "!!! WARNING. " << __func__ << "  BAD OPTION " << option << std::endl;
    modelspace.PreCalculateMoshinsky();
-   #pragma omp parallel for schedule(dynamic,1) 
-   for (int ch=0; ch<nchan; ++ch)
+#pragma omp parallel for schedule(dynamic, 1)
+   for (int ch = 0; ch < nchan; ++ch)
    {
-      TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
-      int Tz = tbc.Tz;
-      if (option=="proton" and Tz > 0) continue; // don't bother with nn channel
-      if (option=="neutron" and Tz < 0) continue; // don't bother with pp channel
-      int nkets = tbc.GetNumberKets();
-      for (int ibra=0;ibra<nkets;++ibra)
-      {
-         Ket & bra = tbc.GetKet(ibra);
-         double prefactor = 1; // factor to account for double counting in pn channel.
-//          if ( (bra.op->l > modelspace.GetLmax()) or (bra.oq->l > modelspace.GetLmax()) )
-//          {
-//            std::cout << "ibra is " << ibra << " => " << bra.p << " " << bra.q << "  => " << bra.op->l << " " <<  bra.oq->l << std::endl;
-//          }
-         if (Tz==0 and (option=="proton" or option=="neutron")) prefactor = 0.5;
-         for (int iket=ibra;iket<nkets;++iket)
-         {
-            Ket & ket = tbc.GetKet(iket);
-            double mat_el = Calculate_r1r2(modelspace,bra,ket,tbc.J) * prefactor; 
-            Rp2Op.TwoBody.SetTBME(ch,ibra,iket,mat_el);
-            Rp2Op.TwoBody.SetTBME(ch,iket,ibra,mat_el);
-         }
-      }
+     TwoBodyChannel &tbc = modelspace.GetTwoBodyChannel(ch);
+     int Tz = tbc.Tz;
+     if (option == "proton" and Tz > 0)
+       continue; // don't bother with nn channel
+     if (option == "neutron" and Tz < 0)
+       continue; // don't bother with pp channel
+     int nkets = tbc.GetNumberKets();
+     for (int ibra = 0; ibra < nkets; ++ibra)
+     {
+       Ket &bra = tbc.GetKet(ibra);
+       double prefactor = 1; // factor to account for double counting in pn channel.
+                             //          if ( (bra.op->l > modelspace.GetLmax()) or (bra.oq->l > modelspace.GetLmax()) )
+                             //          {
+                             //            std::cout << "ibra is " << ibra << " => " << bra.p << " " << bra.q << "  => " << bra.op->l << " " <<  bra.oq->l << std::endl;
+                             //          }
+       if (Tz == 0 and (option == "proton" or option == "neutron"))
+         prefactor = 0.5;
+       for (int iket = ibra; iket < nkets; ++iket)
+       {
+         Ket &ket = tbc.GetKet(iket);
+         double mat_el = Calculate_r1r2(modelspace, bra, ket, tbc.J) * prefactor;
+         Rp2Op.TwoBody.SetTBME(ch, ibra, iket, mat_el);
+         Rp2Op.TwoBody.SetTBME(ch, iket, ibra, mat_el);
+       }
+     }
    }
    return Rp2Op;
  }
 
+ /// Operator whose expectation value gives the proton density at radius R
+ /// \f$ \hat{rho}(r) = \sum_{ij} \phi_i^{*}(r) \phi_j(r) a^{\dagger}_ia_j \f$
+ /// Normalized such that \f$ 4\pi \int dr r^2 \rho(r) = Z$.
+ // Operator ProtonDensityAtR(ModelSpace& modelspace, double R)
+ Operator DensityAtR(ModelSpace &modelspace, double R, std::string pn)
+ {
+   Operator Rho(modelspace, 0, 0, 0, 1);
+   double fourpi = 4 * PI;
+   double hw = modelspace.GetHbarOmega();
 
-/// Operator whose expectation value gives the proton density at radius R
-/// \f$ \hat{rho}(r) = \sum_{ij} \phi_i^{*}(r) \phi_j(r) a^{\dagger}_ia_j \f$
-/// Normalized such that \f$ 4\pi \int dr r^2 \rho(r) = Z$.
-//Operator ProtonDensityAtR(ModelSpace& modelspace, double R)
-Operator DensityAtR(ModelSpace& modelspace, double R, std::string pn)
-{
-  Operator Rho(modelspace,0,0,0,1);
-  double fourpi = 4*PI;
-  double hw = modelspace.GetHbarOmega();
-
-  auto pn_list = pn=="proton" ? modelspace.proton_orbits  : modelspace.neutron_orbits;
-  for ( auto i : pn_list)
-  {
-    Orbit& oi = modelspace.GetOrbit(i);
-    for ( auto j : Rho.OneBodyChannels.at({oi.l,oi.j2,oi.tz2}) )
-    {
+   auto pn_list = pn == "proton" ? modelspace.proton_orbits : modelspace.neutron_orbits;
+   for (auto i : pn_list)
+   {
+     Orbit &oi = modelspace.GetOrbit(i);
+     for (auto j : Rho.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
+     {
        Orbit& oj = modelspace.GetOrbit(j);
        Rho.OneBody(i,j) = HO_Radial_psi(oi.n,oi.l,hw,R) * HO_Radial_psi( oj.n, oj.l, hw, R) / fourpi;
     }
@@ -2017,65 +2080,67 @@ Operator DensityAtR(ModelSpace& modelspace, double R, std::string pn)
 /// The form factor is normalized such that for protons \f$ F(q=0) = Z \f$ and likewise for neutrons.
 /// At low q, the form factor behaves as \f$ F(q\approx = 0) = Z(1 - r^2 q^2 / 6) \f$, where $r^2$ is the rms point proton radius.
 /// NB, PREX-II measurement is at Q^2=0.0062 GeV^2 => Q = 78.74 MeV =~ 0.4 fm^-1.  PREX-I is at 0.475 fm^-1
-Operator FormfactorAtQ(ModelSpace& modelspace, double q, std::string pn)
+Operator FormfactorAtQ(ModelSpace &modelspace, double q, std::string pn)
 {
-  Operator Fq(modelspace,0,0,0,1);
-  double hw = modelspace.GetHbarOmega();
-  double bosc = HBARC / sqrt( M_NUCLEON * hw );
-  double k = q * bosc; // put q in oscillator units
+  Operator Fq(modelspace, 0, 0, 0, 1);
 
-  int npoints = 200;  // current options for npoints are 0-50, 100, and 200.
-  std::vector<double> xvals(npoints,0.);
-  std::vector<double> weights(npoints,0.);
-  std::vector<double> bessel_j0(npoints,0.);
-  for (int ix=0;ix<npoints;ix++)
+  double hw   = modelspace.GetHbarOmega();
+  double bosc = HBARC / sqrt(M_NUCLEON * hw);
+  double k    = q * bosc;                     // put q in oscillator units
+
+  int npoints = 200; // current options for npoints are 0-50, 100, and 200
+
+  std::vector<double> xvals(npoints, 0.);
+  std::vector<double> weights(npoints, 0.);
+  std::vector<double> bessel_j0(npoints, 0.);
+
+  for (int ix = 0; ix < npoints; ix++)
   {
-     xvals[ix]    = GaussLaguerre::gauss_laguerre_points_200[ix][0] ;
-     weights[ix]  =   GaussLaguerre::gauss_laguerre_points_200[ix][1] * xvals[ix] * xvals[ix]  ; // includes x^2 from jacobian
-     bessel_j0[ix] =   gsl_sf_bessel_j0( k * xvals[ix] ) ;
-   }
- 
- 
-  auto pn_list = pn=="proton" ? modelspace.proton_orbits  : modelspace.neutron_orbits;
-  for ( auto i : pn_list)
+    xvals[ix]     = GaussLaguerre::gauss_laguerre_points_200[ix][0];
+    weights[ix]   = GaussLaguerre::gauss_laguerre_points_200[ix][1] * xvals[ix] * xvals[ix]; // includes x^2 from jacobian
+    bessel_j0[ix] = gsl_sf_bessel_j0(k * xvals[ix]);
+  }
+
+  auto pn_list = pn == "proton" ? modelspace.proton_orbits : modelspace.neutron_orbits;
+  for (auto i : pn_list)
   {
-    Orbit& oi = modelspace.GetOrbit(i);
-    std::vector<double> phi_i(npoints,0.);
+    Orbit &oi = modelspace.GetOrbit(i);
+    std::vector<double> phi_i(npoints, 0.);
 
     // compare with HO_Radial_psi: no factor sqrt(1/b^3) because we have a b^3 out front from changing variables from r to r/b.
-    double Norm_i = 2*sqrt( gsl_sf_fact(oi.n) * pow(2,oi.n+oi.l) / SQRTPI / gsl_sf_doublefact(2*oi.n+2*oi.l+1) );
+    double Norm_i = 2 * sqrt(gsl_sf_fact(oi.n) * pow(2, oi.n + oi.l) / SQRTPI / gsl_sf_doublefact(2 * oi.n + 2 * oi.l + 1));
 
-    for (int ix=0;ix<npoints;ix++)
+    for (int ix = 0; ix < npoints; ix++)
     {
-       double x = xvals[ix];
-       // extra +x in exponent comes from Gauss-Laguerre weighting.
-       phi_i[ix] = Norm_i * pow(x,oi.l) * exp(-x*x*0.5 + x) * gsl_sf_laguerre_n(oi.n,oi.l+0.5,x*x) ;
+      double x = xvals[ix];
+      // extra +x in exponent comes from Gauss-Laguerre weighting.
+      phi_i[ix] = Norm_i * pow(x, oi.l) * exp(-x * x * 0.5 + x) * gsl_sf_laguerre_n(oi.n, oi.l + 0.5, x * x);
     }
-    for ( auto j : Fq.OneBodyChannels.at({oi.l,oi.j2,oi.tz2}) )
+    for (auto j : Fq.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
     {
-       if (i<j) continue;
-       Orbit& oj = modelspace.GetOrbit(j);
+      if (i < j)
+        continue;
+      Orbit &oj = modelspace.GetOrbit(j);
 
-       double Norm_j = 2*sqrt( gsl_sf_fact(oj.n) * pow(2,oj.n+oj.l) / SQRTPI / gsl_sf_doublefact(2*oj.n+2*oj.l+1) );
-       std::vector<double> phi_j(npoints,0.);
-       for (int ix=0;ix<npoints;ix++)
-       {
-          double x = xvals[ix];
-          // Notice no +x in the exponent here
-          phi_j[ix] = Norm_j * pow(x,oj.l) * exp(-x*x*0.5 ) * gsl_sf_laguerre_n(oj.n,oj.l+0.5,x*x) ;
-       }
-       double fq_ij = 0;
-       for (int ix=0;ix<npoints;ix++)
-       {
-          fq_ij += weights[ix] *  bessel_j0[ix] * phi_i[ix] * phi_j[ix];
-       }
-       Fq.OneBody(i,j) = fq_ij;
-       Fq.OneBody(j,i) = fq_ij;
+      double Norm_j = 2 * sqrt(gsl_sf_fact(oj.n) * pow(2, oj.n + oj.l) / SQRTPI / gsl_sf_doublefact(2 * oj.n + 2 * oj.l + 1));
+      std::vector<double> phi_j(npoints, 0.);
+      for (int ix = 0; ix < npoints; ix++)
+      {
+        double x = xvals[ix];
+        // Notice no +x in the exponent here
+        phi_j[ix] = Norm_j * pow(x, oj.l) * exp(-x * x * 0.5) * gsl_sf_laguerre_n(oj.n, oj.l + 0.5, x * x);
+      }
+      double fq_ij = 0;
+      for (int ix = 0; ix < npoints; ix++)
+      {
+        fq_ij += weights[ix] * bessel_j0[ix] * phi_i[ix] * phi_j[ix];
+      }
+      Fq.OneBody(i, j) = fq_ij;
+      Fq.OneBody(j, i) = fq_ij;
     }
   }
   return Fq;
 }
-
 
 Operator RpSpinOrbitCorrection(ModelSpace& modelspace)
 {
@@ -2147,346 +2212,1528 @@ Operator E0Op(ModelSpace& modelspace)
    return e0;
 }
 
-
-
-
-
-//Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R)
+// Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R)
 // providing an index list allows us to select e.g. just protons or just neutrons
-//Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::vector<index_t> index_list)
-Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::set<index_t> index_list)
+// Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::vector<index_t> index_list)
+Operator FourierBesselCoeff(ModelSpace &modelspace, int nu, double R, std::set<index_t> index_list)
 {
-  Operator a_nu(modelspace,0,0,0,2);
+  Operator a_nu(modelspace, 0, 0, 0, 2);
 
-  size_t npoints = 99;  // should be a multiple of 3 so we can use the Simpson 3/8 rule
+  size_t npoints = 99; // should be a multiple of 3 so we can use the Simpson 3/8 rule
   std::vector<double> RGRID(npoints);
   std::vector<double> BESSEL(npoints);
   std::vector<double> PSI_p(npoints);
   std::vector<double> INTEGRAND(npoints);
   double dr = R / npoints;
-  double Q = nu*PI/R;
+  double Q = nu * PI / R;
 
-  for (size_t i=0; i<npoints; i++)
+  for (size_t i = 0; i < npoints; i++)
   {
-    RGRID[i] = i*dr;
-    BESSEL[i] =  gsl_sf_bessel_j0( Q * RGRID[i] );
+    RGRID[i] = i * dr;
+    BESSEL[i] = gsl_sf_bessel_j0(Q * RGRID[i]);
   }
 
   double hw = modelspace.GetHbarOmega();
 
-  for ( auto p : index_list )  
+  for (auto p : index_list)
   {
-    Orbit& op = modelspace.GetOrbit(p);
-    for (size_t i=0; i<npoints; i++)
+    Orbit &op = modelspace.GetOrbit(p);
+    for (size_t i = 0; i < npoints; i++)
     {
-      PSI_p[i] = HO_Radial_psi( op.n, op.l, hw, RGRID[i]);
+      PSI_p[i] = HO_Radial_psi(op.n, op.l, hw, RGRID[i]);
     }
 
     // Use Simpson's rule to perform the integral
     // int  dr  r^2  psi_p(r)  j0(nu *pi * r /R ) psi_q(r)
-//    size_t q = p;
-    for (auto q : a_nu.OneBodyChannels.at({op.l,op.j2,op.tz2}) )
+    //    size_t q = p;
+    for (auto q : a_nu.OneBodyChannels.at({op.l, op.j2, op.tz2}))
     {
-      if (q>p) continue;
-      Orbit& oq = modelspace.GetOrbit(q);
-      for (size_t i=0; i<npoints; i++)
+      if (q > p)
+        continue;
+      Orbit &oq = modelspace.GetOrbit(q);
+      for (size_t i = 0; i < npoints; i++)
       {
-        INTEGRAND[i] = HO_Radial_psi( oq.n, oq.l, hw, RGRID[i] ) * RGRID[i]*RGRID[i] * BESSEL[i] * PSI_p[i];
+        INTEGRAND[i] = HO_Radial_psi(oq.n, oq.l, hw, RGRID[i]) * RGRID[i] * RGRID[i] * BESSEL[i] * PSI_p[i];
       }
 
-      double integral = INTEGRAND[0] + INTEGRAND[npoints-1];
-      for (size_t i=1; i<npoints; i+=3)
+      double integral = INTEGRAND[0] + INTEGRAND[npoints - 1];
+      for (size_t i = 1; i < npoints; i += 3)
       {
-        integral += 3*INTEGRAND[i] + 3*INTEGRAND[i+1] + 2*INTEGRAND[i+2];
+        integral += 3 * INTEGRAND[i] + 3 * INTEGRAND[i + 1] + 2 * INTEGRAND[i + 2];
       }
-      integral *= 3./8 * dr;
-      integral *= Q*Q;
+      integral *= 3. / 8 * dr;
+      integral *= Q * Q;
 
-      a_nu.OneBody(p,q) = integral;
-      a_nu.OneBody(q,p) = integral;
+      a_nu.OneBody(p, q) = integral;
+      a_nu.OneBody(q, p) = integral;
     }
   }
 
   return a_nu; // There may need to be some additional normalization by pi or something...
 }
 
-
-
 /// Returns the \f$ T^{2} \f$ operator
- Operator Isospin2_Op(ModelSpace& modelspace)
- {
-   Operator T2 = Operator(modelspace,0,0,0,2);
-   T2.OneBody.diag().fill(0.75);
+Operator Isospin2_Op(ModelSpace &modelspace)
+{
+  Operator T2 = Operator(modelspace, 0, 0, 0, 2);
+  T2.OneBody.diag().fill(0.75);
 
-   for (int ch=0; ch<T2.nChannels; ++ch)
-   {
-     TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
-     arma::mat& TB = T2.TwoBody.GetMatrix(ch);
-     // pp,nn:  2<t2.t1> = 1/(2(1+delta_ab)) along diagonal
-     if (std::abs(tbc.Tz) == 1)
-     {
-        TB.diag().fill(0.5); // pp,nn TBME's
-     }
-     else if (tbc.Tz == 0)
-     {
-        for (size_t ibra=0;ibra<tbc.GetNumberKets(); ++ibra)
+  for (int ch = 0; ch < T2.nChannels; ++ch)
+  {
+    TwoBodyChannel &tbc = modelspace.GetTwoBodyChannel(ch);
+    arma::mat &TB = T2.TwoBody.GetMatrix(ch);
+    // pp,nn:  2<t2.t1> = 1/(2(1+delta_ab)) along diagonal
+    if (std::abs(tbc.Tz) == 1)
+    {
+      TB.diag().fill(0.5); // pp,nn TBME's
+    }
+    else if (tbc.Tz == 0)
+    {
+      for (size_t ibra = 0; ibra < tbc.GetNumberKets(); ++ibra)
+      {
+        Ket &bra = tbc.GetKet(ibra);
+        Orbit &oa = modelspace.GetOrbit(bra.p);
+        Orbit &ob = modelspace.GetOrbit(bra.q);
+        for (size_t iket = ibra; iket < tbc.GetNumberKets(); ++iket)
         {
-           Ket& bra = tbc.GetKet(ibra);
-           Orbit& oa = modelspace.GetOrbit(bra.p);
-           Orbit& ob = modelspace.GetOrbit(bra.q);
-           for (size_t iket=ibra;iket<tbc.GetNumberKets(); ++iket)
-           {
-             Ket& ket = tbc.GetKet(iket);
-             Orbit& oc = modelspace.GetOrbit(ket.p);
-             Orbit& od = modelspace.GetOrbit(ket.q);
-             if (oa.j2==oc.j2 and oa.n==oc.n and oa.l==oc.l
-               and ob.j2==od.j2 and ob.n==od.n and ob.l==od.l )
-             {
-               // tz1 tz2 case
-               if( oa.tz2 == oc.tz2 and ob.tz2==od.tz2)
-               {
-                 TB(ibra,iket) -= 0.5;
-               }
-               // t+ t- case
-               if( oa.tz2 == od.tz2 and ob.tz2==oc.tz2)
-               {
-                 TB(ibra,iket) += 1.0;
-               }
-               // if a==b==c==d, we need to consider the exchange term
-               if (oa.j2==ob.j2 and oa.n==ob.n and oa.l==ob.l)
-               {
-                  int phase = bra.Phase(tbc.J);
-                  // tz1 tz2 case
-                  if( oa.tz2 == oc.tz2 and ob.tz2==od.tz2)
-                  {
-                    TB(ibra,iket) += phase * 1.0;
-                  }
-                  // t+ t- case
-                  if( oa.tz2 == od.tz2 and ob.tz2==oc.tz2)
-                  {
-                    TB(ibra,iket) -= phase * 0.5;
-                  }
-               }
-               TB(iket,ibra) = TB(ibra,iket); // hermitian
-             }
-
-           }
+          Ket &ket = tbc.GetKet(iket);
+          Orbit &oc = modelspace.GetOrbit(ket.p);
+          Orbit &od = modelspace.GetOrbit(ket.q);
+          if (oa.j2 == oc.j2 and oa.n == oc.n and oa.l == oc.l and ob.j2 == od.j2 and ob.n == od.n and ob.l == od.l)
+          {
+            // tz1 tz2 case
+            if (oa.tz2 == oc.tz2 and ob.tz2 == od.tz2)
+            {
+              TB(ibra, iket) -= 0.5;
+            }
+            // t+ t- case
+            if (oa.tz2 == od.tz2 and ob.tz2 == oc.tz2)
+            {
+              TB(ibra, iket) += 1.0;
+            }
+            // if a==b==c==d, we need to consider the exchange term
+            if (oa.j2 == ob.j2 and oa.n == ob.n and oa.l == ob.l)
+            {
+              int phase = bra.Phase(tbc.J);
+              // tz1 tz2 case
+              if (oa.tz2 == oc.tz2 and ob.tz2 == od.tz2)
+              {
+                TB(ibra, iket) += phase * 1.0;
+              }
+              // t+ t- case
+              if (oa.tz2 == od.tz2 and ob.tz2 == oc.tz2)
+              {
+                TB(ibra, iket) -= phase * 0.5;
+              }
+            }
+            TB(iket, ibra) = TB(ibra, iket); // hermitian
+          }
         }
+      }
+    }
+  }
+  return T2;
+}
+
+ /// Mutipole responses (except dipole) with units fm\f$ ^{rL}\f$ (see PRC97(2018)054306 ) --added by bhu
+ Operator MultipoleResponseOp(ModelSpace &modelspace, int rL, int YL, int isospin)
+ {
+   Operator EL(modelspace, YL, 0, YL % 2, 2);
+   double bL = pow(HBARC * HBARC / M_NUCLEON / modelspace.GetHbarOmega(), 0.5 * rL); // b^L where b=sqrt(hbar/mw)
+   int norbits = modelspace.GetNumberOrbits();
+   for (int i = 0; i < norbits; ++i)
+   {
+     Orbit &oi = modelspace.GetOrbit(i);
+     double ji = 0.5 * oi.j2;
+     for (int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
+     {
+       if (j < i)
+         continue;
+       Orbit &oj = modelspace.GetOrbit(j);
+       double jj = 0.5 * oj.j2;
+       double r2int = RadialIntegral(oi.n, oi.l, oj.n, oj.l, rL) * bL;
+       EL.OneBody(i, j) = modelspace.phase(jj + YL - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * YL + 1) / 4. / 3.1415926) * AngMom::ThreeJ(ji, jj, YL, 0.5, -0.5, 0) * r2int;
+       if (YL == 0)
+         EL.OneBody(i, j) = EL.OneBody(i, j) * sqrt(4. * 3.1415926);
+       double fac = isospin ? oi.tz2 : 1.0;
+       EL.OneBody(i, j) = EL.OneBody(i, j) * fac;
+       EL.OneBody(j, i) = modelspace.phase((oi.j2 - oj.j2) / 2) * EL.OneBody(i, j);
      }
    }
-   return T2;
+   return EL;
  }
 
-  /// Mutipole responses (except dipole) with units fm\f$ ^{rL}\f$ (see PRC97(2018)054306 ) --added by bhu
-  Operator MultipoleResponseOp(ModelSpace& modelspace, int rL, int YL, int isospin)
+/// Isovector dipole with units e * fm , see PRC 97 054306 (2018) --added by bhu
+Operator IVDipoleOp(ModelSpace &modelspace, int rL, int YL)
+{
+  Operator EL(modelspace, YL, 0, YL % 2, 2);
+  double bL = pow(HBARC * HBARC / M_NUCLEON / modelspace.GetHbarOmega(), 0.5 * rL); // b^L where b=sqrt(hbar/mw)
+  int norbits = modelspace.GetNumberOrbits();
+  for (int i = 0; i < norbits; ++i)
   {
-    Operator EL(modelspace, YL,0,YL%2,2);
-    double bL = pow( HBARC*HBARC/M_NUCLEON/modelspace.GetHbarOmega(),0.5*rL); // b^L where b=sqrt(hbar/mw)
-    int norbits = modelspace.GetNumberOrbits();
-    for (int i=0; i<norbits; ++i)
+    Orbit &oi = modelspace.GetOrbit(i);
+    double ji = 0.5 * oi.j2;
+    for (int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
     {
-      Orbit& oi = modelspace.GetOrbit(i);
-      double ji = 0.5*oi.j2;
-      for ( int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}) )
-      {
-        if (j<i) continue;
-        Orbit& oj = modelspace.GetOrbit(j);
-        double jj = 0.5*oj.j2;
-        double r2int = RadialIntegral(oi.n,oi.l,oj.n,oj.l,rL) * bL ;
-        EL.OneBody(i,j) = modelspace.phase(jj+YL-0.5) * sqrt( (2*ji+1)*(2*jj+1)*(2*YL+1)/4./3.1415926) * AngMom::ThreeJ(ji,jj,YL,0.5,-0.5,0) * r2int;
-	if( YL == 0 ) EL.OneBody(i,j) = EL.OneBody(i,j) * sqrt(4.*3.1415926);
-        double fac = isospin ? oi.tz2 : 1.0;
-        EL.OneBody(i,j) = EL.OneBody(i,j) * fac;
-        EL.OneBody(j,i) = modelspace.phase((oi.j2-oj.j2)/2) * EL.OneBody(i,j);
+      if (j < i)
+        continue;
+      Orbit &oj = modelspace.GetOrbit(j);
+      double jj = 0.5 * oj.j2;
+      double r2int = RadialIntegral(oi.n, oi.l, oj.n, oj.l, rL) * bL;
+      EL.OneBody(i, j) = modelspace.phase(jj + YL - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * YL + 1) / 4. / 3.1415926) * AngMom::ThreeJ(ji, jj, YL, 0.5, -0.5, 0) * r2int;
+      EL.OneBody(i, j) = EL.OneBody(i, j) * (0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass());
+      EL.OneBody(j, i) = modelspace.phase((oi.j2 - oj.j2) / 2) * EL.OneBody(i, j);
+    }
+  }
+  return EL;
+}
+
+/// Isoscalar dipole with units e * fm^3  --added by bhu
+Operator ISDipoleOp(ModelSpace &modelspace, int rL, int YL, double Rms)
+{
+  Operator EL(modelspace, YL, 0, YL % 2, 2);
+  double bL = pow(HBARC * HBARC / M_NUCLEON / modelspace.GetHbarOmega(), 0.5 * rL); // b^L where b=sqrt(hbar/mw)
+  double bLp = pow(HBARC * HBARC / M_NUCLEON / modelspace.GetHbarOmega(), 0.5 * 1);
+  int norbits = modelspace.GetNumberOrbits();
+  for (int i = 0; i < norbits; ++i)
+  {
+    Orbit &oi = modelspace.GetOrbit(i);
+    double ji = 0.5 * oi.j2;
+    for (int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
+    {
+      if (j < i)
+        continue;
+      Orbit &oj = modelspace.GetOrbit(j);
+      double jj = 0.5 * oj.j2;
+      double r2int = RadialIntegral(oi.n, oi.l, oj.n, oj.l, rL) * bL;
+      double r2intp = RadialIntegral(oi.n, oi.l, oj.n, oj.l, 1) * bLp;
+      r2int = r2int - 5.0 / 3.0 * r2intp * Rms * Rms;
+      EL.OneBody(i, j) = modelspace.phase(jj + YL - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * YL + 1) / 4. / 3.1415926) * AngMom::ThreeJ(ji, jj, YL, 0.5, -0.5, 0) * r2int;
+      EL.OneBody(j, i) = modelspace.phase((oi.j2 - oj.j2) / 2) * EL.OneBody(i, j);
+    }
+  }
+  return EL;
+}
+
+/// Returns a reduced electric multipole operator with units \f$ e\f$ fm\f$^{\lambda} \f$
+/// See Suhonen eq. (6.23)
+Operator ElectricMultipoleOp(ModelSpace& modelspace, int L, int offset, std::string pn)
+{
+  Operator EL(modelspace, L, 0, L % 2, 2);
+
+  double bL = pow(HBARC * HBARC / M_NUCLEON / modelspace.GetHbarOmega(), 0.5 * (L + offset)); // b^L where b = sqrt(hbar/mw)
+
+  auto pn_list = modelspace.proton_orbits;
+
+  if (pn == "neutron")
+    pn_list = modelspace.neutron_orbits;
+  else if (pn == "isoscalar" || pn == "isovector")
+    pn_list = modelspace.all_orbits;
+
+  for (int i : pn_list)
+  {
+    Orbit& oi = modelspace.GetOrbit(i);
+    double ji = 0.5 * oi.j2;
+
+    for (int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
+    {
+      if (j < i)
+        continue;
+
+      Orbit& oj = modelspace.GetOrbit(j);
+      double jj = 0.5 * oj.j2;
+
+      double r2int = RadialIntegral(oi.n, oi.l, oj.n, oj.l, L + offset) * bL;
+
+      double iv_ch = (pn != "isovector") ? 1 : (0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass());
+
+      //EL.OneBody(i,j) = (1 + modelspace.phase(oi.l + oj.l + L)) / 2. * modelspace.phase(jj + L - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * L + 1) / 4. / PI) * AngMom::ThreeJ(ji, jj, L, 0.5, -0.5, 0) * r2int;
+      EL.OneBody(i,j) = iv_ch * modelspace.phase(jj + L - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * L + 1) / 4. / PI) * AngMom::ThreeJ(ji, jj, L, 0.5, -0.5, 0) * r2int;
+      EL.OneBody(j,i) = modelspace.phase((oi.j2 + oj.j2) / 2 + 1) * EL.OneBody(i,j);
+    }
+  }
+  return EL;
+}
+
+/// Returns a modified (Bessel) electric multipole operator
+Operator BesselMultipoleOp(ModelSpace &modelspace, int L, double q, std::string pn)
+{
+  Operator EL(modelspace, L, 0, L % 2, 2);
+
+  auto pn_list = modelspace.all_orbits;
+
+  if (pn == "proton")
+    pn_list = modelspace.proton_orbits;
+  else if (pn == "neutron")
+    pn_list = modelspace.neutron_orbits;
+
+  for (int i : pn_list)
+  {
+    Orbit &oi = modelspace.GetOrbit(i);
+    double ji = 0.5 * oi.j2;
+
+    for (int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
+    {
+      if (j < i)
+        continue;
+
+      Orbit &oj = modelspace.GetOrbit(j);
+      double jj = 0.5 * oj.j2;
+
+      double r2int = RadialIntegral_Bessel(oi.n, oi.l, oj.n, oj.l, L, q, modelspace);
+
+      double iv_ch = (pn != "isovector") ? 1 : (0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass());
+
+      EL.OneBody(i, j) = iv_ch * (1 + modelspace.phase(oi.l + oj.l + L)) / 2. * modelspace.phase(jj + L - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * L + 1) / 4. / PI) * AngMom::ThreeJ(ji, jj, L, 0.5, -0.5, 0) * r2int;
+      EL.OneBody(j, i) = modelspace.phase((oi.j2 + oj.j2) / 2 + 1) * EL.OneBody(i, j);
+    }
+  }
+  return EL;
+}
+
+Operator RdotR(ModelSpace& modelspace)
+{
+  Operator rad = R2_1body_Op(modelspace,"matter");
+
+  Operator op(modelspace,0,0,0,2);
+
+  op.OneBody = rad.OneBody * rad.OneBody.t();
+
+  for (int ch=0; ch<op.nChannels; ++ch) {
+    TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
+
+    index_t nbras = tbc.GetNumberKets();
+    index_t nkets = tbc.GetNumberKets();
+    int J = tbc.J;
+    for (index_t ibra=0;ibra<nbras;++ibra) {
+      Ket& bra = tbc.GetKet(ibra);
+      index_t i = bra.p;
+      index_t j = bra.q;        
+      for (index_t iket=0;iket<nkets;++iket) {
+        Ket& ket = tbc.GetKet(iket);
+        index_t k = ket.p;
+        index_t l = ket.q;
+        double me = 0.;
+        me += rad.OneBody(i,k) * rad.OneBody(j,l);
+        me -= AngMom::phase((bra.op->j2 + bra.oq->j2)/2 + J) * rad.OneBody(i,l) * rad.OneBody(j,k);
+
+        me *= 2;
+
+        if(i==j) me /= PhysConst::SQRT2;
+        if(k==l) me /= PhysConst::SQRT2;
+
+        op.TwoBody.SetTBME(ch,bra,ket,me);
       }
     }
-    return EL;
   }
 
-  /// Isovector dipole with units e * fm , see PRC 97 054306 (2018) --added by bhu
-  Operator IVDipoleOp(ModelSpace& modelspace, int rL, int YL)
+  return op; 
+}
+
+Operator Mix0_0(ModelSpace &modelspace, const Operator &LL, const Operator &RR)
+{
+  Operator LdotR_op(modelspace, 0, 0, 0, 2);
+
+  // One-body part
+  LdotR_op.OneBody = LL.OneBody * RR.OneBody.t();
+
+  // Two-body part
+  for (int ch = 0; ch < LdotR_op.nChannels; ++ch)
   {
-    Operator EL(modelspace, YL,0,YL%2,2);
-    double bL = pow( HBARC*HBARC/M_NUCLEON/modelspace.GetHbarOmega(),0.5*rL); // b^L where b=sqrt(hbar/mw)
-    int norbits = modelspace.GetNumberOrbits();
-    for (int i=0; i<norbits; ++i)
+    TwoBodyChannel &tbc = modelspace.GetTwoBodyChannel(ch);
+
+    index_t nbras = tbc.GetNumberKets();
+    index_t nkets = tbc.GetNumberKets();
+
+    int J = tbc.J;
+
+    for (index_t ibra = 0; ibra < nbras; ++ibra)
     {
-      Orbit& oi = modelspace.GetOrbit(i);
-      double ji = 0.5*oi.j2;
-      for ( int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}) )
+      Ket &bra = tbc.GetKet(ibra);
+
+      index_t i = bra.p;
+      index_t j = bra.q;
+
+      for (index_t iket = 0; iket < nkets; ++iket)
       {
-        if (j<i) continue;
-        Orbit& oj = modelspace.GetOrbit(j);
-        double jj = 0.5*oj.j2;
-        double r2int = RadialIntegral(oi.n,oi.l,oj.n,oj.l,rL) * bL ;
-        EL.OneBody(i,j) = modelspace.phase(jj+YL-0.5) * sqrt( (2*ji+1)*(2*jj+1)*(2*YL+1)/4./3.1415926) * AngMom::ThreeJ(ji,jj,YL,0.5,-0.5,0) * r2int;
-        EL.OneBody(i,j) = EL.OneBody(i,j) * (0.5 - oi.tz2*0.5 - modelspace.GetTargetZ()*1.0/modelspace.GetTargetMass() );
-	EL.OneBody(j,i) = modelspace.phase((oi.j2-oj.j2)/2) * EL.OneBody(i,j);
+        Ket &ket = tbc.GetKet(iket);
+
+        index_t k = ket.p;
+        index_t l = ket.q;
+
+        double me = 0.;
+
+        me += LL.OneBody(i, k) * RR.OneBody(j, l);
+        me -= AngMom::phase((bra.op->j2 + bra.oq->j2) / 2 + J) * RR.OneBody(i, l) * LL.OneBody(j, k);
+
+        me *= 2;
+
+        if (i == j)
+          me /= PhysConst::SQRT2;
+        if (k == l)
+          me /= PhysConst::SQRT2;
+
+        LdotR_op.TwoBody.SetTBME(ch, bra, ket, me);
       }
     }
-    return EL;
+  }
+  return LdotR_op;
+}
+
+// Scalar product of multipole operators
+// Non-energy-weighted sum rule
+// See Lu and Johnson, Phys. Rev. C 97, 034330 (2018)
+// Added 02/12/2024, Andrea
+Operator Mom0(ModelSpace& modelspace, const Operator& Q)
+{
+  // Initialize operator
+  Operator QdotQ_op(modelspace, 0, 0, 0, 2);
+
+  auto& Qmat = Q.OneBody;
+
+  int L = Q.GetJRank();
+
+  // Filling the one-body part
+  for (int i : modelspace.all_orbits)
+  {
+    Orbit& oi = modelspace.GetOrbit(i);
+    double ji = 0.5 * oi.j2;
+
+    for (int j : QdotQ_op.OneBodyChannels.at({oi.l, oi.j2, oi.tz2})) // Channels accessible to the scalar operator
+    {
+      Orbit& oj = modelspace.GetOrbit(j);
+      double jj = 0.5 * oj.j2;
+
+      double me = 0.;
+
+      for (int k : Q.OneBodyChannels.at({oi.l, oi.j2, oi.tz2})) // Channels accessible to the tensor operator
+      {
+        Orbit& ok = modelspace.GetOrbit(k);
+        double jk = 0.5 * ok.j2;
+
+        me += Qmat(k, i) * Qmat(k, j);
+      }
+      QdotQ_op.OneBody(i,j) = me / (2 * ji + 1);
+    }
   }
 
-  /// Isoscalar dipole with units e * fm^3  --added by bhu
-  Operator ISDipoleOp(ModelSpace& modelspace, int rL, int YL, double Rms)
+  // Filling the two-body part
+  int nchan = modelspace.GetNumberTwoBodyChannels();
+
+  for (int ch = 0; ch < nchan; ++ch)
   {
-    Operator EL(modelspace, YL,0,YL%2,2);
-    double bL = pow( HBARC*HBARC/M_NUCLEON/modelspace.GetHbarOmega(),0.5*rL); // b^L where b=sqrt(hbar/mw)
-    double bLp = pow( HBARC*HBARC/M_NUCLEON/modelspace.GetHbarOmega(),0.5*1);
-    int norbits = modelspace.GetNumberOrbits();
-    for (int i=0; i<norbits; ++i)
+    TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
+
+    int nkets = tbc.GetNumberKets();
+    int J     = tbc.J;
+
+    for (int ibra = 0; ibra < nkets; ++ibra)
     {
-      Orbit& oi = modelspace.GetOrbit(i);
-      double ji = 0.5*oi.j2;
-      for ( int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}) )
+      Ket & bra = tbc.GetKet(ibra);
+
+      int i = bra.p;
+      int j = bra.q;
+
+      Orbit & oi = modelspace.GetOrbit(i);
+      Orbit & oj = modelspace.GetOrbit(j);
+
+      double ji = oi.j2 * 0.5;
+      double jj = oj.j2 * 0.5;
+
+      for (int iket = ibra; iket < nkets; ++iket)
       {
-        if (j<i) continue;
-        Orbit& oj = modelspace.GetOrbit(j);
-        double jj = 0.5*oj.j2;
-        double r2int = RadialIntegral(oi.n,oi.l,oj.n,oj.l,rL) * bL ;
-        double r2intp = RadialIntegral(oi.n,oi.l,oj.n,oj.l,1) * bLp ;
-        r2int = r2int - 5.0/3.0*r2intp*Rms*Rms ;
-        EL.OneBody(i,j) = modelspace.phase(jj+YL-0.5) * sqrt( (2*ji+1)*(2*jj+1)*(2*YL+1)/4./3.1415926) * AngMom::ThreeJ(ji,jj,YL,0.5,-0.5,0) * r2int;
-	EL.OneBody(j,i) = modelspace.phase((oi.j2-oj.j2)/2) * EL.OneBody(i,j);
+        Ket & ket = tbc.GetKet(iket);
+
+        int k = ket.p;
+        int l = ket.q;
+
+        Orbit & ok = modelspace.GetOrbit(k);
+        Orbit & ol = modelspace.GetOrbit(l);
+
+        double jk = ok.j2 * 0.5;
+        double jl = ol.j2 * 0.5;
+
+        double Aijkl = modelspace.GetSixJ(ji, jl, L, jk, jj, J) * Qmat(k, j) * Qmat(i, l);
+        double Ajikl = modelspace.GetSixJ(jj, jl, L, jk, ji, J) * Qmat(k, i) * Qmat(j, l);
+
+        double QdQ = 0.;
+
+        if (tbc.Tz == 0) // proton-neutron channel
+        {
+               if (oj.tz2 == ok.tz2) QdQ = Aijkl;                                     // pnpn
+          else if (oi.tz2 == ok.tz2) QdQ = modelspace.phase(ji + jj + J + 1) * Ajikl; // pnnp
+
+          QdQ *= -2.;
+        }
+        else // pppp or nnnn
+        {
+          QdQ = Aijkl - modelspace.phase(ji + jj + J) * Ajikl;  // pppp or nnnn
+          if (i == j) QdQ /= sqrt(2.0);
+          if (k == l) QdQ /= sqrt(2.0);
+
+          QdQ *= -2.;
+        }        
+        QdotQ_op.TwoBody.SetTBME(ch, ibra, iket, QdQ);
       }
     }
-    return EL;
   }
+  return QdotQ_op;
+}
 
-  /// Returns a reduced electric multipole operator with units \f$ e\f$ fm\f$^{\lambda} \f$
-  /// See Suhonen eq. (6.23)
-  Operator ElectricMultipoleOp(ModelSpace& modelspace, int L)
+// Energy-weighted sum rule
+// See Lu and Johnson, Phys. Rev. C 97, 034330 (2018)
+// Added and benchmarked 16/12/2024, Andrea
+Operator Mom1(ModelSpace& modelspace, const Operator& H, const Operator& F)
+{
+  // Initialize operator
+  Operator SR(modelspace, 0, 0, 0, 2);
+
+  auto& Fmat = F.OneBody;
+  auto& h    = H.OneBody;
+  auto& V    = H.TwoBody;
+
+  int K = F.GetJRank();
+
+  // Filling the one-body part
+  for (int a : modelspace.all_orbits)
   {
-    Operator EL(modelspace, L,0,L%2,2);
-    double bL = pow( HBARC*HBARC/M_NUCLEON/modelspace.GetHbarOmega(),0.5*L); // b^L where b=sqrt(hbar/mw)
-    for (int i : modelspace.proton_orbits)
+    Orbit& oa = modelspace.GetOrbit(a);
+    double ja = 0.5 * oa.j2;
+
+    for (int b : SR.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) // Channels accessible to the scalar operator
     {
-      Orbit& oi = modelspace.GetOrbit(i);
-      double ji = 0.5*oi.j2;
-      for ( int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}) )
+      Orbit& ob = modelspace.GetOrbit(b);
+      double jb = 0.5 * ob.j2;
+
+      // Part 1
+      double m1 = 0.;
+
+      for (int c : H.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
       {
-        if (j<i) continue;
-        Orbit& oj = modelspace.GetOrbit(j);
-        double jj = 0.5*oj.j2;
-        double r2int = RadialIntegral(oi.n,oi.l,oj.n,oj.l,L) * bL ;
-        EL.OneBody(i,j) = modelspace.phase(jj+L-0.5) * sqrt( (2*ji+1)*(2*jj+1)*(2*L+1)/4./3.1415926) * AngMom::ThreeJ(ji,jj, L, 0.5, -0.5,0) * r2int;
-        EL.OneBody(j,i) = modelspace.phase((oi.j2-oj.j2)/2) * EL.OneBody(i,j);
-      }
-    }
-    return EL;
-  }
+        Orbit& oc = modelspace.GetOrbit(c);
+        double jc = 0.5 * oc.j2;
 
-  Operator RdotR(ModelSpace& modelspace)
-  {
-    Operator rad = R2_1body_Op(modelspace,"matter");
+        for (int d : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& od = modelspace.GetOrbit(d);
+          double jd = 0.5 * od.j2;
 
-    Operator op(modelspace,0,0,0,2);
-
-    op.OneBody = rad.OneBody * rad.OneBody.t();
-
-    for (int ch=0; ch<op.nChannels; ++ch) {
-      TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
-
-      index_t nbras = tbc.GetNumberKets();
-      index_t nkets = tbc.GetNumberKets();
-      int J = tbc.J;
-      for (index_t ibra=0;ibra<nbras;++ibra) {
-        Ket& bra = tbc.GetKet(ibra);
-        index_t i = bra.p;
-        index_t j = bra.q;        
-        for (index_t iket=0;iket<nkets;++iket) {
-          Ket& ket = tbc.GetKet(iket);
-          index_t k = ket.p;
-          index_t l = ket.q;
-          double me = 0.;
-          me += rad.OneBody(i,k) * rad.OneBody(j,l);
-          me -= AngMom::phase((bra.op->j2 + bra.oq->j2)/2 + J) * rad.OneBody(i,l) * rad.OneBody(j,k);
-
-          me *= 2;
-
-          if(i==j) me /= PhysConst::SQRT2;
-          if(k==l) me /= PhysConst::SQRT2;
-
-          op.TwoBody.SetTBME(ch,bra,ket,me);
+          m1 -= h(a, c) * Fmat(c, d) * Fmat(b, d);
         }
       }
-    }
+      // Part 2
+      double m2 = 0.;
 
-    return op; 
+      for (int c : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+      {
+        Orbit& oc = modelspace.GetOrbit(c);
+        double jc = 0.5 * oc.j2;
+
+        for (int d : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& od = modelspace.GetOrbit(d);
+          double jd = 0.5 * od.j2;
+
+          m2 += Fmat(a, c) * h(c, d) * Fmat(b, d);
+        }
+      }
+      // Part 3
+      double m3 = 0.;
+
+      for (int c : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+      {
+        Orbit& oc = modelspace.GetOrbit(c);
+        double jc = 0.5 * oc.j2;
+
+        for (int d : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& od = modelspace.GetOrbit(d);
+          double jd = 0.5 * od.j2;
+
+          m3 += Fmat(c, a) * h(c, d) * Fmat(d, b);
+        }
+      }
+      // Part 4
+      double m4 = 0.;
+
+      for (int c : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+      {
+        Orbit& oc = modelspace.GetOrbit(c);
+        double jc = 0.5 * oc.j2;
+
+        for (int d : H.OneBodyChannels.at({ob.l, ob.j2, ob.tz2})) // changed
+        {
+          Orbit& od = modelspace.GetOrbit(d);
+          double jd = 0.5 * od.j2;
+
+          m4 -= Fmat(c, a) * Fmat(c, d) * h(d, b);
+        }
+      }
+
+      double me = m1 + m2 + m3 + m4;
+
+      SR.OneBody(a, b) = 0.5 * me / (2 * ja + 1);
+    }
   }
 
-  /// Returns a reduced electric multipole operator with units \f$ e\f$ fm\f$^{\lambda} \f$
-  /// See Suhonen eq. (6.23)
-  Operator NeutronElectricMultipoleOp(ModelSpace& modelspace, int L)
+  // Filling the two-body part
+  int nchan = modelspace.GetNumberTwoBodyChannels();
+
+  #pragma omp parallel for schedule(dynamic,1) 
+  for (int ch = 0; ch < nchan; ++ch)
   {
-    Operator EL(modelspace, L,0,L%2,2);
-    double bL = pow( HBARC*HBARC/M_NUCLEON/modelspace.GetHbarOmega(),0.5*L); // b^L where b=sqrt(hbar/mw)
-    for (int i : modelspace.neutron_orbits)
+    TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
+
+    int nkets = tbc.GetNumberKets();
+    int J     = tbc.J;
+
+    // int Jmin = std::abs(J - K);
+    // int Jmax = (J + K);
+
+    for (int ibra = 0; ibra < nkets; ++ibra)
     {
-      Orbit& oi = modelspace.GetOrbit(i);
-      double ji = 0.5*oi.j2;
-      for ( int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}) )
+      Ket & bra = tbc.GetKet(ibra);
+
+      int a = bra.p;
+      int b = bra.q;
+
+      Orbit & oa = modelspace.GetOrbit(a);
+      Orbit & ob = modelspace.GetOrbit(b);
+
+      double ja = oa.j2 * 0.5;
+      double jb = ob.j2 * 0.5;
+
+      for (int iket = ibra; iket < nkets; ++iket)
       {
-        if (j<i) continue;
-        Orbit& oj = modelspace.GetOrbit(j);
-        double jj = 0.5*oj.j2;
-        double r2int = RadialIntegral(oi.n,oi.l,oj.n,oj.l,L) * bL ;
-        EL.OneBody(i,j) = modelspace.phase(jj+L-0.5) * sqrt( (2*ji+1)*(2*jj+1)*(2*L+1)/4./3.1415926) * AngMom::ThreeJ(ji,jj, L, 0.5, -0.5,0) * r2int;
-        EL.OneBody(j,i) = modelspace.phase((oi.j2-oj.j2)/2) * EL.OneBody(i,j);
+        Ket & ket = tbc.GetKet(iket);
+
+        int c = ket.p;
+        int d = ket.q;
+
+        Orbit & oc = modelspace.GetOrbit(c);
+        Orbit & od = modelspace.GetOrbit(d);
+
+        double jc = oc.j2 * 0.5;
+        double jd = od.j2 * 0.5;
+
+        //if(oa.tz2 + ob.tz2 != oc.tz2 + od.tz2) continue;
+
+        ///////////////////////////// W1 /////////////////////////////
+
+        double W1abcd = 0.;
+        double W1abdc = 0.;
+
+        for (int e : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+        {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          for (int f : F.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+          {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+
+            double abcd = V.GetTBME_J(J, a, b, e, f) * Fmat(e, c) * Fmat(f, d);
+
+            int Jmin = std::max(std::abs(od.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((od.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(d == e && JJ % 2 != 0))
+                W1abcd += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, jd, je, jf) * modelspace.GetSixJ(J, K, JJ, je, jd, jc) * abcd;
+          }
+        }
+
+        for (int e : F.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+        {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          for (int f : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+          {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+
+            double abdc = V.GetTBME_J(J, a, b, e, f) * Fmat(e, d) * Fmat(f, c);
+
+            int Jmin = std::max(std::abs(oc.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oc.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(c == e && JJ % 2 != 0))
+                W1abdc += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, jc, je, jf) * modelspace.GetSixJ(J, K, JJ, je, jc, jd) * abdc;
+          }
+        }
+
+        double W1 = W1abcd - modelspace.phase(jc + jd + J) * W1abdc;
+
+        ///////////////////////////// W2 /////////////////////////////
+
+        double W2abcd = 0.;
+        double W2abdc = 0.;
+
+        for (int f : F.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : F.OneBodyChannels.at({of.l, of.j2, of.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abcd = V.GetTBME_J(J, a, b, c, e) * Fmat(e, f) * Fmat(d, f);
+
+            int Jmin = std::max(std::abs(oc.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oc.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(c == f && JJ % 2 != 0))
+                W2abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, jc, je) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * abcd;
+          }
+        }
+
+        for (int f : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : F.OneBodyChannels.at({of.l, of.j2, of.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abdc = V.GetTBME_J(J, a, b, d, e) * Fmat(e, f) * Fmat(c, f);
+
+            int Jmin = std::max(std::abs(od.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((od.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(d == f && JJ % 2 != 0))
+                W2abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, jd, je) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * abdc;
+          }
+        }
+
+        double W2 = W2abcd - modelspace.phase(jc + jd + J) * W2abdc;
+
+        ///////////////////////////// W3 /////////////////////////////
+
+        double W3abcd = 0.;
+        double W3abdc = 0.;
+        double W3bacd = 0.;
+        double W3badc = 0.;
+
+        for (int f : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            int Jmin = std::max(std::abs(ob.j2 - oe.j2), std::abs(od.j2 - of.j2)) / 2;
+            int Jmax = std::min((ob.j2 + oe.j2), (od.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, b, e, d, f) * Fmat(e, a) * Fmat(f, c);
+          }
+        }
+
+        for (int f : F.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            int Jmin = std::max(std::abs(ob.j2 - oe.j2), std::abs(oc.j2 - of.j2)) / 2;
+            int Jmax = std::min((ob.j2 + oe.j2), (oc.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, b, e, c, f) * Fmat(e, a) * Fmat(f, d);
+          }
+        }
+
+        for (int f : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            int Jmin = std::max(std::abs(oa.j2 - oe.j2), std::abs(od.j2 - of.j2)) / 2;
+            int Jmax = std::min((oa.j2 + oe.j2), (od.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3bacd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, a, e, d, f) * Fmat(e, b) * Fmat(f, c);
+          }
+        }
+
+        for (int f : F.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            int Jmin = std::max(std::abs(oa.j2 - oe.j2), std::abs(oc.j2 - of.j2)) / 2;
+            int Jmax = std::min((oa.j2 + oe.j2), (oc.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3badc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, a, e, c, f) * Fmat(e, b) * Fmat(f, d);
+          }
+        }
+
+        double W3 = W3abcd - modelspace.phase(jc + jd + J) * W3abdc - modelspace.phase(ja + jb + J) * W3bacd + modelspace.phase(ja + jb + J) * modelspace.phase(jc + jd + J) * W3badc;
+
+        ///////////////////////////// W4 /////////////////////////////
+
+        double W4abcd = 0.;
+        double W4abdc = 0.;
+
+        for (int e : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+        {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          for (int f : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+          {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+
+            double abcd = V.GetTBME_J(J, c, d, e, f) * Fmat(e, a) * Fmat(f, b);
+
+            int Jmin = std::max(std::abs(ob.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((ob.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(b == e && JJ % 2 != 0))
+                W4abcd += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, jb, je, jf) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * abcd;
+          }
+        }
+
+        for (int e : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          for (int f : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+          {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+
+            double abdc = V.GetTBME_J(J, c, d, e, f) * Fmat(e, b) * Fmat(f, a);
+
+            int Jmin = std::max(std::abs(oa.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oa.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(a == e && JJ % 2 != 0))
+                W4abdc += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, ja, je, jf) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * abdc;
+          }
+        }
+
+        double W4 = W4abcd - modelspace.phase(ja + jb + J) * W4abdc;
+
+        ///////////////////////////// W5 /////////////////////////////
+
+        double W5abcd = 0.;
+        double W5abdc = 0.;
+
+        for (int f : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : F.OneBodyChannels.at({of.l, of.j2, of.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abcd = V.GetTBME_J(J, c, d, a, e) * Fmat(e, f) * Fmat(b, f);
+
+            int Jmin = std::max(std::abs(oa.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oa.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(a == f && JJ % 2 != 0))
+                W5abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, ja, je) * modelspace.GetSixJ(J, K, JJ, jf, ja, jb) * abcd;
+          }
+        }
+
+        for (int f : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : F.OneBodyChannels.at({of.l, of.j2, of.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abdc = V.GetTBME_J(J, c, d, b, e) * Fmat(e, f) * Fmat(a, f);
+
+            int Jmin = std::max(std::abs(ob.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((ob.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(b == f && JJ % 2 != 0))
+                W5abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, jb, je) * modelspace.GetSixJ(J, K, JJ, jf, jb, ja) * abdc;
+          }
+        }
+
+        double W5 = W5abcd - modelspace.phase(ja + jb + J) * W5abdc;
+
+        ///////////////////////////// TOTAL ///////////////////////////
+
+        double W = (W3 - 0.5 * (W1 + W2 + W4 + W5));
+
+        if (a == b) W /= sqrt(2.0);
+        if (c == d) W /= sqrt(2.0);
+
+        SR.TwoBody.SetTBME(ch, ibra, iket, W);
       }
     }
-    return EL;
+  }
+  return SR;
+}
+
+Operator Mix0(ModelSpace& modelspace, const Operator& LL, const Operator& RR)
+{
+  // Initialize operator
+  Operator LdotR_op(modelspace, 0, 0, 0, 2);
+
+  auto& Lmat = LL.OneBody;
+  auto& Rmat = RR.OneBody;
+
+  int Ll = LL.GetJRank();
+  int Lr = RR.GetJRank();
+
+  if (Ll != Lr) 
+  {
+    std::cout << "Trying to mix different multipole channels: exit" << std::endl;
+    exit(EXIT_FAILURE);
   }
 
-  /// Returns a reduced magnetic multipole operator with units \f$ \mu_{N}\f$ fm\f$ ^{\lambda-1} \f$
-  Operator MagneticMultipoleOp(ModelSpace& modelspace, int L)
-  {
-    return MagneticMultipoleOp_pn(modelspace,L,"both");
-  }
+  int L = Ll;
 
-  /// Returns a reduced magnetic multipole operator with units \f$ \mu_{N}\f$ fm\f$ ^{\lambda-1} \f$
-  /// This version allows for the selection of just proton or just neutron contributions, or both.
-  /// See Suhonen eq. (6.24)
-  Operator MagneticMultipoleOp_pn(ModelSpace& modelspace, int L, std::string pn)
+  //if (L == 0)
+  //  return Mix0_0(modelspace, LL, RR);
+
+  // Filling the one-body part
+  for (int i : modelspace.all_orbits)
   {
-    double bL = pow( HBARC*HBARC/M_NUCLEON/modelspace.GetHbarOmega(),0.5*(L-1));
-    Operator ML(modelspace, L,0,(L+1)%2,2);
-    if (L<1)
+    Orbit& oi = modelspace.GetOrbit(i);
+    double ji = 0.5 * oi.j2;
+
+    for (int j : LdotR_op.OneBodyChannels.at({oi.l, oi.j2, oi.tz2})) // Channels accessible to the scalar operator
     {
-      std::cout << "A magnetic monopole operator??? Setting it to zero..." << std::endl;
-      return ML;
-    }
-    bool spin = true;
-    bool orbit = true;
-    if ( pn.find("spin") != std::string::npos ) orbit = false;
-    if ( pn.find("orbit") != std::string::npos ) spin = false;
-    int norbits = modelspace.GetNumberOrbits();
-    for (int i=0; i<norbits; ++i)
-    {
-      Orbit& oi = modelspace.GetOrbit(i);
-      if (pn=="proton" and oi.tz2>0) continue;
-      if (pn=="neutron" and oi.tz2<0) continue;
-      double gl = oi.tz2<0 ? 1.0 : 0.0;
-//      double gs = oi.tz2<0 ? 5.586 : -3.826;
-      double gs = oi.tz2<0 ? PROTON_SPIN_G : NEUTRON_SPIN_G; // These are 5.586 and -3.826 for proton and neutron, respectively. Defined in PhysicalConstants.hh
-      if (not spin) gs = 0;
-      if (not orbit) gl = 0;
-      double ji = 0.5*oi.j2;
-      for ( int j : ML.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}) )
+      Orbit& oj = modelspace.GetOrbit(j);
+      double jj = 0.5 * oj.j2;
+
+      double me = 0.;
+
+      for (int k : LL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2})) // Channels accessible to the tensor operator
       {
-        if (j<i) continue;
-        Orbit& oj = modelspace.GetOrbit(j);
-        double jj = 0.5*oj.j2;
-        // multiply radial integral by b^L-1 = (hbar/mw)^L-1/2
-        double r2int = RadialIntegral(oi.n,oi.l,oj.n,oj.l,L-1) * bL;
-        double kappa =  modelspace.phase(oi.l+ji+0.5) * (ji+0.5)  +  modelspace.phase(oj.l+jj+0.5) * (jj+0.5);
-        ML.OneBody(i,j) = modelspace.phase(jj+L-0.5) * sqrt( (2*ji+1)*(2*jj+1)*(2*L+1)/4./3.1415926) * AngMom::ThreeJ(ji, jj,L, 0.5,-0.5,0)
-                        * (L - kappa) *(gl*(1+kappa/(L+1.))-0.5*gs )  * r2int ;
-        ML.OneBody(j,i) = modelspace.phase((oi.j2-oj.j2)/2) * ML.OneBody(i,j);
+        Orbit& ok = modelspace.GetOrbit(k);
+        double jk = 0.5 * ok.j2;
+
+        me += 0.5 * (Lmat(k, i) * Rmat(k, j) + Rmat(k, i) * Lmat(k, j));
+      }
+      LdotR_op.OneBody(i,j) = me / (2 * ji + 1);
+    }
+  }
+
+  // Filling the two-body part
+  int nchan = modelspace.GetNumberTwoBodyChannels();
+
+  for (int ch = 0; ch < nchan; ++ch)
+  {
+    TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
+
+    int nkets = tbc.GetNumberKets();
+    int J     = tbc.J;
+
+    for (int ibra = 0; ibra < nkets; ++ibra)
+    {
+      Ket & bra = tbc.GetKet(ibra);
+
+      int i = bra.p;
+      int j = bra.q;
+
+      Orbit & oi = modelspace.GetOrbit(i);
+      Orbit & oj = modelspace.GetOrbit(j);
+
+      double ji = oi.j2 * 0.5;
+      double jj = oj.j2 * 0.5;
+
+      for (int iket = ibra; iket < nkets; ++iket)
+      {
+        Ket & ket = tbc.GetKet(iket);
+
+        int k = ket.p;
+        int l = ket.q;
+
+        Orbit & ok = modelspace.GetOrbit(k);
+        Orbit & ol = modelspace.GetOrbit(l);
+
+        double jk = ok.j2 * 0.5;
+        double jl = ol.j2 * 0.5;
+
+        if (oi.tz2 + oj.tz2 != ok.tz2 + ol.tz2) continue; // Only charge-conserving transitions are allowed up to now
+
+        double Aijkl = 0.5 * modelspace.GetSixJ(ji, jl, L, jk, jj, J) * (Lmat(k, j) * Rmat(i, l) + Rmat(k, j) * Lmat(i, l));
+        double Ajikl = 0.5 * modelspace.GetSixJ(jj, jl, L, jk, ji, J) * (Lmat(k, i) * Rmat(j, l) + Rmat(k, i) * Lmat(j, l));
+
+        double val = 0.;
+
+        if (tbc.Tz == 0) // proton-neutron channel
+        {
+               if (oj.tz2 == ok.tz2) val = Aijkl;                                     // pnpn
+          else if (oi.tz2 == ok.tz2) val = modelspace.phase(ji + jj + J + 1) * Ajikl; // pnnp
+
+          val *= -2.;
+        }
+        else // pppp or nnnn
+        {
+          val = Aijkl - modelspace.phase(ji + jj + J) * Ajikl;
+
+          if (i == j) val /= sqrt(2.0);
+          if (k == l) val /= sqrt(2.0);
+
+          val *= -2.;
+        }
+        LdotR_op.TwoBody.SetTBME(ch, ibra, iket, val);
       }
     }
+  }
+  return LdotR_op;
+}
+
+Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, const Operator& RR)
+{
+  // Initialize operator
+  Operator SR(modelspace, 0, 0, 0, 2);
+
+  auto& Rmat = RR.OneBody;
+  auto& Lmat = LL.OneBody;
+  auto& h    = H.OneBody;
+  auto& V    = H.TwoBody;
+
+  int Ll = LL.GetJRank();
+  int Lr = RR.GetJRank();
+
+  if (Ll != Lr) 
+  {
+    std::cout << "Trying to mix different multipole channels: exit" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  int K = Ll;
+
+  // Filling the one-body part
+  for (int a : modelspace.all_orbits)
+  {
+    Orbit& oa = modelspace.GetOrbit(a);
+    double ja = 0.5 * oa.j2;
+
+    for (int b : SR.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) // Channels accessible to the scalar operator
+    {
+      Orbit& ob = modelspace.GetOrbit(b);
+      double jb = 0.5 * ob.j2;
+
+      // Part 1
+      double m1 = 0.;
+
+      for (int c : H.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+      {
+        Orbit& oc = modelspace.GetOrbit(c);
+        double jc = 0.5 * oc.j2;
+
+        for (int d : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& od = modelspace.GetOrbit(d);
+          double jd = 0.5 * od.j2;
+
+          m1 -= 0.5 * h(a, c) * (Lmat(c, d) * Rmat(b, d) + Rmat(c, d) * Lmat(b, d));
+        }
+      }
+      // Part 2
+      double m2 = 0.;
+
+      for (int c : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+      {
+        Orbit& oc = modelspace.GetOrbit(c);
+        double jc = 0.5 * oc.j2;
+
+        for (int d : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& od = modelspace.GetOrbit(d);
+          double jd = 0.5 * od.j2;
+
+          m2 += 0.5 * h(c, d) * (Lmat(a, c) * Rmat(b, d) + Rmat(a, c) * Lmat(b, d));
+        }
+      }
+      // Part 3
+      double m3 = 0.;
+
+      for (int c : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+      {
+        Orbit& oc = modelspace.GetOrbit(c);
+        double jc = 0.5 * oc.j2;
+
+        for (int d : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& od = modelspace.GetOrbit(d);
+          double jd = 0.5 * od.j2;
+
+          m3 += 0.5 * h(c, d) * (Lmat(c, a) * Rmat(d, b) + Rmat(c, a) * Lmat(d, b));
+        }
+      }
+      // Part 4
+      double m4 = 0.;
+
+      for (int c : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+      {
+        Orbit& oc = modelspace.GetOrbit(c);
+        double jc = 0.5 * oc.j2;
+
+        for (int d : H.OneBodyChannels.at({ob.l, ob.j2, ob.tz2})) // changed
+        {
+          Orbit& od = modelspace.GetOrbit(d);
+          double jd = 0.5 * od.j2;
+
+          m4 -= 0.5 * (Lmat(c, a) * Rmat(c, d) + Rmat(c, a) * Lmat(c, d)) * h(d, b);
+        }
+      }
+
+      double me = m1 + m2 + m3 + m4;
+
+      SR.OneBody(a, b) = 0.5 * me / (2 * ja + 1);
+    }
+  }
+
+  // Filling the two-body part
+  int nchan = modelspace.GetNumberTwoBodyChannels();
+
+  #pragma omp parallel for schedule(dynamic,1) 
+  for (int ch = 0; ch < nchan; ++ch)
+  {
+    TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
+
+    int nkets = tbc.GetNumberKets();
+    int J     = tbc.J;
+
+    // int Jmin = std::abs(J - K);
+    // int Jmax = (J + K);
+
+    for (int ibra = 0; ibra < nkets; ++ibra)
+    {
+      Ket & bra = tbc.GetKet(ibra);
+
+      int a = bra.p;
+      int b = bra.q;
+
+      Orbit & oa = modelspace.GetOrbit(a);
+      Orbit & ob = modelspace.GetOrbit(b);
+
+      double ja = oa.j2 * 0.5;
+      double jb = ob.j2 * 0.5;
+
+      for (int iket = ibra; iket < nkets; ++iket)
+      {
+        Ket & ket = tbc.GetKet(iket);
+
+        int c = ket.p;
+        int d = ket.q;
+
+        Orbit & oc = modelspace.GetOrbit(c);
+        Orbit & od = modelspace.GetOrbit(d);
+
+        double jc = oc.j2 * 0.5;
+        double jd = od.j2 * 0.5;
+
+        //if(oa.tz2 + ob.tz2 != oc.tz2 + od.tz2) continue;
+
+        ///////////////////////////// W1 /////////////////////////////
+
+        double W1abcd = 0.;
+        double W1abdc = 0.;
+
+        for (int e : LL.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+        {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          for (int f : LL.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+          {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+
+            double abcd = 0.5 * V.GetTBME_J(J, a, b, e, f) * (Lmat(e, c) * Rmat(f, d) + Rmat(e, c) * Lmat(f, d));
+
+            int Jmin = std::max(std::abs(od.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((od.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(d == e && JJ % 2 != 0))
+                W1abcd += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, jd, je, jf) * modelspace.GetSixJ(J, K, JJ, je, jd, jc) * abcd;
+          }
+        }
+
+        for (int e : LL.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+        {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          for (int f : LL.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+          {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+
+            double abdc = 0.5 * V.GetTBME_J(J, a, b, e, f) * (Rmat(e, d) * Lmat(f, c) + Lmat(e, d) * Rmat(f, c));
+
+            int Jmin = std::max(std::abs(oc.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oc.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(c == e && JJ % 2 != 0))
+                W1abdc += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, jc, je, jf) * modelspace.GetSixJ(J, K, JJ, je, jc, jd) * abdc;
+          }
+        }
+
+        double W1 = W1abcd - modelspace.phase(jc + jd + J) * W1abdc;
+
+        ///////////////////////////// W2 /////////////////////////////
+
+        double W2abcd = 0.;
+        double W2abdc = 0.;
+
+        for (int f : LL.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : LL.OneBodyChannels.at({of.l, of.j2, of.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abcd = 0.5 * V.GetTBME_J(J, a, b, c, e) * (Lmat(e, f) * Rmat(d, f) + Rmat(e, f) * Lmat(d, f));
+
+            int Jmin = std::max(std::abs(oc.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oc.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(c == f && JJ % 2 != 0))
+                W2abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, jc, je) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * abcd;
+          }
+        }
+
+        for (int f : LL.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : LL.OneBodyChannels.at({of.l, of.j2, of.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abdc = 0.5 * V.GetTBME_J(J, a, b, d, e) * (Rmat(e, f) * Lmat(c, f) + Lmat(e, f) * Rmat(c, f));
+
+            int Jmin = std::max(std::abs(od.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((od.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(d == f && JJ % 2 != 0))
+                W2abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, jd, je) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * abdc;
+          }
+        }
+
+        double W2 = W2abcd - modelspace.phase(jc + jd + J) * W2abdc;
+
+        ///////////////////////////// W3 /////////////////////////////
+
+        double W3abcd = 0.;
+        double W3abdc = 0.;
+        double W3bacd = 0.;
+        double W3badc = 0.;
+
+        for (int f : LL.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            int Jmin = std::max(std::abs(ob.j2 - oe.j2), std::abs(od.j2 - of.j2)) / 2;
+            int Jmax = std::min((ob.j2 + oe.j2), (od.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, b, e, d, f) * (Lmat(e, a) * Rmat(f, c) + Rmat(e, a) * Lmat(f, c));
+          }
+        }
+
+        for (int f : LL.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            int Jmin = std::max(std::abs(ob.j2 - oe.j2), std::abs(oc.j2 - of.j2)) / 2;
+            int Jmax = std::min((ob.j2 + oe.j2), (oc.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, b, e, c, f) * (Lmat(e, a) * Rmat(f, d) + Rmat(e, a) * Lmat(f, d));
+          }
+        }
+
+        for (int f : LL.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            int Jmin = std::max(std::abs(oa.j2 - oe.j2), std::abs(od.j2 - of.j2)) / 2;
+            int Jmax = std::min((oa.j2 + oe.j2), (od.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3bacd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, a, e, d, f) * (Lmat(e, b) * Rmat(f, c) + Rmat(e, b) * Lmat(f, c));
+          }
+        }
+
+        for (int f : LL.OneBodyChannels.at({od.l, od.j2, od.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            int Jmin = std::max(std::abs(oa.j2 - oe.j2), std::abs(oc.j2 - of.j2)) / 2;
+            int Jmax = std::min((oa.j2 + oe.j2), (oc.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3badc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, a, e, c, f) * (Lmat(e, b) * Rmat(f, d) + Rmat(e, b) * Lmat(f, d));
+          }
+        }
+
+        double W3 = W3abcd - modelspace.phase(jc + jd + J) * W3abdc - modelspace.phase(ja + jb + J) * W3bacd + modelspace.phase(ja + jb + J) * modelspace.phase(jc + jd + J) * W3badc;
+
+        ///////////////////////////// W4 /////////////////////////////
+
+        double W4abcd = 0.;
+        double W4abdc = 0.;
+
+        for (int e : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+        {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          for (int f : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+          {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+
+            double abcd = 0.5 * V.GetTBME_J(J, c, d, e, f) * (Lmat(e, a) * Rmat(f, b) + Rmat(e, a) * Lmat(f, b));
+
+            int Jmin = std::max(std::abs(ob.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((ob.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(b == e && JJ % 2 != 0))
+                W4abcd += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, jb, je, jf) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * abcd;
+          }
+        }
+
+        for (int e : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          for (int f : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+          {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+
+            double abdc = 0.5 * V.GetTBME_J(J, c, d, e, f) * (Rmat(e, b) * Lmat(f, a) + Lmat(e, b) * Rmat(f, a));
+
+            int Jmin = std::max(std::abs(oa.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oa.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(a == e && JJ % 2 != 0))
+                W4abdc += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, ja, je, jf) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * abdc;
+          }
+        }
+
+        double W4 = W4abcd - modelspace.phase(ja + jb + J) * W4abdc;
+
+        ///////////////////////////// W5 /////////////////////////////
+
+        double W5abcd = 0.;
+        double W5abdc = 0.;
+
+        for (int f : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : LL.OneBodyChannels.at({of.l, of.j2, of.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abcd = 0.5 * V.GetTBME_J(J, c, d, a, e) * (Lmat(e, f) * Rmat(b, f) + Rmat(e, f) * Lmat(b, f));
+
+            int Jmin = std::max(std::abs(oa.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oa.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(a == f && JJ % 2 != 0))
+                W5abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, ja, je) * modelspace.GetSixJ(J, K, JJ, jf, ja, jb) * abcd;
+          }
+        }
+
+        for (int f : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+        {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+
+          for (int e : LL.OneBodyChannels.at({of.l, of.j2, of.tz2}))
+          {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abdc = 0.5 * V.GetTBME_J(J, c, d, b, e) * (Rmat(e, f) * Lmat(a, f) + Lmat(e, f) * Rmat(a, f));
+
+            int Jmin = std::max(std::abs(ob.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((ob.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(b == f && JJ % 2 != 0))
+                W5abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, jb, je) * modelspace.GetSixJ(J, K, JJ, jf, jb, ja) * abdc;
+          }
+        }
+
+        double W5 = W5abcd - modelspace.phase(ja + jb + J) * W5abdc;
+
+        ///////////////////////////// TOTAL ///////////////////////////
+
+        double W = 0.5 * (W3 - (W1 + W2 + W4 + W5));
+
+        if (a == b) W /= sqrt(2.0);
+        if (c == d) W /= sqrt(2.0);
+
+        SR.TwoBody.SetTBME(ch, ibra, iket, W);
+      }
+    }
+  }
+  return SR;
+}
+
+/// Returns a reduced electric multipole operator with units \f$ e\f$ fm\f$^{\lambda} \f$
+/// See Suhonen eq. (6.23)
+Operator NeutronElectricMultipoleOp(ModelSpace& modelspace, int L, int offset)
+{
+  Operator EL(modelspace, L, 0, L % 2, 2);
+  double bL = pow(HBARC * HBARC / M_NUCLEON / modelspace.GetHbarOmega(), 0.5 * (L + offset)); // b^L where b=sqrt(hbar/mw)
+
+  for (int i : modelspace.neutron_orbits)
+  {
+    Orbit& oi = modelspace.GetOrbit(i);
+    double ji = 0.5 * oi.j2;
+
+    for (int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
+    {
+      if (j<i) continue;
+
+      Orbit& oj = modelspace.GetOrbit(j);
+      double jj = 0.5 * oj.j2;
+
+      double r2int = RadialIntegral(oi.n, oi.l, oj.n, oj.l, L + offset) * bL;
+
+      EL.OneBody(i, j) = modelspace.phase(jj + L - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * L + 1)/ 4. / PI) * AngMom::ThreeJ(ji, jj, L, 0.5, -0.5, 0) * r2int;
+      EL.OneBody(j, i) = modelspace.phase((oi.j2 + oj.j2)/2 + 1) * EL.OneBody(i, j);
+    }
+  }
+  return EL;
+}
+
+/// Returns a reduced magnetic multipole operator with units \f$ \mu_{N}\f$ fm\f$ ^{\lambda-1} \f$
+Operator MagneticMultipoleOp(ModelSpace& modelspace, int L)
+{
+  return MagneticMultipoleOp_pn(modelspace,L,"both");
+}
+
+/// Returns a reduced magnetic multipole operator with units \f$ \mu_{N}\f$ fm\f$ ^{\lambda-1} \f$
+/// This version allows for the selection of just proton or just neutron contributions, or both.
+/// See Suhonen eq. (6.24)
+Operator MagneticMultipoleOp_pn(ModelSpace& modelspace, int L, std::string pn)
+{
+  double bL = pow( HBARC*HBARC/M_NUCLEON/modelspace.GetHbarOmega(),0.5*(L-1));
+  Operator ML(modelspace, L,0,(L+1)%2,2);
+  if (L<1)
+  {
+    std::cout << "A magnetic monopole operator??? Setting it to zero..." << std::endl;
     return ML;
   }
+  bool spin = true;
+  bool orbit = true;
+  if ( pn.find("spin") != std::string::npos ) orbit = false;
+  if ( pn.find("orbit") != std::string::npos ) spin = false;
+  int norbits = modelspace.GetNumberOrbits();
+  for (int i=0; i<norbits; ++i)
+  {
+    Orbit& oi = modelspace.GetOrbit(i);
+    if (pn=="proton" and oi.tz2>0) continue;
+    if (pn=="neutron" and oi.tz2<0) continue;
+    double gl = oi.tz2<0 ? 1.0 : 0.0;
+//      double gs = oi.tz2<0 ? 5.586 : -3.826;
+    double gs = oi.tz2<0 ? PROTON_SPIN_G : NEUTRON_SPIN_G; // These are 5.586 and -3.826 for proton and neutron, respectively. Defined in PhysicalConstants.hh
+    if (not spin) gs = 0;
+    if (not orbit) gl = 0;
+    double ji = 0.5*oi.j2;
+    for ( int j : ML.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}) )
+    {
+      if (j<i) continue;
+      Orbit& oj = modelspace.GetOrbit(j);
+      double jj = 0.5*oj.j2;
+      // multiply radial integral by b^L-1 = (hbar/mw)^L-1/2
+      double r2int = RadialIntegral(oi.n,oi.l,oj.n,oj.l,L-1) * bL;
+      double kappa =  modelspace.phase(oi.l+ji+0.5) * (ji+0.5)  +  modelspace.phase(oj.l+jj+0.5) * (jj+0.5);
+      ML.OneBody(i,j) = modelspace.phase(jj+L-0.5) * sqrt( (2*ji+1)*(2*jj+1)*(2*L+1)/4./3.1415926) * AngMom::ThreeJ(ji, jj,L, 0.5,-0.5,0)
+                      * (L - kappa) *(gl*(1+kappa/(L+1.))-0.5*gs )  * r2int ;
+      ML.OneBody(j,i) = modelspace.phase((oi.j2-oj.j2)/2) * ML.OneBody(i,j);
+    }
+  }
+  return ML;
+}
 
 
 
@@ -2596,8 +3843,6 @@ Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::set<i
     return EL;
   }
 
-
-
 /// Evaluate the radial integral \f[
 /// \tilde{\mathcal{R}}^{\lambda}_{ab} = \int_{0}^{\infty} dx \tilde{g}_{n_a\ell_a}(x)x^{\lambda+2}\tilde{g}_{n_b\ell_b}(x)
 /// \f]
@@ -2607,95 +3852,172 @@ Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::set<i
 /// This implementation uses eq (6.41) from Suhonen.
 /// Note this is only valid for \f$ \ell_a+\ell_b+\lambda\f$ = even.
 /// If \f$ \ell_a+\ell_b+\lambda\f$ is odd, RadialIntegral_RpowK() is called.
-  double RadialIntegral(int na, int la, int nb, int lb, int L)
+double RadialIntegral(int na, int la, int nb, int lb, int L)
+{
+  if ((la + lb + L) % 2 != 0)
+    return RadialIntegral_RpowK(na, la, nb, lb, L);
+
+  int tau_a = std::max((lb - la + L) / 2, 0);
+  int tau_b = std::max((la - lb + L) / 2, 0);
+
+  int sigma_min = std::max(std::max(na - tau_a, nb - tau_b), 0);
+  int sigma_max = std::min(na, nb);
+
+  // For l_a + l_b + L even, follow Eq. (6.41) from Suhonen
+  double term1 = AngMom::phase(na + nb) * gsl_sf_fact(tau_a) * gsl_sf_fact(tau_b) * sqrt(gsl_sf_fact(na) * gsl_sf_fact(nb) / (tgamma(na + la + 1.5) * tgamma(nb + lb + 1.5)));
+  double term2 = 0;
+  for (int sigma = sigma_min; sigma <= sigma_max; ++sigma)
   {
-    if ((la+lb+L)%2!=0) return RadialIntegral_RpowK(na,la,nb,lb,L);
-    int tau_a = std::max((lb-la+L)/2,0);
-    int tau_b = std::max((la-lb+L)/2,0);
-    int sigma_min = std::max(std::max(na-tau_a,nb-tau_b),0);
-    int sigma_max = std::min(na,nb);
-  
-    double term1 = AngMom::phase(na+nb) * gsl_sf_fact(tau_a)*gsl_sf_fact(tau_b) * sqrt(gsl_sf_fact(na)*gsl_sf_fact(nb)
-                   / (tgamma(na+la+1.5)*tgamma(nb+lb+1.5) ) );
-//    double term1 = AngMom::phase(na+nb) * gsl_sf_fact(tau_a)*gsl_sf_fact(tau_b) * sqrt(gsl_sf_fact(na)*gsl_sf_fact(nb)
-//                   / (gsl_sf_gamma(na+la+1.5)*gsl_sf_gamma(nb+lb+1.5) ) );
-    double term2 = 0;
-    for (int sigma=sigma_min; sigma<=sigma_max; ++sigma)
+    term2 += tgamma(0.5 * (la + lb + L) + sigma + 1.5) / (gsl_sf_fact(sigma) * gsl_sf_fact(na - sigma) * gsl_sf_fact(nb - sigma) * gsl_sf_fact(sigma + tau_a - na) * gsl_sf_fact(sigma + tau_b - nb));
+  }
+  return term1 * term2;
+}
+
+// the nomenclature on the variable k has sort of gotten out of hand here...
+double RadialIntegral_RpowK(int na, int la, int nb, int lb, int k)
+{
+  long double I = 0;
+  int pmin = (la + lb) / 2;
+  int pmax = pmin + na + nb;
+
+  //   std::vector<double> Ip(pmax+1);
+  //   Ip[pmin] = TalmiI(pmin,k);
+  //   for (int p=pmin+1; p<=pmax;++p) Ip[p] = (2*p+1+k)/(2*p+1.) * Ip[p-1];
+
+  if (pmax < 20)
+  {
+    for (int p = pmin; p <= pmax; ++p)
     {
-//      term2 += gsl_sf_gamma(0.5*(la+lb+L)+sigma+1.5) / (gsl_sf_fact(sigma)*gsl_sf_fact(na-sigma)*gsl_sf_fact(nb-sigma)*gsl_sf_fact(sigma+tau_a-na)*gsl_sf_fact(sigma+tau_b-nb) );
-      term2 += tgamma(0.5*(la+lb+L)+sigma+1.5) / (gsl_sf_fact(sigma)*gsl_sf_fact(na-sigma)*gsl_sf_fact(nb-sigma)*gsl_sf_fact(sigma+tau_a-na)*gsl_sf_fact(sigma+tau_b-nb) );
+      //        I += TalmiB(na,la,nb,lb,p) * Ip[p];
+      I += TalmiB(na, la, nb, lb, p) * TalmiI(p, k);
+      //        I += AngMom::TalmiB(na,la,nb,lb,p) * TalmiI(p,k);
     }
-    return term1*term2;
-  
+  }
+  else // just do it with quadrature
+  {
+    //     double Iquad = 0;
+    double Norm = 2 * sqrt(tgamma(na + 1) * tgamma(nb + 1) / tgamma(na + la + 1.5) / tgamma(nb + lb + 1.5));
+    //     double Norm = 2*sqrt( gsl_sf_gamma(na+1)*gsl_sf_gamma(nb+1)/gsl_sf_gamma(na+la+1.5)/gsl_sf_gamma(nb+lb+1.5)) ;
+    //     int npoints = 50;
+    //     int npoints = std::min(50,na+nb+(la+lb+1+k)/2+10000);
+    //     int poly_order = na+nb+(la+lb+1+k)/2+1;
+    //     int npoints = std::min(50, 2*poly_order-1);
+    int npoints = 200; // current options for npoints are 0-50, 100, and 200.
+                       //     double I1=0;
+                       //     double I2 = 0;
+    for (int i = 0; i < npoints; i++)
+    {
+      //       double x_i = GaussLaguerre::gauss_laguerre_points[npoints][i][0];
+      //       double w_i = GaussLaguerre::gauss_laguerre_points[npoints][i][1];
+      double x_i = GaussLaguerre::gauss_laguerre_points_200[i][0];
+      double w_i = GaussLaguerre::gauss_laguerre_points_200[i][1];
+      double f_i = Norm * 0.5 * gsl_sf_laguerre_n(na, la + 0.5, x_i) * gsl_sf_laguerre_n(nb, lb + 0.5, x_i) * pow(x_i, 0.5 * (la + lb + 1 + k));
+      I += w_i * f_i;
+    }
   }
 
+  return I;
+  //   return Iquad;
+}
 
- // the nomenclature on the variable k has sort of gotten out of hand here...
- double RadialIntegral_RpowK(int na, int la, int nb, int lb, int k)
- {
-   long double I = 0;
-   int pmin = (la+lb)/2;
-   int pmax = pmin + na + nb;
+double RadialIntegral_Bessel(int na, int la, int nb, int lb, int L, double q, ModelSpace &modelspace)
+{
+  double hw   = modelspace.GetHbarOmega();
+  double bosc = HBARC / sqrt(M_NUCLEON * hw);
 
-//   std::vector<double> Ip(pmax+1);
-//   Ip[pmin] = TalmiI(pmin,k);
-//   for (int p=pmin+1; p<=pmax;++p) Ip[p] = (2*p+1+k)/(2*p+1.) * Ip[p-1];
+  long double I = 0.;
 
-   if (pmax < 20 )
-   {
-     for (int p=pmin;p<=pmax;++p)
-     {
-//        I += TalmiB(na,la,nb,lb,p) * Ip[p];
-        I += TalmiB(na,la,nb,lb,p) * TalmiI(p,k);
-//        I += AngMom::TalmiB(na,la,nb,lb,p) * TalmiI(p,k);
-     }
-   }
-   else // just do it with quadrature
-   {
-//     double Iquad = 0;
-     double Norm = 2*sqrt( tgamma(na+1)*tgamma(nb+1)/tgamma(na+la+1.5)/tgamma(nb+lb+1.5)) ;
-//     double Norm = 2*sqrt( gsl_sf_gamma(na+1)*gsl_sf_gamma(nb+1)/gsl_sf_gamma(na+la+1.5)/gsl_sf_gamma(nb+lb+1.5)) ;
-//     int npoints = 50;
-//     int npoints = std::min(50,na+nb+(la+lb+1+k)/2+10000);
-//     int poly_order = na+nb+(la+lb+1+k)/2+1;
-//     int npoints = std::min(50, 2*poly_order-1);
-     int npoints = 200;  // current options for npoints are 0-50, 100, and 200.
-//     double I1=0;
-//     double I2 = 0;
-     for (int i=0;i<npoints;i++)
-     {
-//       double x_i = GaussLaguerre::gauss_laguerre_points[npoints][i][0];
-//       double w_i = GaussLaguerre::gauss_laguerre_points[npoints][i][1];
-       double x_i = GaussLaguerre::gauss_laguerre_points_200[i][0];
-       double w_i = GaussLaguerre::gauss_laguerre_points_200[i][1];
-       double f_i = Norm * 0.5* gsl_sf_laguerre_n(na,la+0.5,x_i)  * gsl_sf_laguerre_n(nb,lb+0.5,x_i) * pow(x_i,0.5*(la+lb+1+k) )  ;
-       I += w_i * f_i;
-     }
-   }
+  bool Simpson = false; // use for very small q
 
-   return I;
-//   return Iquad;
- }
+  /*if(Simpson) // Using Simpson quadrature
+  {
+    size_t npoints = 99; // should be a multiple of 3 so we can use the Simpson 3/8 rule
 
+    std::vector<double> RGRID(npoints);
+    std::vector<double> BESSEL(npoints);
+    std::vector<double> INTEGRAND(npoints);
 
- double RadialIntegral_Gauss( int na, int la, int nb, int lb, double sigma )
- {
-   long double I = 0;
-   int pmin = (la+lb)/2;
-   int pmax = pmin + na + nb;
-   double kappa = 1.0 / (2*sigma*sigma); // Gaussian exp( -x^2 / (2 sigma^2)) =>  exp(-kappa x^2)
+    double dr   = 8.0 / npoints;
 
-//   if (pmax < 20 )
-//   {
-     for (int p=pmin;p<=pmax;++p)
-     {
-//        I += TalmiB(na,la,nb,lb,p) * TalmiI(p,k);
-        I += TalmiB(na,la,nb,lb,p) * pow(1+kappa, -(p+1.5) )  ; // Talmi integral is analytic
-     }
-//   }
-   return I;
+    for (size_t i = 0; i < npoints; i++)
+    {
+      RGRID[i]     = i * dr;
+      BESSEL[i]    = gsl_sf_bessel_jl(L, q * bosc * RGRID[i]);
+      INTEGRAND[i] = HO_gr(nb, lb, RGRID[i]) * RGRID[i] * RGRID[i] * BESSEL[i] * HO_gr(na, la, RGRID[i]);
 
- }
+      if(i > 2 && i % 3 == 0)
+        I += 3 * INTEGRAND[i - 2] + 3 * INTEGRAND[i - 1] + 2 * INTEGRAND[i]; //occhio
+    }
+
+    I += INTEGRAND[0] + INTEGRAND[npoints - 1];
+    I *= 3. / 8 * dr;
+  }*/
+  if (Simpson)  // Using Simpson quadrature
+  {
+      size_t npoints = 301;  // Should be a multiple of 3 plus 1 for correct interval division
+
+      std::vector<double> RGRID(npoints);
+      std::vector<double> BESSEL(npoints);
+      std::vector<double> INTEGRAND(npoints);
+
+      double dr = 8.0 / double(npoints - 1);
+
+      for (size_t i = 0; i < npoints; i++)
+      {
+          RGRID[i] = i * dr;
+          BESSEL[i] = gsl_sf_bessel_jl(L, q * bosc * RGRID[i]);
+          INTEGRAND[i] = HO_gr(nb, lb, RGRID[i]) * RGRID[i] * RGRID[i] * BESSEL[i] * HO_gr(na, la, RGRID[i]);
+      }
+
+      // Apply Simpson's 3/8 rule
+      I = INTEGRAND[0] + INTEGRAND[npoints - 1];
+
+      for (size_t i = 1; i < npoints - 1; i++)
+      {
+          if (i % 3 == 0)
+              I += 2 * INTEGRAND[i];  // Coefficient 2 for multiples of 3
+          else
+              I += 3 * INTEGRAND[i];  // Coefficient 3 for others
+      }
+
+      I *= 3.0 / 8.0 * dr;  // Final multiplication factor
+  }
+  else // Using Gauss-Laguerre quadrature
+  {
+    double Norm = sqrt(tgamma(na + 1) * tgamma(nb + 1) / tgamma(na + la + 1.5) / tgamma(nb + lb + 1.5));
+
+    int npoints = 200; // current options for npoints are 0-50, 100, and 200.
+
+    for (int i = 0; i < npoints; i++)
+    {
+      //double x_i = GaussLaguerre::gauss_laguerre_points[npoints][i][0]; // From 0 to 50 points
+      //double w_i = GaussLaguerre::gauss_laguerre_points[npoints][i][1]; // From 0 to 50 points
+      double x_i = GaussLaguerre::gauss_laguerre_points_200[i][0];
+      double w_i = GaussLaguerre::gauss_laguerre_points_200[i][1];
+      double f_i = Norm * gsl_sf_laguerre_n(na, la + 0.5, x_i) * gsl_sf_laguerre_n(nb, lb + 0.5, x_i) * pow(x_i, 0.5 * (la + lb + 1)) * gsl_sf_bessel_jl(L, pow(x_i, 0.5) * q * bosc);
+
+      I += w_i * f_i;
+    }
+  } 
+  return I;
+}
+
+double RadialIntegral_Gauss(int na, int la, int nb, int lb, double sigma)
+{
+  long double I = 0;
+
+  int pmin = (la + lb) / 2;
+  int pmax = pmin + na + nb;
+
+  double kappa = 1.0 / (2 * sigma * sigma); // Gaussian exp( -x^2 / (2 sigma^2)) =>  exp(-kappa x^2)
+
+  for (int p = pmin; p <= pmax; ++p)
+  {
+    // I += TalmiB(na,la,nb,lb,p) * TalmiI(p,k);
+    I += TalmiB(na, la, nb, lb, p) * pow(1 + kappa, -(p + 1.5)); // Talmi integral is analytic
+  }
+  return I;
+}
 
 /// General Talmi integral for a potential r**k
 /// 1/gamma(p+3/2) * 2*INT dr r**2 r**2p r**k exp(-r**2/b**2)
@@ -3082,47 +4404,55 @@ Operator L_Op_pn(ModelSpace &modelspace, std::string pn) {
  // < ij J || Q * Q || kl J > where Q is the quadrupole operator (possibly up to overall factors like square roots of pi, etc...)
  Operator QdotQ_Op(ModelSpace& modelspace)
  {
-    
-//   // temporarily store <i||Q||j> in the one body part.
-   Operator QdotQ_op(modelspace,0,0,0,2);
-   Operator E2op = ElectricMultipoleOp(modelspace,2) + NeutronElectricMultipoleOp(modelspace,2);
-   auto& Qmat = E2op.OneBody;
+  Operator QdotQ_op(modelspace, 0, 0, 0, 2);
+  // temporarily store <i||Q||j> in the one body part.
+  Operator E2op = ElectricMultipoleOp(modelspace, 2) + NeutronElectricMultipoleOp(modelspace, 2); // to make more general for other multipolarities
+
+  auto& Qmat = E2op.OneBody;
 
    int nchan = modelspace.GetNumberTwoBodyChannels();
 
-   for (int ch=0; ch<nchan; ++ch)
+   for (int ch = 0; ch < nchan; ++ch)
    {
       TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
+
       int nkets = tbc.GetNumberKets();
-      int J = tbc.J;
-      for (int ibra=0;ibra<nkets;++ibra)
+      int J     = tbc.J;
+
+      for (int ibra = 0; ibra < nkets; ++ibra)
       {
          Ket & bra = tbc.GetKet(ibra);
+
          int i = bra.p;
          int j = bra.q;
+
          Orbit & oi = modelspace.GetOrbit(i);
          Orbit & oj = modelspace.GetOrbit(j);
-         double ji = oi.j2*0.5;
-         double jj = oj.j2*0.5;
 
-         for (int iket=ibra;iket<nkets;++iket)
+         double ji = oi.j2 * 0.5;
+         double jj = oj.j2 * 0.5;
+
+         for (int iket = ibra; iket < nkets; ++iket)
          {
-            
             Ket & ket = tbc.GetKet(iket);
+
             int k = ket.p;
             int l = ket.q;
+
             Orbit & ok = modelspace.GetOrbit(k);
             Orbit & ol = modelspace.GetOrbit(l);
-            double jk = ok.j2*0.5;
-            double jl = ol.j2*0.5 ;
+
+            double jk = ok.j2 * 0.5;
+            double jl = ol.j2 * 0.5;
 
             // Suhonen (8.56)
-            double Aijkl = modelspace.phase(ji+jj+J) * modelspace.GetSixJ(ji,jj,J,jl,jk,2) * Qmat(k,i) * Qmat(j,l);
-            double Aijlk = modelspace.phase(ji+jj+J) * modelspace.GetSixJ(ji,jj,J,jk,jl,2) * Qmat(l,i) * Qmat(j,k);
-//            double Aijlk = modelspace.phase(jk+jl+J) * modelspace.phase(ji+jj+J) * modelspace.GetSixJ(ji,jj,J,jk,jl,2) * Qmat(l,i) * Qmat(j,k);
+            double Aijkl = modelspace.phase(ji + jj + J) * modelspace.GetSixJ(ji, jj, J, jl, jk, 2) * Qmat(k,i) * Qmat(j,l);
+            double Aijlk = modelspace.phase(ji + jj + J) * modelspace.GetSixJ(ji, jj, J, jk, jl, 2) * Qmat(l,i) * Qmat(j,k);
+            //  double Aijlk = modelspace.phase(jk+jl+J) * modelspace.phase(ji+jj+J) * modelspace.GetSixJ(ji,jj,J,jk,jl,2) * Qmat(l,i) * Qmat(j,k);
             // Suhonen (8.55),(8.57),(8.58)
             double QdQ;
-            if ( tbc.Tz==0 ) // proton-neutron channel
+
+            if (tbc.Tz == 0) // proton-neutron channel
             {
               if ( oi.tz2 == ok.tz2)   QdQ = Aijkl;  // pnpn
               else                     QdQ = -modelspace.phase(jk+jl+J) * Aijlk;  // pnnp
@@ -3130,8 +4460,8 @@ Operator L_Op_pn(ModelSpace &modelspace, std::string pn) {
             else
             {
                QdQ = Aijkl - modelspace.phase(jk+jl+j)*Aijlk;  // pppp or nnnn
-               if (i==j) QdQ /= sqrt(2.0);
-               if (k==l) QdQ /= sqrt(2.0);
+               if (i == j) QdQ /= sqrt(2.0);
+               if (k == l) QdQ /= sqrt(2.0);
             }
 
             QdotQ_op.TwoBody.SetTBME(ch,ibra,iket,QdQ);
@@ -5699,9 +7029,27 @@ Operator L_Op_pn(ModelSpace &modelspace, std::string pn) {
 
   }
 
+  void printKernel(std::ostream& out, double qL, double qR, double mom0_0, double mom1_0, double mom0_s, double mom1_s)
+  {
+    out << std::setw(10) << "qL"
+        << std::setw(10) << "qR"
+        << std::setw(16) << "mom0_HF"
+        << std::setw(16) << "mom1_HF"
+        << std::setw(16) << "mom0_imsrg"
+        << std::setw(16) << "mom1_imsrg" << std::endl;
 
+    out << std::fixed << std::setprecision(3);
+    out << std::setw(10) << qL
+        << std::setw(10) << qR;
 
- 
+    out << std::fixed << std::setprecision(8);
+    out << std::fixed << std::scientific;  // Use scientific notation
+    out << std::setw(16) << mom0_0
+        << std::setw(16) << mom1_0
+        << std::setw(16) << mom0_s
+        << std::setw(16) << mom1_s << std::endl;
+  }
+
 
 }// namespace imsrg_util
 

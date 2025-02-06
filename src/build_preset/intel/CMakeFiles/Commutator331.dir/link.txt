@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libCommutator331.a CMakeFiles/Commutator331.dir/Commutator331.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libCommutator331.a

@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libModelSpace.a CMakeFiles/ModelSpace.dir/ModelSpace.cc.o CMakeFiles/ModelSpace.dir/TwoBodyChannel.cc.o CMakeFiles/ModelSpace.dir/ThreeBodyChannel.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libModelSpace.a

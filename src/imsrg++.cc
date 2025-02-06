@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 //    imsrg++.cc, part of  imsrg++
 //    Copyright (C) 2018  Ragnar Stroberg
 //
@@ -42,8 +42,7 @@
 //    You should have received a copy of the GNU General Public License along
 //    with this program; if not, write to the Free Software Foundation, Inc.,
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-///////////////////////////////////////////////////////////////////////////////////
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 #include <iostream>
@@ -53,6 +52,7 @@
 #include <stdio.h>
 #include <string>
 #include <omp.h>
+#include <boost/format.hpp>
 #include "Commutator.hh"
 #include "IMSRG.hh"
 #include "Parameters.hh"
@@ -72,6 +72,7 @@ int main(int argc, char** argv)
   Parameters parameters(argc,argv);
   if (parameters.help_mode) return 0;
 
+  std::string inputobme = parameters.s("1bme");
   std::string inputtbme = parameters.s("2bme");
   std::string input3bme = parameters.s("3bme");
   std::string input3bme_type = parameters.s("3bme_type");
@@ -83,6 +84,7 @@ int main(int argc, char** argv)
   std::string method = parameters.s("method");
   std::string flowfile = parameters.s("flowfile");
   std::string intfile = parameters.s("intfile");
+  std::string omefile = parameters.s("omefile");
   std::string core_generator = parameters.s("core_generator");
   std::string valence_generator = parameters.s("valence_generator");
   std::string fmt2 = parameters.s("fmt2");
@@ -96,6 +98,8 @@ int main(int argc, char** argv)
   std::string physical_system = parameters.s("physical_system");
   std::string denominator_partitioning = parameters.s("denominator_partitioning");
   std::string NAT_order = parameters.s("NAT_order");
+  std::string iso_ch = parameters.s("isospin_ch");
+  std::string kerdir = parameters.s("kerdir");
 
   bool use_brueckner_bch = parameters.s("use_brueckner_bch") == "true";
   bool nucleon_mass_correction = parameters.s("nucleon_mass_correction") == "true";
@@ -123,6 +127,10 @@ int main(int argc, char** argv)
   bool write_HO_ops = parameters.s("write_HO_ops") == "true";  // added by Antoine Belley
   bool write_HF_ops = parameters.s("write_HF_ops") == "true";  // added by Antoine Belley
   bool use_HF_reference_in_NAT = parameters.s("use_HF_reference_in_NAT") == "true";
+  bool sum_rule = parameters.s("moments") == "true";
+  bool kernel = parameters.s("kernel") == "true";
+  bool write_H = parameters.s("write_Hamiltonian") == "true";
+  bool write_omega_me = parameters.s("write_omega_me") == "true";
 
   int eMax = parameters.i("emax");
   int lmax = parameters.i("lmax"); // so far I only use this with atomic systems.
@@ -143,14 +151,8 @@ int main(int argc, char** argv)
   int e3Max_imsrg = parameters.i("e3max_imsrg");
   int eMax_3body_imsrg = parameters.i("emax_3body_imsrg");
   int imsrg3_commutator_depth = parameters.i("imsrg3_commutator_depth");
-//  if ( not ( eMax_imsrg==-1 and e2Max_imsrg==-1 and e3Max_imsrg==-1 ) )
-//  {
-//    if ( eMax_imsrg==-1 ) eMax_imsrg = eMax;
-//    if ( e2Max_imsrg==-1 ) e2Max_imsrg = 2*eMax_imsrg;
-//    if ( e3Max_imsrg==-1 ) e3Max_imsrg = std::min( E3max, 3*eMax_imsrg);
-//  }
-////  if (e2Max_imsrg==-1 and eMax_imsrg != -1) e2Max_imsrg = 2*eMax_imsrg;
-////  if (e3Max_imsrg==-1 and eMax_imsrg != -1) e3Max_imsrg = std::min(E3max, 3*eMax_imsrg);
+  int L_MixMom = parameters.i("L_MixMom");
+  int N_Magnus = parameters.i("N_Magnus");
 
   double hw = parameters.d("hw");
   double smax = parameters.d("smax");
@@ -168,6 +170,10 @@ int main(int argc, char** argv)
   double OccNat3Cut = parameters.d("OccNat3Cut");
   double threebody_threshold = parameters.d("threebody_threshold");
 
+  double pol = parameters.d("polarisability"); // To evaluate m_-1 (TEST, needs multiple evaluations)
+  double qL = parameters.d("qL");
+  double qR = parameters.d("qR");
+
   std::vector<std::string> opnames = parameters.v("Operators");
   std::vector<std::string> opsfromfile = parameters.v("OperatorsFromFile");
   std::vector<std::string> opnamesPT1 = parameters.v("OperatorsPT1");
@@ -181,8 +187,7 @@ int main(int argc, char** argv)
   using PhysConst::NEUTRON_RCH2;
   using PhysConst::DARWIN_FOLDY;
 
-
-  // test 2bme file
+  // Test 2bme file
   if (inputtbme != "none" and fmt2.find("oakridge")==std::string::npos and fmt2 != "schematic" )
   {
     if( not std::ifstream(inputtbme).good() )
@@ -191,7 +196,7 @@ int main(int argc, char** argv)
       return 1;
     }
   }
-  // test 3bme file
+  // Test 3bme file
   if (input3bme != "none")
   {
     if( not std::ifstream(input3bme).good() )
@@ -432,22 +437,27 @@ if (opff.file2name != "") {
   }
 
 
-//  std::cout << "Making the Hamiltonian..." << std::endl;
-  int particle_rank = input3bme=="none" ? 2 : 3;
-  Operator Hbare = Operator(modelspace,0,0,0,particle_rank);
-  Hbare.SetHermitian();
+  //  Hamiltonian settings
+  int particle_rank = input3bme == "none" ? 2 : 3;
 
+  Operator Hbare = Operator(modelspace, 0, 0, 0, particle_rank);
+
+  Hbare.SetHermitian();
 
   Commutator::SetUseGooseTank(goose_tank);
   Commutator::SetThreebodyThreshold(threebody_threshold);
 
   std::cout << "Reading interactions..." << std::endl;
 
-
   if (inputtbme != "none")
   {
     if (fmt2 == "me2j")
       rw.ReadBareTBME_Darmstadt(inputtbme, Hbare,file2e1max,file2e2max,file2lmax);
+    if (fmt2 == "me2jp")
+    {
+      rw.Read_me1j (inputobme, Hbare, file2e1max, file2lmax);
+      rw.Read_me2jp(inputtbme, Hbare, file2e1max, file2e2max, file2lmax);
+    }
     else if (fmt2 == "navratil" or fmt2 == "Navratil")
       rw.ReadBareTBME_Navratil(inputtbme, Hbare);
     else if (fmt2 == "oslo" )
@@ -469,8 +479,7 @@ if (opff.file2name != "") {
       std::cout << "using schematic potential " << inputtbme << std::endl;
       if ( inputtbme == "Minnesota") Hbare += imsrg_util::MinnesotaPotential( modelspace );
     }
-
-    std::cout << "done reading 2N" << std::endl;
+    std::cout << "Done reading 2N" << std::endl;
   }
 
   // Read in the 3-body file
@@ -482,13 +491,11 @@ if (opff.file2name != "") {
     }
     if(input3bme_type == "no2b")
     {
-
       Hbare.ThreeBody.SetMode("no2b");
       if (no2b_precision == "half")  Hbare.ThreeBody.SetMode("no2bhalf");
 
       Hbare.ThreeBody.ReadFile( {input3bme}, {file3e1max, file3e2max, file3e3max, file3e1max} );
       rw.File3N = input3bme;
-
     }
     else if(input3bme_type == "mono")
     {
@@ -504,12 +511,8 @@ if (opff.file2name != "") {
     Hbare.ThreeBody.TransformToPN();
   }
 
-
-
-
   if (inputtbme == "none" and physical_system == "atomic")
   {
-
     using PhysConst::M_ELECTRON;
     using PhysConst::M_NUCLEON;
     int Z = (atomicZ>=0) ?  atomicZ : modelspace.GetTargetZ() ;
@@ -519,9 +522,19 @@ if (opff.file2name != "") {
     Hbare /= PhysConst::HARTREE; // Convert to Hartree
   }
 
-  if (fmt2 != "nushellx" and physical_system != "atomic" and hw_trap < 0)  // Don't need to add kinetic energy if we read a shell model interaction
+  if (fmt2 != "nushellx" and fmt2 != "me2jp" and physical_system != "atomic" and hw_trap < 0)  // Don't need to add kinetic energy if we read a shell model interaction
   {
-    Hbare += imsrg_util::Trel_Op(modelspace);
+    Hbare += imsrg_util::Trel_Op(modelspace); 
+    //Hbare += imsrg_util::KineticEnergy_Op(modelspace); // added for local RPA test
+
+    if (pol != 0.) // Added for evaluating the monopole IEWSR
+    {
+      std::cout << "POLARISABILITY" << std::endl;
+      Operator mono = imsrg_util::RSquaredOp(modelspace);
+      
+      Hbare += pol * mono;
+    }
+
     if (Hbare.OneBody.has_nan())
     {
        std::cout << "  Looks like the Trel op is hosed from the get go. Dying." << std::endl;
@@ -537,7 +550,7 @@ if (opff.file2name != "") {
   }
 
   // correction to kinetic energy because M_proton != M_neutron
-  if ( nucleon_mass_correction)
+  if (nucleon_mass_correction)
   {
     Hbare += imsrg_util::Trel_Masscorrection_Op(modelspace);
   }
@@ -547,9 +560,6 @@ if (opff.file2name != "") {
     Hbare += imsrg_util::KineticEnergy_RelativisticCorr(modelspace);
   }
 
-
-
-
   // Add a Lawson center of mass term. If hwBetaCM is specified, use that frequency, otherwise use the basis frequency
   if (std::abs(BetaCM)>1e-3)
   {
@@ -558,9 +568,6 @@ if (opff.file2name != "") {
     hcm_opname << "HCM_" << hwBetaCM;
     Hbare += BetaCM * imsrg_util::OperatorFromString( modelspace, hcm_opname.str());
   }
-
-
-
 
   std::cout << "Creating HF" << std::endl;
   HFMBPT hf(Hbare); // HFMBPT inherits from HartreeFock, so this works for HF and NAT bases.
@@ -1213,11 +1220,11 @@ if (opff.file2name != "") {
       // exit(-1);
     // }
 
-//    int nOmega = imsrgsolver.GetOmegaSize() + imsrgsolver.GetNOmegaWritten();
-//    std::cout << "Undoing NO wrt A=" << modelspace.GetAref() << " Z=" << modelspace.GetZref() << std::endl;
+    //    int nOmega = imsrgsolver.GetOmegaSize() + imsrgsolver.GetNOmegaWritten();
+    //    std::cout << "Undoing NO wrt A=" << modelspace.GetAref() << " Z=" << modelspace.GetZref() << std::endl;
     std::cout << "Undoing NO wrt A=" << modelspace_imsrg.GetAref() << " Z=" << modelspace_imsrg.GetZref() << std::endl;
     std::cout << "Before doing so, the spes are " << std::endl;
-//    for ( auto i : modelspace.all_orbits ) std::cout << "  " << i << " : " << HNO.OneBody(i,i) << std::endl;
+    //    for ( auto i : modelspace.all_orbits ) std::cout << "  " << i << " : " << HNO.OneBody(i,i) << std::endl;
     for ( auto i : modelspace_imsrg.all_orbits ) std::cout << "  " << i << " : " << HNO.OneBody(i,i) << std::endl;
     if (IMSRG3)
     {
@@ -1350,9 +1357,6 @@ if (opff.file2name != "") {
     }
   }
 
-
-
-
 /////////////////////
 /// Transform operators and write them
 
@@ -1361,7 +1365,6 @@ if (opff.file2name != "") {
     Commutator::SetUseIMSRG3N7(false);
     Commutator::SetUseIMSRG3_MP4(false);
   }
-
 
   if ((method == "magnus") || (method == "magnus_backoff"))
   {
@@ -1375,8 +1378,386 @@ if (opff.file2name != "") {
 
     int count_from_file =0;
 
-
     if (opnames.size()>0) std::cout << "transforming operators" << std::endl;
+
+    // fetch Hamiltonian
+    Operator H_HF = *(imsrgsolver.H_0);
+    Operator Hs = imsrgsolver.GetH_s();
+
+    // Evaluating Sum Rules for the monopole operator before and after the IMSRG flow
+    if(sum_rule)
+    {
+      H_HF = H_HF.UndoNormalOrdering();
+      arma::mat CHO  = hf.C;
+      arma::mat CHOt = CHO.t();
+      Operator H0_HO = H_HF.Transform(CHOt); // Hamiltonioan in the HO basis
+
+      double bosc = PhysConst::HBARC / sqrt(PhysConst::M_NUCLEON * hw);
+
+      double qmin = 0.1;
+      double qmax = 2. * bosc;
+      double dq   = 0.1;
+
+      int L = L_MixMom; // select multipolarity, default is 0
+      std::string pn = iso_ch; // select isospin channel, default is proton
+      
+      std::vector<double>   qs;
+      std::vector<Operator> Opq;
+      std::vector<Operator> Opq_mono;
+
+      // Initialising transition operator
+
+      Operator TransOp = Operator(modelspace, 0, 0, 0, 2);
+
+      if (L == 0)
+        TransOp = imsrg_util::ElectricMultipoleOp(modelspace, L, 2, pn);
+      else
+        TransOp = imsrg_util::ElectricMultipoleOp(modelspace, L, 0, pn);
+
+      Opq.push_back(TransOp);
+      qs.push_back(0.);
+
+      if (L == 0)
+      {
+        Operator Monopole = imsrg_util::RSquaredOp(modelspace, pn);
+        Monopole /= sqrt(4 * PhysConst::PI);
+
+        Opq_mono.push_back(Monopole);
+      }
+
+      // Initialising Bessel operators
+      
+      for( double q = qmin; q < qmax; q += dq)
+      {
+        Operator BesselOp = imsrg_util::BesselMultipoleOp(modelspace, L, q, pn);
+
+        Opq.push_back(BesselOp);
+        qs.push_back(q);
+
+        if (L == 0)
+        {
+          Operator BesselMono = imsrg_util::BesselMonopoleOp(modelspace, q, pn);
+          BesselMono /= sqrt(4 * PhysConst::PI);
+
+          Opq_mono.push_back(BesselMono);
+        }
+      }
+
+      for( int i = 0; i < qs.size(); i++)
+      {
+        for( int j = 0; j < qs.size(); j++) // for( int j = 0; j < i + 1; j++) check monopole for symmetry before reducing the dimensionality
+        {
+          Operator Op1 = Opq.at(i);
+          Operator Op2 = Opq.at(j);
+
+          Operator MixMom0 = imsrg_util::Mix0(modelspace, Op1, Op2);
+          Operator MixMom1 = imsrg_util::Mix1(modelspace, H0_HO, Op1, Op2);
+
+          MixMom0 = hf.TransformToHFBasis(MixMom0).DoNormalOrdering();
+          MixMom1 = hf.TransformToHFBasis(MixMom1).DoNormalOrdering();
+
+          if (L == 0)
+          {
+            Op1 = hf.TransformToHFBasis(Opq_mono.at(i)).DoNormalOrdering();
+            Op2 = hf.TransformToHFBasis(Opq_mono.at(j)).DoNormalOrdering();
+          }
+
+          double mom0_0 = MixMom0.ZeroBody;
+          double mom1_0 = MixMom1.ZeroBody;
+
+          if (L == 0)
+            mom0_0 -= Op1.ZeroBody * Op2.ZeroBody;
+
+          MixMom0 = imsrgsolver.Transform(MixMom0);
+          MixMom1 = imsrgsolver.Transform(MixMom1);
+
+          if (L == 0)
+          {
+            Op1 = imsrgsolver.Transform(Op1);
+            Op2 = imsrgsolver.Transform(Op2);
+          }
+
+          double mom0_s = MixMom0.ZeroBody;
+          double mom1_s = MixMom1.ZeroBody;
+
+          if (L == 0)
+            mom0_s -= Op1.ZeroBody * Op2.ZeroBody;
+
+          std::cout << i << " " << j << " " << qs.at(i) << " " << qs.at(j) << " " << std::scientific << mom0_0 << " " << mom1_0 << " " << mom0_s << " " << mom1_s << std::endl;
+        }
+      }
+      /////////
+      Operator Monopole = imsrg_util::ElectricMultipoleOp(modelspace, 0, 2) + imsrg_util::NeutronElectricMultipoleOp(modelspace, 0, 2);
+
+      if (basis == "oscillator")
+        Monopole = Monopole.DoNormalOrdering();
+      else if (basis == "HF")
+        Monopole = hf.TransformToHFBasis(Monopole).DoNormalOrdering();
+      else if (basis == "NAT")
+        Monopole = hf.TransformHOToNATBasis(Monopole).DoNormalOrdering();
+
+      Operator Monopole_s = imsrgsolver.Transform(Monopole);
+
+      std::cout << "Energy and Excitation Operator expectation values, lda = " << pol << std::endl;
+      std::cout << std::endl;
+      std::cout << "E(0) = " << H_HF.ZeroBody << "   Q(0) = " << Monopole.ZeroBody   << std::endl;
+      std::cout << "E(s) = " << Hs.ZeroBody   << "   Q(s) = " << Monopole_s.ZeroBody << std::endl;
+      std::cout << std::endl;
+
+      if (pol == 0.)
+      {
+        Operator M0 = imsrg_util::Mom0(modelspace, Monopole); // Remember to multiply by 4 * PI the result
+        Operator M1 = Commutator::EvaluateCommutatorSumRule_op(Monopole, H_HF, 1);
+
+        if (basis == "oscillator")
+          M0 = M0.DoNormalOrdering();
+        else if (basis == "HF")
+          M0 = hf.TransformToHFBasis(M0).DoNormalOrdering();
+        else if (basis == "NAT")
+          M0 = hf.TransformHOToNATBasis(M0).DoNormalOrdering();
+
+        Operator M0_s = imsrgsolver.Transform(M0);
+        Operator M1_s = imsrgsolver.Transform(M1);
+
+        std::cout << "Monopole moments values" << std::endl;
+        std::cout << std::endl;
+        std::cout << "M0(0) = " << M0.ZeroBody   << "   M1(0) = " << - 1./2. * M1.ZeroBody   << std::endl;
+        std::cout << "M0(s) = " << M0_s.ZeroBody << "   M1(s) = " << - 1./2. * M1_s.ZeroBody << std::endl;
+        std::cout << std::endl;
+
+        //Operator op_s = imsrgsolver.Transform(Monopole);
+
+        // sum rules at HF and IMSRG level
+        /*if(Monopole.rank_J == 0)
+        {
+          std::cout << "Mean field values for sum rules" << std::endl;
+          Commutator::EvaluateCommutatorSumRule(Monopole,H_HF,9);
+          Commutator::EvaluateCommutatorSumRuleSymmetric(Monopole,H_HF,9);
+    
+          
+          Operator S1 = Commutator::EvaluateCommutatorSumRule_op(Monopole, Hs, 1);   // Using evolved H and unevolved operator
+          Operator Ss = Commutator::EvaluateCommutatorSumRule_op(op_s, Hs, 1); // Using both evolved H and operator
+          
+
+          std::cout << "m1 sum rule with unevolved H and op:  " << - 1./2. * S0.ZeroBody << std::endl;
+          std::cout << "m1 sum rule with evolved H and un op: " << - 1./2. * S1.ZeroBody << std::endl;
+          std::cout << "m1 sum rule with evolved H and op:    " << - 1./2. * Ss.ZeroBody << std::endl;
+          std::cout << "m1 sum rule with evolved S0:          " << - 1./2. * Sn.ZeroBody << std::endl;
+
+          std::cout << "IMSRG values for sum rules" << std::endl;
+          Commutator::EvaluateCommutatorSumRule(Monopole,Hs,9);
+          Commutator::EvaluateCommutatorSumRuleSymmetric(Monopole,Hs,9);
+        }*/
+      }
+    }
+
+    if (kernel)
+    {
+      H_HF = H_HF.UndoNormalOrdering();
+      arma::mat CHO  = hf.C;
+      arma::mat CHOt = CHO.t();
+      Operator H0_HO = H_HF.Transform(CHOt); // Hamiltonioan in the HO basis
+
+      int L = L_MixMom; // select multipolarity, default is 0
+      std::string pn = iso_ch; // select isospin channel, default is proton
+
+      // Initialising left and right operators
+
+      Operator OpL = Operator(modelspace, 0, 0, 0, 2);
+      Operator OpR = Operator(modelspace, 0, 0, 0, 2);
+
+      Operator OpSubL = Operator(modelspace, 0, 0, 0, 2);
+      Operator OpSubR = Operator(modelspace, 0, 0, 0, 2);
+
+      if (L == 0) // In the monopole case one needs to set the operator to subtract
+      {
+        if (qL == 0)
+        {
+          OpL     = imsrg_util::ElectricMultipoleOp(modelspace, L, 2, pn);
+          OpSubL  = imsrg_util::RSquaredOp(modelspace, pn);
+          OpSubL /= sqrt(4 * PhysConst::PI);
+        }
+        else
+        {
+          OpL     = imsrg_util::BesselMultipoleOp(modelspace, L, qL, pn);
+          OpSubL  = imsrg_util::BesselMonopoleOp(modelspace, qL, pn);
+          OpSubL /= sqrt(4 * PhysConst::PI);
+        }
+        if (qR == 0)
+        {
+          OpR     = imsrg_util::ElectricMultipoleOp(modelspace, L, 2, pn);
+          OpSubR  = imsrg_util::RSquaredOp(modelspace, pn);
+          OpSubR /= sqrt(4 * PhysConst::PI);
+        }
+        else
+        {
+          OpR     = imsrg_util::BesselMultipoleOp(modelspace, L, qR, pn);
+          OpSubR  = imsrg_util::BesselMonopoleOp(modelspace, qR, pn);
+          OpSubR /= sqrt(4 * PhysConst::PI);
+        }
+      }
+      else // Otherwise not
+      {
+        if (qL == 0)
+          OpL = imsrg_util::ElectricMultipoleOp(modelspace, L, 0, pn);
+        else
+          OpL = imsrg_util::BesselMultipoleOp(modelspace, L, qL, pn);
+        if (qR == 0)
+          OpR = imsrg_util::ElectricMultipoleOp(modelspace, L, 0, pn);
+        else
+          OpR = imsrg_util::BesselMultipoleOp(modelspace, L, qR, pn);
+      }
+
+      Operator MixMom0 = imsrg_util::Mix0(modelspace, OpL, OpR);
+      Operator MixMom1 = imsrg_util::Mix1(modelspace, H0_HO, OpL, OpR);
+
+      MixMom0 = hf.TransformToHFBasis(MixMom0).DoNormalOrdering();
+      MixMom1 = hf.TransformToHFBasis(MixMom1).DoNormalOrdering();
+
+      if (L == 0)
+      {
+        OpSubL = hf.TransformToHFBasis(OpSubL).DoNormalOrdering();
+        OpSubR = hf.TransformToHFBasis(OpSubR).DoNormalOrdering();
+      }
+
+      double mom0_0 = MixMom0.ZeroBody;
+      double mom1_0 = MixMom1.ZeroBody;
+
+      if (L == 0)
+        mom0_0 -= OpSubL.ZeroBody * OpSubR.ZeroBody;
+
+      // Previous implementation with only one BCH-contracted operator
+
+      // Operator Magnus = Operator(modelspace, 0, 0, 0, 2);
+
+      // Magnus.SetAntiHermitian();
+
+      // rw.Read_me1j (omefile + ".me1j.gz",  Magnus, eMax, eMax);
+      // rw.Read_me2jp(omefile + ".me2jp.gz", Magnus, eMax, 2 * eMax, eMax);
+
+      // MixMom0 = Commutator::BCH_Transform(MixMom0, Magnus);
+      // MixMom1 = Commutator::BCH_Transform(MixMom1, Magnus);
+
+      // if (L == 0)
+      // {
+      //   OpSubL = Commutator::BCH_Transform(OpSubL, Magnus);
+      //   OpSubR = Commutator::BCH_Transform(OpSubR, Magnus);
+      // }
+
+      for (int i = 0; i < N_Magnus; i++)
+      {
+        Operator Magnus_i = Operator(modelspace, 0, 0, 0, 2);
+
+        Magnus_i.SetAntiHermitian();
+
+        rw.Read_me1j (omefile + "_" + std::to_string(i) + ".me1j.gz",  Magnus_i, eMax, eMax);
+        rw.Read_me2jp(omefile + "_" + std::to_string(i) + ".me2jp.gz", Magnus_i, eMax, 2 * eMax, eMax);
+
+        MixMom0 = Commutator::BCH_Transform(MixMom0, Magnus_i);
+        MixMom1 = Commutator::BCH_Transform(MixMom1, Magnus_i);
+
+        if (L == 0)
+        {
+          OpSubL = Commutator::BCH_Transform(OpSubL, Magnus_i);
+          OpSubR = Commutator::BCH_Transform(OpSubR, Magnus_i);
+        }
+      }
+
+      double mom0_s = MixMom0.ZeroBody;
+      double mom1_s = MixMom1.ZeroBody;
+
+      if (L == 0)
+        mom0_s -= OpSubL.ZeroBody * OpSubR.ZeroBody;
+
+      //std::string filename = kerdir + "/L=" + std::to_string(L) + "_" + pn + "_" + std::to_string(qL) + "_" + std::to_string(qR) + ".dat";
+
+      auto ss = boost::format{"%s/L=%i_%s_%.3f_%.3f.dat"} % kerdir % L % pn % qL % qR;
+      std::string filename = ss.str();
+
+      imsrg_util::printKernel(std::cout, qL, qR, mom0_0, mom1_0, mom0_s, mom1_s);
+
+      // Print to file
+      std::ofstream file(filename);
+      if (file)
+      {
+        imsrg_util::printKernel(file, qL, qR, mom0_0, mom1_0, mom0_s, mom1_s);
+        file.close();
+        std::cout << "Data written to " << filename << std::endl;
+      }
+      else
+      {
+        std::cout << "Error opening file " << filename << std::endl;
+      }
+    }
+
+    // Write the original and evolved Hamiltonian in the HO basis
+    if (write_H)
+    {
+      int emax_imsrg = eMax;
+
+      // H(0): generate vacuum represetations (HF basis)
+      H_HF = H_HF.UndoNormalOrdering();
+
+      // Transformation from HF to HO basis
+      arma::mat CHO  = hf.C;
+      arma::mat CHOt = CHO.t();
+
+      // Transform H(0) from the HF to the HO basis and write to file
+      Operator H0_HO = H_HF.Transform(CHOt);
+
+      rw.Write_me1j(intfile + ".me1j.gz", H0_HO, emax_imsrg, emax_imsrg);                    // One-body part
+      rw.Write_me2jp(intfile + ".me2jp.gz", H0_HO, emax_imsrg, 2 * emax_imsrg, emax_imsrg);  // Two-body part
+
+      bool write_evolved_H = false;
+
+      if (smax != 0. && write_evolved_H)
+      {
+        // H(s): generate vacuum represetations (HF basis)
+        Hs = Hs.UndoNormalOrdering();
+
+        // Transform H(0) from the HF to the HO basis and write to file
+        Operator Hs_HO = Hs.Transform(CHOt);
+
+        rw.Write_me1j (intfile + "_s" + std::to_string(smax) + ".me1j.gz",  Hs_HO, emax_imsrg, emax_imsrg);                  // One-body part
+        rw.Write_me2jp(intfile + "_s" + std::to_string(smax) + ".me2jp.gz", Hs_HO, emax_imsrg, 2 * emax_imsrg, emax_imsrg);  // Two-body part
+      }        
+    }
+
+    // Print the Magnus operator, Andrea 30/01/2025
+    if (write_omega_me)
+    {
+      std::cout << "--------- Writing Omega ---------" << std::endl; 
+      int emax_imsrg = eMax;
+
+      std::cout << "Number of Omega[i]:\t" << imsrgsolver.Omega.size() << std::endl;
+      std::cout << std::endl;
+
+      std::cout << "Printing the BCH-contracted operator" << std::endl;
+      std::cout << std::endl;
+
+      Operator Omega = imsrgsolver.GetOmega(0);
+
+      for (size_t i = 1; i < imsrgsolver.Omega.size(); ++i)
+      {
+        Operator step = imsrgsolver.GetOmega(i);
+        Omega = Commutator::BCH_Product(Omega, step);
+      }
+
+      rw.Write_me1j (omefile + ".me1j.gz",  Omega, emax_imsrg, emax_imsrg);                  // One-body part
+      rw.Write_me2jp(omefile + ".me2jp.gz", Omega, emax_imsrg, 2 * emax_imsrg, emax_imsrg);  // Two-body part
+
+      std::cout << std::endl;
+      std::cout << "Printing the Omega[i] operators" << std::endl;
+      std::cout << std::endl;
+
+      for (size_t i = 0; i < imsrgsolver.Omega.size(); ++i)
+      {
+        Operator Omega_i = imsrgsolver.Omega[i];
+        
+        rw.Write_me1j (omefile + "_" + std::to_string(i) + ".me1j.gz",  Omega_i, emax_imsrg, emax_imsrg);                  // One-body part
+        rw.Write_me2jp(omefile + "_" + std::to_string(i) + ".me2jp.gz", Omega_i, emax_imsrg, 2 * emax_imsrg, emax_imsrg);  // Two-body part
+      }
+    }
 
     for (size_t i=0;i<opnames.size();++i)
     {
@@ -1427,7 +1808,7 @@ if (opff.file2name != "") {
       {
          op = imsrg_util::OperatorFromString( modelspace, opname );
       }
-//      Operator op = imsrg_util::OperatorFromString( modelspace, opname );
+      // Operator op = imsrg_util::OperatorFromString( modelspace, opname );
 
 
       // Added by Antoine Belley
@@ -1444,10 +1825,6 @@ if (opff.file2name != "") {
           rw.WriteTensorTwoBody(intfile+opnames[i]+"_HO_2b.op",op,opnames[i]);
         }
       }
-
-
-
-
 
       if ( basis == "oscillator" or opname=="OccRef") {
         op = op.DoNormalOrdering();
@@ -1480,51 +1857,7 @@ if (opff.file2name != "") {
         }
       }
 
-      // fetch Hamiltonian
-      Operator H_HF = *(imsrgsolver.H_0);
-      Operator Hs = imsrgsolver.GetH_s();
 
-      bool sum_rule = false;
-
-      std::cout << "Operator: " << opnames[i] << std::endl;      
-
-      op = imsrgsolver.Transform(op);
-
-      // sum rules at HF and IMSRG level
-      if(op.rank_J == 0){
-        std::cout << "Mean field values for sum rules" << std::endl;
-        Commutator::EvaluateCommutatorSumRule(op,H_HF,9);
-        Commutator::EvaluateCommutatorSumRuleSymmetric(op,H_HF,9);
-
-        std::cout << "IMSRG values for sum rules" << std::endl;
-        Commutator::EvaluateCommutatorSumRule(op,Hs,9);
-      }
-
-      int emax_imsrg = eMax;
-      std::string emax_imsrg_string = std::to_string(emax_imsrg);
-
-      // O(s): generate vacuum represetation and write to file
-      op = op.UndoNormalOrdering();
-      rw.Write_me1j(intfile + "_" + opnames[i] + "_" + emax_imsrg_string + ".me1j", op, emax_imsrg, emax_imsrg);
-      if(op.rank_J == 0){
-        rw.Write_me2jp(intfile + "_" + opnames[i] + "_" + emax_imsrg_string + ".me2jp", op, emax_imsrg, 2* emax_imsrg, emax_imsrg);
-      }
-
-      // H(s): generate vacuum represetation and write to file
-      Hs = Hs.UndoNormalOrdering();
-      
-      //rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j", Hs, emax_imsrg, emax_imsrg);
-      //rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp", Hs, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
-
-      arma::mat CHO  = hf.C;
-      arma::mat CHOt = CHO.t(); // Transformation from HF to HO basis
-
-      // Transform H(s) from the HF to the HO basis and write to file
-
-      Operator Hs_HO = Hs.Transform(CHOt);
-
-      rw.Write_me1j(intfile + "_" + emax_imsrg_string + ".me1j_A", Hs_HO, emax_imsrg, emax_imsrg);
-      rw.Write_me2jp(intfile + "_" + emax_imsrg_string + ".me2jp_A", Hs_HO, emax_imsrg, 2 * emax_imsrg, emax_imsrg);
 
       // Unclear whether we should do NO2B here as well...
       // std::cout << "Before renormal ordering Op(5,4) is " << std::setprecision(10) << op.OneBody(5,4) << std::endl;
@@ -1668,7 +2001,7 @@ if (opff.file2name != "") {
        outputfile << intfile << "_Omega_" << i;
        // rw.CopyFile( inputfile.str(), outputfile.str() );
     }
-//    rw.WriteOmega(intfile,scratch, imsrgsolver.n_omega_written);
+    //    rw.WriteOmega(intfile,scratch, imsrgsolver.n_omega_written);
 
 
 
@@ -1716,7 +2049,7 @@ if (opff.file2name != "") {
 
 
 
-//    bool filesucess = hf.C.save(intfile+"C.mat");
+    //    bool filesucess = hf.C.save(intfile+"C.mat");
     if (filesucess == false)
     {
       std::cout<<"Couldn't save HF coefficient matrix."<<std::endl;

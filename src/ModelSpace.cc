@@ -1834,46 +1834,44 @@ void ModelSpace::MoshinskyUnHash(uint64_t key,uint64_t& N,uint64_t& Lam,uint64_t
 
 double ModelSpace::GetSixJ(double j1, double j2, double j3, double J1, double J2, double J3)
 {
-// { j1 j2 j3 }
-// { J1 J2 J3 }
-   uint64_t key = SixJHash(j1,j2,j3,J1,J2,J3);
+  // { j1 j2 j3 }
+  // { J1 J2 J3 }
+  uint64_t key = SixJHash(j1, j2, j3, J1, J2, J3);
 
-   const auto it = SixJList.find(key);
-   double sixj=0.0;
-   if (it != SixJList.end() )
-   {
-     sixj = it->second;
-   }
-   else
-   {
-    sixj = AngMom::SixJ(j1,j2,j3,J1,J2,J3);
-//    if (not sixj_has_been_precalculated)
-    if (omp_get_num_threads()<2)
+  const auto it = SixJList.find(key);
+  double sixj = 0.0;
+  if (it != SixJList.end())
+  {
+    sixj = it->second;
+  }
+  else
+  {
+    sixj = AngMom::SixJ(j1, j2, j3, J1, J2, J3);
+    //    if (not sixj_has_been_precalculated)
+    if (omp_get_num_threads() < 2)
     {
-      #pragma omp critical
+#pragma omp critical
       {
         SixJList[key] = sixj;
       }
     }
-    else
+    /*else
     {
-//      printf("DANGER!!!!!!!  Updating SixJList inside a parellel loop breaks thread safety!\n");
-//      printf(" I shouldn't be here in GetSixJ(%.1f %.1f %.1f %.1f %.1f %.1f).  key =%" PRIx64 "   sixj=%f\n",j1,j2,j3,J1,J2,J3,key,sixj); //PRIx64 is portable uint64_t format
+      //      printf("DANGER!!!!!!!  Updating SixJList inside a parellel loop breaks thread safety!\n");
+      //      printf(" I shouldn't be here in GetSixJ(%.1f %.1f %.1f %.1f %.1f %.1f).  key =%" PRIx64 "   sixj=%f\n",j1,j2,j3,J1,J2,J3,key,sixj); //PRIx64 is portable uint64_t format
       std::cout << "DANGER!!!!!!!  Updating SixJList inside a parellel loop breaks thread safety!" << std::endl;
       std::cout << "  I shouldn't be here in GetSixJ("
                 << std::setprecision(1) << std::fixed << j1 << " " << std::setprecision(1) << std::fixed << j2 << " "
                 << std::setprecision(1) << std::fixed << j3 << " " << std::setprecision(1) << std::fixed << J1 << " "
                 << std::setprecision(1) << std::fixed << J2 << " " << std::setprecision(1) << std::fixed << J3 << "). key = "
                 << std::hex << key << "   sixj = " << std::dec << sixj << std::endl;
-      profiler.counter["N_CalcSixJ_in_Parallel_loop"] +=1;
-//      quick_exit(EXIT_FAILURE);
+      profiler.counter["N_CalcSixJ_in_Parallel_loop"] += 1;
+      //      quick_exit(EXIT_FAILURE);
       exit(EXIT_FAILURE);
-    }
-   }
-   return sixj;
+    }*/
+  }
+  return sixj;
 }
-
-
 
 /// Loop over all the 6j symbols that we expect to encounter, and 
 /// store them in a hash table.
@@ -1893,90 +1891,90 @@ double ModelSpace::GetSixJ(double j1, double j2, double j3, double J1, double J2
 ///
 void ModelSpace::PreCalculateSixJ()
 {
-  if (sixj_has_been_precalculated) return;
+  if (sixj_has_been_precalculated)
+    return;
   std::cout << "Precalculating SixJ's" << std::endl;
   double t_start = omp_get_wtime();
   std::vector<uint64_t> KEYS;
-  for (int j2a=1; j2a<=(2*Emax+1); j2a+=2)
+  for (int j2a = 1; j2a <= (2 * Emax + 1); j2a += 2)
   {
-//   for (int j2b=1; j2b<=(2*Emax+1); j2b+=2)
-   for (int j2b=1; j2b<=3*(2*Emax+1); j2b+=2)
-   {
-    for (int j2c=1; j2c<=(2*Emax+1); j2c+=2)
+    // for (int j2b=1; j2b<=(2*Emax+1); j2b+=2)
+    for (int j2b = 1; j2b <= 3 * (2 * Emax + 1); j2b += 2)
     {
-     // four half-integer j's,  two integer J's
-     for (int j2d=1; j2d<=3*(2*Emax+1); j2d+=2)
-     {
-      if ( j2b > std::max(j2d,2*Emax+1) ) continue;
-      // J1 couples a,b, and c,d;  J2 couples a,d and b,c
-      // int J1_min = std::max( std::abs(j2a-j2b), std::abs(j2c-j2d) );
-      // int J1_max = std::min( j2a+j2b, j2c+j2d );
-      // int J2_min = std::max( std::abs(j2a-j2d), std::abs(j2b-j2c) );
-      // int J2_max = std::min( j2a+j2d, j2b+j2c );
-      // We extend the hash table to include symbols outside the coupling range for computational gain.
-      // We may want to revert this change at some point.
-      for (int J1=0; J1<=2*(Emax * 2 + 1); J1+=2)
+      for (int j2c = 1; j2c <= (2 * Emax + 1); j2c += 2)
       {
-       for (int J2=0; J2<=2*(Emax*2 + 1); J2+=2)
-       {
-         uint64_t key = SixJHash(0.5*j2a,0.5*j2b,0.5*J1,0.5*j2c,0.5*j2d,0.5*J2);
-         if ( SixJList.count(key) == 0 ) 
-         {
-           KEYS.push_back(key);
-           SixJList[key] = 0.; // Make sure eveything's in there to avoid a rehash in the parallel loop
-         }
-       } // for J2
-      } // for J1
-     } // for j2d
-//     if ( j2b > (2*Emax+1) ) continue;
+        // four half-integer j's,  two integer J's
+        for (int j2d = 1; j2d <= 3 * (2 * Emax + 1); j2d += 2)
+        {
+          if (j2b > std::max(j2d, 2 * Emax + 1))
+            continue;
+          // J1 couples a, b, and c, d;  J2 couples a, d and b, c
+          // int J1_min = std::max( std::abs(j2a - j2b), std::abs(j2c - j2d) );
+          // int J1_max = std::min( j2a+j2b, j2c + j2d);
+          // int J2_min = std::max( std::abs(j2a - j2d), std::abs(j2b - j2c) );
+          // int J2_max = std::min( j2a+j2d, j2b + j2c);
+          // We extend the hash table to include symbols outside the coupling range for computational gain.
+          // We may want to revert this change at some point.
+          for (int J1 = 0; J1 <= 2 * (Emax * 2 + 1); J1 += 2)
+          {
+            for (int J2 = 0; J2 <= 2 * (Emax * 2 + 1); J2 += 2)
+            {
+              uint64_t key = SixJHash(0.5 * j2a, 0.5 * j2b, 0.5 * J1, 0.5 * j2c, 0.5 * j2d, 0.5 * J2);
+              if (SixJList.count(key) == 0)
+              {
+                KEYS.push_back(key);
+                SixJList[key] = 0.; // Make sure eveything's in there to avoid a rehash in the parallel loop
+              }
+            } // for J2
+          } // for J1
+        } // for j2d
+        //     if ( j2b > (2*Emax+1) ) continue;
 
-     // three half-integer j's, three integer J's
-     // <J1,J2|J3>  <a,b|J3>,  <J1,b|c>  <a,J2|c>
-//     int J1_min = std::abs(j2a-j2c) ;
-//     int J1_max = j2a+j2c;
-//     int J2_min = std::abs(j2b-j2c) ;
-//     int J2_max = j2b+j2c;
-     int J1_min = std::abs(j2b-j2c) ;
-     int J1_max = j2b+j2c;
-     int J2_min = std::abs(j2a-j2c) ;
-     int J2_max = j2a+j2c;
-     for (int J1=J1_min; J1<=J1_max; J1+=2)
-     {
-      for (int J2=J2_min; J2<=J2_max; J2+=2)
-      {
-       int J3_min = std::max( std::abs(J1-J2), std::abs(j2a-j2b) );
-       int J3_max = std::min( J1+J2, j2a+j2b );
-       for (int J3=J3_min; J3<=J3_max; J3+=2)
-       {
-         uint64_t key = SixJHash(0.5*J1,0.5*J2,0.5*J3,0.5*j2a,0.5*j2b,0.5*j2c);
-         if ( SixJList.count(key) == 0 ) 
-         {
-           KEYS.push_back(key);
-           SixJList[key] = 0.; // Make sure eveything's in there to avoid a rehash in the parallel loop
-         }
-       }// for J3
-      }// for J2
-     }// for J1
-    }// for j2c
-   }// for j2b
-  }// for j2a
+        // three half-integer j's, three integer J's
+        // <J1,J2|J3>  <a,b|J3>,  <J1,b|c>  <a,J2|c>
+        //     int J1_min = std::abs(j2a-j2c) ;
+        //     int J1_max = j2a+j2c;
+        //     int J2_min = std::abs(j2b-j2c) ;
+        //     int J2_max = j2b+j2c;
+        int J1_min = std::abs(j2b - j2c);
+        int J1_max = j2b + j2c;
+        int J2_min = std::abs(j2a - j2c);
+        int J2_max = j2a + j2c;
+        for (int J1 = J1_min; J1 <= J1_max; J1 += 2)
+        {
+          for (int J2 = J2_min; J2 <= J2_max; J2 += 2)
+          {
+            int J3_min = std::max(std::abs(J1 - J2), std::abs(j2a - j2b));
+            int J3_max = std::min(J1 + J2, j2a + j2b);
+            for (int J3 = J3_min; J3 <= J3_max; J3 += 2)
+            {
+              uint64_t key = SixJHash(0.5 * J1, 0.5 * J2, 0.5 * J3, 0.5 * j2a, 0.5 * j2b, 0.5 * j2c);
+              if (SixJList.count(key) == 0)
+              {
+                KEYS.push_back(key);
+                SixJList[key] = 0.; // Make sure eveything's in there to avoid a rehash in the parallel loop
+              }
+            } // for J3
+          } // for J2
+        } // for J1
+      } // for j2c
+    } // for j2b
+  } // for j2a
 
-  #pragma omp parallel for schedule(dynamic,1)
-  for (size_t i=0;i< KEYS.size(); ++i)
+#pragma omp parallel for schedule(dynamic, 1)
+  for (size_t i = 0; i < KEYS.size(); ++i)
   {
-    uint64_t j1,j2,j3,J1,J2,J3;
+    uint64_t j1, j2, j3, J1, J2, J3;
     uint64_t key = KEYS[i];
-    SixJUnHash(key, j1,j2,j3,J1,J2,J3);
-    SixJList[key] = AngMom::SixJ(0.5*j1,0.5*j2,0.5*j3,0.5*J1,0.5*J2,0.5*J3);
+    SixJUnHash(key, j1, j2, j3, J1, J2, J3);
+    SixJList[key] = AngMom::SixJ(0.5 * j1, 0.5 * j2, 0.5 * j3, 0.5 * J1, 0.5 * J2, 0.5 * J3);
   }
   sixj_has_been_precalculated = true;
   std::cout << "done calculating sixJs (" << KEYS.size() << " of them)" << std::endl;
-  std::cout << "Hash table has " << SixJList.bucket_count() << " buckets and a load factor " << SixJList.load_factor() 
-       << "  estimated storage ~ " << ((SixJList.bucket_count()+SixJList.size()) * (sizeof(size_t)+sizeof(void*))) / (1024.*1024.*1024.) << " GB" << std::endl;
+  std::cout << "Hash table has " << SixJList.bucket_count() << " buckets and a load factor " << SixJList.load_factor()
+            << "  estimated storage ~ " << ((SixJList.bucket_count() + SixJList.size()) * (sizeof(size_t) + sizeof(void *))) / (1024. * 1024. * 1024.) << " GB" << std::endl;
   profiler.timer[__func__] += omp_get_wtime() - t_start;
 }
-
-
 
 void ModelSpace::PreCalculateNineJ()
 {

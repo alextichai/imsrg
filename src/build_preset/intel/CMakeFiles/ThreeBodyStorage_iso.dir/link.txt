@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libThreeBodyStorage_iso.a CMakeFiles/ThreeBodyStorage_iso.dir/ThreeBodyStorage_iso.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libThreeBodyStorage_iso.a

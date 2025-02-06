@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libM0nu.a CMakeFiles/M0nu.dir/M0nu.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libM0nu.a

@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-10/root/usr/bin/ar qc libThreeBodyStorage_no2b.a CMakeFiles/ThreeBodyStorage_no2b.dir/ThreeBodyStorage_no2b.cc.o
+/opt/rh/gcc-toolset-10/root/usr/bin/ranlib libThreeBodyStorage_no2b.a

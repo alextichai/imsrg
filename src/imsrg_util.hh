@@ -43,15 +43,15 @@ namespace imsrg_util
  Operator NumberOp(ModelSpace& modelspace, int n, int l, int j2, int tz2);
  Operator NumberOpAlln(ModelSpace& modelspace, int l, int j2, int tz2);
  Operator NumberOpRef(ModelSpace& modelspace);
- Operator  OneBodyDensity(ModelSpace& modelspace,index_t i,index_t j);
+ Operator OneBodyDensity(ModelSpace& modelspace,index_t i,index_t j);
  Operator PSquaredOp(ModelSpace& modelspace);
- Operator RSquaredOp(ModelSpace& modelspace);
+ Operator RSquaredOp(ModelSpace& modelspace, std::string pn = "isoscalar");
  Operator E0Op(ModelSpace& modelspace);
  Operator MultipoleResponseOp(ModelSpace& modelspace, int rL, int YL, int isospin);
  Operator IVDipoleOp(ModelSpace& modelspace, int rL, int YL);
  Operator ISDipoleOp(ModelSpace& modelspace, int rL, int YL, double Rms);
- Operator ElectricMultipoleOp(ModelSpace& modelspace, int L);
- Operator NeutronElectricMultipoleOp(ModelSpace& modelspace, int L);
+ Operator ElectricMultipoleOp(ModelSpace& modelspace, int L, int offset = 0, std::string pn = "proton");
+ Operator NeutronElectricMultipoleOp(ModelSpace& modelspace, int L, int offset = 0);
  Operator IntrinsicElectricMultipoleOp(ModelSpace& modelspace, int L);
  Operator MagneticMultipoleOp(ModelSpace& modelspace, int L);
  Operator MagneticMultipoleOp_pn(ModelSpace& modelspace, int L, std::string pn);
@@ -93,12 +93,21 @@ namespace imsrg_util
  Operator RdotR(ModelSpace& modelspace);
  Operator DensityAtR(ModelSpace& modelspace, double R, std::string pn);
  Operator FormfactorAtQ(ModelSpace& modelspace, double q, std::string pn);
-// Operator ProtonDensityAtR(ModelSpace& modelspace, double R);
-// Operator NeutronDensityAtR(ModelSpace& modelspace, double R);
+ // Operator ProtonDensityAtR(ModelSpace& modelspace, double R);
+ // Operator NeutronDensityAtR(ModelSpace& modelspace, double R);
  Operator RpSpinOrbitCorrection(ModelSpace& modelspace);
  Operator RpSpinOrbitCorrectionWrong(ModelSpace& modelspace);
  //Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::vector<index_t> index_list);
  Operator FourierBesselCoeff(ModelSpace& modelspace, int nu, double R, std::set<index_t> index_list);
+
+ Operator Mom0(ModelSpace& modelspace, const Operator& F);
+ Operator Mom1(ModelSpace& modelspace, const Operator& H, const Operator& F);
+ Operator Mix0(ModelSpace& modelspace, const Operator& L, const Operator& R);
+ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& L, const Operator& R);
+ Operator Mix0_0(ModelSpace& modelspace, const Operator& L, const Operator& R);
+
+ Operator BesselMultipoleOp(ModelSpace &modelspace, int L, double q, std::string pn = "isoscalar");
+ Operator BesselMonopoleOp (ModelSpace &modelspace, double q, std::string pn = "isoscalar");
 
  Operator Isospin2_Op(ModelSpace& modelspace);
  Operator AllowedFermi_Op(ModelSpace& modelspace);
@@ -187,9 +196,11 @@ namespace imsrg_util
  double Calculate_r1r2(ModelSpace& modelspace, Ket & bra, Ket & ket, int J);
  double HO_density(int n, int l, double hw, double r);
  double HO_Radial_psi(int n, int l, double hw, double r);
+ double HO_gr(int n, int l, double hw, double r);
  double RadialIntegral(int na, int la, int nb, int lb, int L);
  double RadialIntegral_RpowK(int na, int la, int nb, int lb, int k);
  double RadialIntegral_Gauss( int na, int la, int nb, int lb, double sigma );
+ double RadialIntegral_Bessel(int na, int la, int nb, int lb, int L, double q, ModelSpace& modelspace);
  long double TalmiI(int p, double k);
  long double TalmiB(int na, int la, int nb, int lb, int p);
  long double TalmiB_SingleTerm(int na, int la, int nb, int lb, int p, int K);
@@ -210,6 +221,8 @@ namespace imsrg_util
  void UnReduce(Operator&);
 
  void SplitUp(Operator& OpIn, Operator& OpLow, Operator& OpHi, int ecut);
+
+ void printKernel(std::ostream& out, double qL, double qR, double mom0_0, double mom1_0, double mom0_s, double mom1_s);
 
 /*
 // Templated functions need to be defined in the header file (or else explicitly declared in the .cc file).

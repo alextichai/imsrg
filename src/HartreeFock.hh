@@ -96,6 +96,7 @@ class HartreeFock
 //   Operator GetNormalOrderedH();  ///< Return the Hamiltonian in the HF basis at the normal-ordered 2body level.
    Operator GetNormalOrderedH(int particle_rank=2);  ///< Return the Hamiltonian in the HF basis at the normal-ordered 2body level.
    Operator GetNormalOrderedH(arma::mat& Cin, int particle_rank=2);  ///< Return the Hamiltonian in the HF basis at the normal-ordered 2body level.
+   Operator GetTransformedH(arma::mat& Cin, double E0, int particle_rank=2);
    Operator GetOmega();           ///< Return a generator of the Hartree Fock transformation
    Operator GetHbare(){return Hbare;}; ///< Getter function for Hbare
    void PrintSPE(); ///< Print out the single-particle energies
