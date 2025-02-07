@@ -102,6 +102,7 @@ namespace imsrg_util
 
  Operator Mom0(ModelSpace& modelspace, const Operator& F);
  Operator Mom1(ModelSpace& modelspace, const Operator& H, const Operator& F);
+ Operator Mom1_opt(ModelSpace& modelspace, const Operator& H, const Operator& F);
  Operator Mix0(ModelSpace& modelspace, const Operator& L, const Operator& R);
  Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& L, const Operator& R);
  Operator Mix0_0(ModelSpace& modelspace, const Operator& L, const Operator& R);

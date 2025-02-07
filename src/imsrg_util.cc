@@ -3109,6 +3109,387 @@ Operator Mom1(ModelSpace& modelspace, const Operator& H, const Operator& F)
   return SR;
 }
 
+// Energy-weighted sum rule
+// See Lu and Johnson, Phys. Rev. C 97, 034330 (2018)
+// Added and benchmarked 16/12/2024, Andrea
+Operator Mom1_opt(ModelSpace& modelspace, const Operator& H, const Operator& F)
+{
+  // Initialize operator
+  Operator SR(modelspace, 0, 0, 0, 2);
+
+  auto& Fmat = F.OneBody;
+  auto& h    = H.OneBody;
+  auto& V    = H.TwoBody;
+
+  int K = F.GetJRank();
+
+  // cut on matrix elements in loops
+  double prec = 1e-8;
+
+  SR.OneBody -= h * Fmat * Fmat.t();
+  SR.OneBody += Fmat * h * Fmat.t();
+  SR.OneBody += Fmat.t() * h * Fmat;
+  SR.OneBody -= Fmat.t() * Fmat * h;
+
+  // reduce operator
+  for (int a : modelspace.all_orbits) {
+    Orbit& oa = modelspace.GetOrbit(a);
+    double ja = 0.5 * oa.j2;
+
+    for (int b : SR.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) {
+      Orbit& ob = modelspace.GetOrbit(b);
+      double jb = 0.5 * ob.j2;
+
+      SR.OneBody(a, b) *= 0.5 * (2 * ja + 1);
+    }
+  }
+
+  // Filling the two-body part
+  int nchan = modelspace.GetNumberTwoBodyChannels();
+
+  #pragma omp parallel for schedule(dynamic,1) 
+  for (int ch = 0; ch < nchan; ++ch) {
+    TwoBodyChannel& tbc = modelspace.GetTwoBodyChannel(ch);
+
+    int nkets = tbc.GetNumberKets();
+    int J     = tbc.J;
+
+    for (int ibra = 0; ibra < nkets; ++ibra) {
+      Ket & bra = tbc.GetKet(ibra);
+
+      int a = bra.p;
+      int b = bra.q;
+
+      Orbit & oa = modelspace.GetOrbit(a);
+      Orbit & ob = modelspace.GetOrbit(b);
+
+      double ja = oa.j2 * 0.5;
+      double jb = ob.j2 * 0.5;
+
+      for (int iket = ibra; iket < nkets; ++iket) {
+        Ket & ket = tbc.GetKet(iket);
+
+        int c = ket.p;
+        int d = ket.q;
+
+        Orbit & oc = modelspace.GetOrbit(c);
+        Orbit & od = modelspace.GetOrbit(d);
+
+        double jc = oc.j2 * 0.5;
+        double jd = od.j2 * 0.5;
+
+        ///////////////////////////// W1 /////////////////////////////
+        double W1abcd = 0.;
+        double W1abdc = 0.;
+
+        for (int e : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2})) {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          double me1 = Fmat(e,c);
+          if(abs(me1) < prec) continue;
+
+          for (int f : F.OneBodyChannels.at({od.l, od.j2, od.tz2})) {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+            double me2 = Fmat(f,d);
+            if(abs(me2) < prec) continue;
+
+            double abcd = V.GetTBME_J(J, a, b, e, f) * me1 * me2;
+            if(abs(abcd) < prec) continue;
+
+            int Jmin = std::max(std::abs(od.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((od.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(d == e && JJ % 2 != 0))
+                W1abcd += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, jd, je, jf) * modelspace.GetSixJ(J, K, JJ, je, jd, jc) * abcd;
+          }
+        }
+
+        for (int e : F.OneBodyChannels.at({od.l, od.j2, od.tz2})) {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+          double me1 = Fmat(e,d);
+
+          for (int f : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2})) {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+            double me2 = Fmat(f, c);
+
+            double abdc = V.GetTBME_J(J, a, b, e, f) * me1 * me2;
+
+            int Jmin = std::max(std::abs(oc.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oc.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(c == e && JJ % 2 != 0))
+                W1abdc += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, jc, je, jf) * modelspace.GetSixJ(J, K, JJ, je, jc, jd) * abdc;
+          }
+        }
+
+        double W1 = W1abcd - modelspace.phase(jc + jd + J) * W1abdc;
+
+        ///////////////////////////// W2 /////////////////////////////
+
+        double W2abcd = 0.;
+        double W2abdc = 0.;
+
+        for (int e : F.OneBodyChannels.at({of.l, of.j2, of.tz2})) {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+          double me1 = V.GetTBME_J(J, a, b, c, e);
+          if(abs(me1) < prec) continue;
+
+          for (int f : F.OneBodyChannels.at({od.l, od.j2, od.tz2})) {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+        
+            double abcd = me1 * Fmat(e, f) * Fmat(d, f);
+
+            int Jmin = std::max(std::abs(oc.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oc.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(c == f && JJ % 2 != 0))
+                W2abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, jc, je) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * abcd;
+          }
+        }
+
+        for (int e : F.OneBodyChannels.at({of.l, of.j2, of.tz2})) {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          double Vabde = V.GetTBME_J(J, a, b, d, e);
+          
+          for (int f : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2})) {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+          
+            double abdc = Vabde * Fmat(e, f) * Fmat(c, f);
+
+            int Jmin = std::max(std::abs(od.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((od.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(d == f && JJ % 2 != 0))
+                W2abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, jd, je) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * abdc;
+          }
+        }
+
+        double W2 = W2abcd - modelspace.phase(jc + jd + J) * W2abdc;
+
+        ///////////////////////////// W3 /////////////////////////////
+
+        double W3abcd = 0.;
+        double W3abdc = 0.;
+        double W3bacd = 0.;
+        double W3badc = 0.;
+
+        for (int e : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+
+          double me1 = Fmat(e, a);
+          if(abs(me1) < prec) continue;
+
+          for (int f : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2})) {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+            double me2 = Fmat(f, c);
+            if(abs(me2) < prec) continue;        
+
+            int Jmin = std::max(std::abs(ob.j2 - oe.j2), std::abs(od.j2 - of.j2)) / 2;
+            int Jmax = std::min((ob.j2 + oe.j2), (od.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, b, e, d, f) * me1 * me2;
+          }
+        }
+
+        for (int f : F.OneBodyChannels.at({od.l, od.j2, od.tz2})) {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+          double me2 = Fmat(f, d);
+          if(abs(me2) < prec) continue;;
+
+          for (int e : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+            double me1 = Fmat(e, a);
+            if(abs(me1) < prec) continue;;
+
+            int Jmin = std::max(std::abs(ob.j2 - oe.j2), std::abs(oc.j2 - of.j2)) / 2;
+            int Jmax = std::min((ob.j2 + oe.j2), (oc.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, b, e, c, f) * me1 * me2;
+          }
+        }
+
+        for (int e : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2})){
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+          double me1 = Fmat(e, b);
+          if(abs(me1) < prec) continue;
+
+          for (int f : F.OneBodyChannels.at({oc.l, oc.j2, oc.tz2})) {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+            double me2 = Fmat(f,c);            
+            if(abs(me2) < prec) continue;
+
+          
+
+            int Jmin = std::max(std::abs(oa.j2 - oe.j2), std::abs(od.j2 - of.j2)) / 2;
+            int Jmax = std::min((oa.j2 + oe.j2), (od.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3bacd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, a, e, d, f) * me1 * me2;
+          }
+        }
+
+        for (int f : F.OneBodyChannels.at({od.l, od.j2, od.tz2})) {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+          double me2 = Fmat(f, d);
+          if(abs(me2) < prec) continue;
+
+          for (int e : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2})) {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+            double me1 = Fmat(e, b);
+            if(abs(me1) < prec) continue;
+
+            int Jmin = std::max(std::abs(oa.j2 - oe.j2), std::abs(oc.j2 - of.j2)) / 2;
+            int Jmax = std::min((oa.j2 + oe.j2), (oc.j2 + of.j2)) / 2;
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              W3badc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, a, e, c, f) * me1 * me2;
+          }
+        }
+
+        double W3 = W3abcd - modelspace.phase(jc + jd + J) * W3abdc - modelspace.phase(ja + jb + J) * W3bacd + modelspace.phase(ja + jb + J) * modelspace.phase(jc + jd + J) * W3badc;
+
+        ///////////////////////////// W4 /////////////////////////////
+
+        double W4abcd = 0.;
+        double W4abdc = 0.;
+
+        for (int e : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+          double me1 = Fmat(e, a);
+          if(abs(me1) < prec) continue;
+
+          for (int f : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2})) {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+            double me2 = Fmat(f, b);
+            if(abs(me2) < prec) continue;            
+
+            double abcd = V.GetTBME_J(J, c, d, e, f) * me1 * me2;
+            if(abs(abcd) < prec) continue;
+
+            int Jmin = std::max(std::abs(ob.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((ob.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(b == e && JJ % 2 != 0))
+                W4abcd += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, jb, je, jf) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * abcd;
+          }
+        }
+
+        for (int e : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2})) {
+          Orbit& oe = modelspace.GetOrbit(e);
+          double je = 0.5 * oe.j2;
+          double me1 = Fmat(e, b);
+          if(abs(me1) < prec) continue;
+
+          for (int f : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) {
+            Orbit& of = modelspace.GetOrbit(f);
+            double jf = 0.5 * of.j2;
+            double me2 = Fmat(f, a);
+            if(abs(me2) < prec) continue;
+
+            double abdc = V.GetTBME_J(J, c, d, e, f) * me1 * me2;
+            if(abs(abcd) < prec) continue;
+
+            int Jmin = std::max(std::abs(oa.j2 - oe.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oa.j2 + oe.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(a == e && JJ % 2 != 0))
+                W4abdc += (2 * JJ + 1) * modelspace.phase(J + JJ) * modelspace.GetSixJ(J, K, JJ, ja, je, jf) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * abdc;
+          }
+        }
+
+        double W4 = W4abcd - modelspace.phase(ja + jb + J) * W4abdc;
+
+        ///////////////////////////// W5 /////////////////////////////
+
+        double W5abcd = 0.;
+        double W5abdc = 0.;
+
+        for (int f : F.OneBodyChannels.at({ob.l, ob.j2, ob.tz2})) {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+          double me1 = Fmat(b, f);
+          if(abs(me1) < prec) continue;
+
+          for (int e : F.OneBodyChannels.at({of.l, of.j2, of.tz2})) {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abcd = V.GetTBME_J(J, c, d, a, e) * Fmat(e, f) * me1;
+            if(abs(abcd) < prec) continue;
+
+            int Jmin = std::max(std::abs(oa.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((oa.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(a == f && JJ % 2 != 0))
+                W5abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, ja, je) * modelspace.GetSixJ(J, K, JJ, jf, ja, jb) * abcd;
+          }
+        }
+
+        for (int f : F.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) {
+          Orbit& of = modelspace.GetOrbit(f);
+          double jf = 0.5 * of.j2;
+          double me1 = Fmat(a, f);
+          if(abs(me1) < prec) continue;
+
+          for (int e : F.OneBodyChannels.at({of.l, of.j2, of.tz2})) {
+            Orbit& oe = modelspace.GetOrbit(e);
+            double je = 0.5 * oe.j2;
+
+            double abdc = V.GetTBME_J(J, c, d, b, e) * Fmat(e, f) * me1;
+            if(abs(abdc) < prec) continue;
+
+            int Jmin = std::max(std::abs(ob.j2 - of.j2) / 2, std::abs(J - K));
+            int Jmax = std::min((ob.j2 + of.j2) / 2, J + K);
+
+            for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
+              if (!(b == f && JJ % 2 != 0))
+                W5abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, jf, jb, je) * modelspace.GetSixJ(J, K, JJ, jf, jb, ja) * abdc;
+          }
+        }
+
+        double W5 = W5abcd - modelspace.phase(ja + jb + J) * W5abdc;
+
+        ///////////////////////////// TOTAL ///////////////////////////
+        double W = (W3 - 0.5 * (W1 + W2 + W4 + W5));
+
+        if (a == b) W /= sqrt(2.0);
+        if (c == d) W /= sqrt(2.0);
+
+        SR.TwoBody.SetTBME(ch, ibra, iket, W);
+      }
+    }
+  }
+  return SR;
+}
+
 Operator Mix0(ModelSpace& modelspace, const Operator& LL, const Operator& RR)
 {
   // Initialize operator
