@@ -67,6 +67,7 @@ std::map<std::string,std::string> Parameters::string_par = {
   {"flowfile",			            "default"},	          // name of output flow file
   {"intfile",			              "default"},	          // name of output interaction file
   {"omefile",			              "default"},	          // name of output Magnus file
+  {"vs_out",			              "default"},	          // name of output vs files
   {"fmt2",			                "me2j"},	            // can also be navratil or Navratil to read Petr's TBME format
   {"fmt3",			                "me3j"},	            // can also be navratil or Navratil to read Petr's TBME format
   {"input_op_fmt",		          "navratil"},	        // navratil means read Petr Navratil's format for 2b currents. miyagi means Takayuki Miyagi's format.
@@ -114,8 +115,11 @@ std::map<std::string,std::string> Parameters::string_par = {
   {"isospin_ch",                "proton"},            // Select the isospin nature of the excitation operators
   {"kernel",                    "false"},             // Evaluate the IMSRG kernels for the multipole response (Andrea) 
   {"kerdir",                    "default"},           // Directory where the kernels are stored (Andrea) 
+  {"op_val",                    "false"},             // Evaluate the operator expectation value (Andrea) 
+  {"def_params_vs",             "false"},             // Deformation parameters matrix elements for VS (Andrea) 
+  {"fL",  "C"},       // left value of lda
+  {"fR",  "C"},       // right value of lda
 };
-
 
 std::map<std::string,double> Parameters::double_par = {
   {"hw",		20.0},

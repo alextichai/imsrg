@@ -30,7 +30,6 @@
 #include <vector>
 #include <array>
 
-
 namespace imsrg_util
 {
 
@@ -57,7 +56,7 @@ namespace imsrg_util
  Operator MagneticMultipoleOp_pn(ModelSpace& modelspace, int L, std::string pn);
  Operator Trel_Op(ModelSpace& modelspace);
  Operator TCM_Op(ModelSpace& modelspace);
- Operator HCM_Op(ModelSpace& modelspace);
+ Operator HCM_Op(ModelSpace& modelspace, double hw_opt = -1);
  Operator Trel_Masscorrection_Op(ModelSpace& modelspace);
  Operator KineticEnergy_Op(ModelSpace& modelspace);
  Operator KineticEnergy_RelativisticCorr(ModelSpace& modelspace);
@@ -109,6 +108,8 @@ namespace imsrg_util
 
  Operator BesselMultipoleOp(ModelSpace &modelspace, int L, double q, std::string pn = "isoscalar");
  Operator BesselMonopoleOp (ModelSpace &modelspace, double q, std::string pn = "isoscalar");
+ Operator RadialPower(ModelSpace& modelspace, int exp, std::string pn = "isoscalar");
+ Operator TE_Op(ModelSpace &modelspace, int L, double q);
 
  Operator Isospin2_Op(ModelSpace& modelspace);
  Operator AllowedFermi_Op(ModelSpace& modelspace);
@@ -202,6 +203,7 @@ namespace imsrg_util
  double RadialIntegral_RpowK(int na, int la, int nb, int lb, int k);
  double RadialIntegral_Gauss( int na, int la, int nb, int lb, double sigma );
  double RadialIntegral_Bessel(int na, int la, int nb, int lb, int L, double q, ModelSpace& modelspace);
+ double RadialIntegral_TE(int na, int la, double ja, int nb, int lb, int tz2, int L, double q, ModelSpace &modelspace);
  long double TalmiI(int p, double k);
  long double TalmiB(int na, int la, int nb, int lb, int p);
  long double TalmiB_SingleTerm(int na, int la, int nb, int lb, int p, int K);
@@ -223,7 +225,7 @@ namespace imsrg_util
 
  void SplitUp(Operator& OpIn, Operator& OpLow, Operator& OpHi, int ecut);
 
- void printKernel(std::ostream& out, double qL, double qR, double mom0_0, double mom1_0, double mom0_s, double mom1_s);
+ void printKernel(std::ostream& out, double qL, double qR, double mom0_0, double mom1_0, double momT1_0, double momT3_0, double mom0_s, double mom1_s, double momT1_s, double momT3_s);
 
 /*
 // Templated functions need to be defined in the header file (or else explicitly declared in the .cc file).
@@ -253,8 +255,5 @@ namespace imsrg_util
 */
 
 }
-
-
-
 
 #endif

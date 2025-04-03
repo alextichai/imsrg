@@ -29,6 +29,7 @@
 #include "Generator.hh"
 #include "IMSRGSolver.hh"
 #include "imsrg_util.hh"
+#include "imsrg_response.hh"
 #include "AngMom.hh"
 #include "IMSRGProfiler.hh"
 #include "Jacobi3BME.hh"

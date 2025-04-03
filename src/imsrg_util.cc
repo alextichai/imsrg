@@ -20,25 +20,24 @@
 #include <map>
 #include <array>
 
-
 /// imsrg_util namespace. Used to define some helpful functions.
 namespace imsrg_util
 {
- using PhysConst::HBARC;
- using PhysConst::M_PROTON;
- using PhysConst::M_NEUTRON;
- using PhysConst::M_NUCLEON;
- using PhysConst::M_ELECTRON;
- using PhysConst::PROTON_SPIN_G;
- using PhysConst::NEUTRON_SPIN_G;
- using PhysConst::ELECTRON_SPIN_G;
- using PhysConst::F_PI;
- using PhysConst::ALPHA_FS;
- using PhysConst::PI;
- using PhysConst::SQRT2;
- using PhysConst::SQRTPI;
- using PhysConst::INVSQRT2;
- using PhysConst::LOG2;
+  using PhysConst::HBARC;
+  using PhysConst::M_PROTON;
+  using PhysConst::M_NEUTRON;
+  using PhysConst::M_NUCLEON;
+  using PhysConst::M_ELECTRON;
+  using PhysConst::PROTON_SPIN_G;
+  using PhysConst::NEUTRON_SPIN_G;
+  using PhysConst::ELECTRON_SPIN_G;
+  using PhysConst::F_PI;
+  using PhysConst::ALPHA_FS;
+  using PhysConst::PI;
+  using PhysConst::SQRT2;
+  using PhysConst::SQRTPI;
+  using PhysConst::INVSQRT2;
+  using PhysConst::LOG2;
 
  std::vector<std::string> split_string(std::string s, std::string delimiter)
  {
@@ -144,7 +143,6 @@ namespace imsrg_util
       }
       else if (opnamesplit[0] =="VSDI")
       {
-//        std::cout << "    " << opnamesplit[0] << " " << opnamesplit[1] << " " << opnamesplit[2] << std::endl;
          double V0 = 1.0;
          double R = 1.0;
          if ( opnamesplit.size() > 2 ) 
@@ -154,20 +152,16 @@ namespace imsrg_util
          }
          theop =  SurfaceDeltaInteraction(modelspace,V0,R);
       }
-      else if (opnamesplit[0] =="HCM")
+      else if (opnamesplit[0] == "HCM")
       {
-//         if ( opnamesplit.size() == 1 ) theop =  HCM_Op(modelspace);
-//         else
-//         {
-           double hw_HCM = modelspace.GetHbarOmega(); // frequency of trapping potential
-           if (opnamesplit.size()>1)
-           {
-              std::istringstream( opnamesplit[1] ) >> hw_HCM;
-           }
-           int A = modelspace.GetTargetMass();
-//           std::cout << "Calling HCM with hw = " << hw_HCM << " target mass = " << A << std::endl;
-           theop =  TCM_Op(modelspace) + 0.5*A*M_NUCLEON*hw_HCM*hw_HCM/HBARC/HBARC*R2CM_Op(modelspace);
-//         }
+        double hw_HCM = modelspace.GetHbarOmega(); // frequency of trapping potential
+
+        if (opnamesplit.size() > 1)
+          std::istringstream(opnamesplit[1]) >> hw_HCM;
+
+        int A = modelspace.GetTargetMass();
+        // std::cout << "Calling HCM with hw = " << hw_HCM << " target mass = " << A << std::endl;
+        theop = TCM_Op(modelspace) + 0.5 * A * M_NUCLEON * hw_HCM * hw_HCM / HBARC / HBARC * R2CM_Op(modelspace);
       }
       else if (opnamesplit[0] == "VCM") // GetHCM with a different frequency, ie HCM_24 for hw=24
       {
@@ -1863,16 +1857,18 @@ Operator FDelta1n_Op(ModelSpace& modelspace,double q) {
 /// H_{CM} &= T_{CM} + \frac{1}{2} Am\omega^2 R^2 \\
 ///        &= T_{CM} + \frac{1}{2b^2} AR^2 \hbar\omega
 /// \f}
- Operator HCM_Op(ModelSpace& modelspace)
- {
-   double hw = modelspace.GetHbarOmega();
-   int A = modelspace.GetTargetMass();
-   Operator HcmOp = TCM_Op(modelspace) + 0.5*A*M_NUCLEON*hw*hw/HBARC/HBARC * R2CM_Op(modelspace) ;
-   std::cout << "HcmOp: first 1b element = " << HcmOp.OneBody(0,0) << std::endl;
-   return HcmOp;
- }
+Operator HCM_Op(ModelSpace &modelspace, double hbar_opt)
+{
+  double hw = modelspace.GetHbarOmega();
+  if (hbar_opt > 0)
+    hw = hbar_opt;
 
-
+  int A = modelspace.GetTargetMass();
+  Operator HcmOp = TCM_Op(modelspace) + 0.5 * A * M_NUCLEON * hw * hw / HBARC / HBARC * R2CM_Op(modelspace);
+  HcmOp.ZeroBody = -1.5 * hw;
+  // std::cout << "HcmOp: first 1b element = " << HcmOp.OneBody(0, 0) << std::endl;
+  return HcmOp;
+}
 
 /// Returns
 /// \f[ r^2 = \sum_{i} r_{i}^2 \f]
@@ -1955,6 +1951,41 @@ Operator BesselMonopoleOp(ModelSpace& modelspace, double q, std::string pn)
   return SpOp;
 }
 
+Operator RadialPower(ModelSpace& modelspace, int exp, std::string pn)
+{
+  Operator SpOp = Operator(modelspace, 0, 0, 0, 2);
+
+  SpOp.OneBody.zeros();
+
+  auto pn_list = modelspace.all_orbits;
+
+  if (pn == "proton")
+    pn_list = modelspace.proton_orbits;
+  else if (pn == "neutron")
+    pn_list = modelspace.neutron_orbits;
+
+  for (int i : pn_list)
+  {
+    Orbit &oi = modelspace.GetOrbit(i);
+
+    double iv_ch = (pn == "isovector") ? oi.tz2 : 1.;
+
+    for (int j : SpOp.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
+    {
+      if (j < i)
+        continue;
+
+      Orbit &oj = modelspace.GetOrbit(j);
+
+      double rint = RadialIntegral(oi.n, oi.l, oj.n, oj.l, exp);
+
+      SpOp.OneBody(i, j) = iv_ch * rint;
+      SpOp.OneBody(j, i) = iv_ch * rint;
+    }
+  }
+  return SpOp;
+}
+
 
  /// One-body part of the \f$ R^2 \f$ operator for protons
  Operator R2_p1_Op(ModelSpace& modelspace)
@@ -2013,7 +2044,7 @@ Operator BesselMonopoleOp(ModelSpace& modelspace, double q, std::string pn)
  {
    Operator Rp2Op(modelspace, 0, 0, 0, 2);
 
-   std::cout << __func__ << " begin" << std::endl;
+   // std::cout << __func__ << " begin" << std::endl;
    int nchan = modelspace.GetNumberTwoBodyChannels();
    if (option != "matter" and option != "proton" and option != "neutron")
      std::cout << "!!! WARNING. " << __func__ << "  BAD OPTION " << option << std::endl;
@@ -2445,7 +2476,15 @@ Operator ElectricMultipoleOp(ModelSpace& modelspace, int L, int offset, std::str
 
       double r2int = RadialIntegral(oi.n, oi.l, oj.n, oj.l, L + offset) * bL;
 
-      double iv_ch = (pn != "isovector") ? 1 : (0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass());
+      double iv_ch = 1.;
+      if (pn != "isovector")
+        iv_ch = 1.;
+      // else if (L == 1 && offset == 0)
+      //   iv_ch = 0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass();
+      else
+        iv_ch = oi.tz2;
+
+      //double iv_ch = (pn != "isovector") ? 1 : (0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass());
 
       //EL.OneBody(i,j) = (1 + modelspace.phase(oi.l + oj.l + L)) / 2. * modelspace.phase(jj + L - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * L + 1) / 4. / PI) * AngMom::ThreeJ(ji, jj, L, 0.5, -0.5, 0) * r2int;
       EL.OneBody(i,j) = iv_ch * modelspace.phase(jj + L - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * L + 1) / 4. / PI) * AngMom::ThreeJ(ji, jj, L, 0.5, -0.5, 0) * r2int;
@@ -2482,13 +2521,64 @@ Operator BesselMultipoleOp(ModelSpace &modelspace, int L, double q, std::string 
 
       double r2int = RadialIntegral_Bessel(oi.n, oi.l, oj.n, oj.l, L, q, modelspace);
 
-      double iv_ch = (pn != "isovector") ? 1 : (0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass());
+      double iv_ch = 1.;
+      if (pn != "isovector")
+        iv_ch = 1.;
+      //else if (L == 1 && offset == 0)
+      //  iv_ch = 0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass();
+      else
+        iv_ch = oi.tz2;
+
+      //double iv_ch = (pn != "isovector") ? 1 : (0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass());
 
       EL.OneBody(i, j) = iv_ch * (1 + modelspace.phase(oi.l + oj.l + L)) / 2. * modelspace.phase(jj + L - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * L + 1) / 4. / PI) * AngMom::ThreeJ(ji, jj, L, 0.5, -0.5, 0) * r2int;
       EL.OneBody(j, i) = modelspace.phase((oi.j2 + oj.j2) / 2 + 1) * EL.OneBody(i, j);
     }
   }
   return EL;
+}
+
+/// Returns the q-dependent transverse electric operator. In the q->0 limit this is strictly equivalent to the usual definitions (LWA)
+Operator TE_Op(ModelSpace &modelspace, int L, double q)//, std::string pn)
+{
+  Operator EL(modelspace, L, 0, L % 2, 2);
+
+  auto pn_list = modelspace.all_orbits;
+
+  /*if (pn == "proton")
+    pn_list = modelspace.proton_orbits;
+  else if (pn == "neutron")
+    pn_list = modelspace.neutron_orbits;*/
+
+  for (int i : pn_list)
+  {
+    Orbit &oi = modelspace.GetOrbit(i);
+    double ji = 0.5 * oi.j2;
+
+    for (int j : EL.OneBodyChannels.at({oi.l, oi.j2, oi.tz2}))
+    {
+      //if (j < i)
+      //  continue;
+
+      Orbit &oj = modelspace.GetOrbit(j);
+      double jj = 0.5 * oj.j2;
+
+      double r2int = RadialIntegral_TE(oi.n, oi.l, ji, oj.n, oj.l, oi.tz2, L, q, modelspace);
+
+      //double iv_ch = 1.;
+      //if (pn != "isovector")
+      //  iv_ch = 1.;
+      //else if (L == 1 && offset == 0)
+      //  iv_ch = 0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass();
+      //else
+      //  iv_ch = oi.tz2;
+
+      //double iv_ch = (pn != "isovector") ? 1 : (0.5 - oi.tz2 * 0.5 - modelspace.GetTargetZ() * 1.0 / modelspace.GetTargetMass());
+
+      EL.OneBody(i, j) = (1 + modelspace.phase(oi.l + oj.l + L)) / 2. * modelspace.phase(jj + L - 0.5) * sqrt((2 * ji + 1) * (2 * jj + 1) * (2 * L + 1) / 4. / PI) * AngMom::ThreeJ(ji, jj, L, 0.5, -0.5, 0) * r2int;
+    }
+  }
+  return gsl_sf_doublefact(2 * L + 1) / (L + 1) / pow(q, L) * EL;
 }
 
 Operator RdotR(ModelSpace& modelspace)
@@ -3623,87 +3713,110 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
 
   int K = Ll;
 
+  // cut on matrix elements in loops
+  double prec = 1e-8;
+
   // Filling the one-body part
-  for (int a : modelspace.all_orbits)
-  {
+
+  SR.OneBody -= h * Lmat * Rmat.t() + h * Rmat * Lmat.t();
+  SR.OneBody += Lmat * h * Rmat.t() + Rmat * h * Lmat.t();
+  SR.OneBody += Lmat.t() * h * Rmat + Rmat.t() * h * Lmat;
+  SR.OneBody -= Lmat.t() * Rmat * h + Rmat.t() * Lmat * h;
+
+  // reduce operator
+  for (int a : modelspace.all_orbits) {
     Orbit& oa = modelspace.GetOrbit(a);
     double ja = 0.5 * oa.j2;
 
-    for (int b : SR.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) // Channels accessible to the scalar operator
-    {
+    for (int b : SR.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) {
       Orbit& ob = modelspace.GetOrbit(b);
       double jb = 0.5 * ob.j2;
 
-      // Part 1
-      double m1 = 0.;
-
-      for (int c : H.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
-      {
-        Orbit& oc = modelspace.GetOrbit(c);
-        double jc = 0.5 * oc.j2;
-
-        for (int d : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
-        {
-          Orbit& od = modelspace.GetOrbit(d);
-          double jd = 0.5 * od.j2;
-
-          m1 -= 0.5 * h(a, c) * (Lmat(c, d) * Rmat(b, d) + Rmat(c, d) * Lmat(b, d));
-        }
-      }
-      // Part 2
-      double m2 = 0.;
-
-      for (int c : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
-      {
-        Orbit& oc = modelspace.GetOrbit(c);
-        double jc = 0.5 * oc.j2;
-
-        for (int d : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
-        {
-          Orbit& od = modelspace.GetOrbit(d);
-          double jd = 0.5 * od.j2;
-
-          m2 += 0.5 * h(c, d) * (Lmat(a, c) * Rmat(b, d) + Rmat(a, c) * Lmat(b, d));
-        }
-      }
-      // Part 3
-      double m3 = 0.;
-
-      for (int c : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
-      {
-        Orbit& oc = modelspace.GetOrbit(c);
-        double jc = 0.5 * oc.j2;
-
-        for (int d : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
-        {
-          Orbit& od = modelspace.GetOrbit(d);
-          double jd = 0.5 * od.j2;
-
-          m3 += 0.5 * h(c, d) * (Lmat(c, a) * Rmat(d, b) + Rmat(c, a) * Lmat(d, b));
-        }
-      }
-      // Part 4
-      double m4 = 0.;
-
-      for (int c : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
-      {
-        Orbit& oc = modelspace.GetOrbit(c);
-        double jc = 0.5 * oc.j2;
-
-        for (int d : H.OneBodyChannels.at({ob.l, ob.j2, ob.tz2})) // changed
-        {
-          Orbit& od = modelspace.GetOrbit(d);
-          double jd = 0.5 * od.j2;
-
-          m4 -= 0.5 * (Lmat(c, a) * Rmat(c, d) + Rmat(c, a) * Lmat(c, d)) * h(d, b);
-        }
-      }
-
-      double me = m1 + m2 + m3 + m4;
-
-      SR.OneBody(a, b) = 0.5 * me / (2 * ja + 1);
+      SR.OneBody(a, b) *= 0.25 / (2 * ja + 1);
     }
   }
+
+  // // Filling the one-body part
+  // for (int a : modelspace.all_orbits)
+  // {
+  //   Orbit& oa = modelspace.GetOrbit(a);
+  //   double ja = 0.5 * oa.j2;
+
+  //   for (int b : SR.OneBodyChannels.at({oa.l, oa.j2, oa.tz2})) // Channels accessible to the scalar operator
+  //   {
+  //     Orbit& ob = modelspace.GetOrbit(b);
+  //     double jb = 0.5 * ob.j2;
+
+  //     // Part 1
+  //     double m1 = 0.;
+
+  //     for (int c : H.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+  //     {
+  //       Orbit& oc = modelspace.GetOrbit(c);
+  //       double jc = 0.5 * oc.j2;
+
+  //       for (int d : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+  //       {
+  //         Orbit& od = modelspace.GetOrbit(d);
+  //         double jd = 0.5 * od.j2;
+
+  //         m1 -= 0.5 * h(a, c) * (Lmat(c, d) * Rmat(b, d) + Rmat(c, d) * Lmat(b, d));
+  //       }
+  //     }
+  //     // Part 2
+  //     double m2 = 0.;
+
+  //     for (int c : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+  //     {
+  //       Orbit& oc = modelspace.GetOrbit(c);
+  //       double jc = 0.5 * oc.j2;
+
+  //       for (int d : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+  //       {
+  //         Orbit& od = modelspace.GetOrbit(d);
+  //         double jd = 0.5 * od.j2;
+
+  //         m2 += 0.5 * h(c, d) * (Lmat(a, c) * Rmat(b, d) + Rmat(a, c) * Lmat(b, d));
+  //       }
+  //     }
+  //     // Part 3
+  //     double m3 = 0.;
+
+  //     for (int c : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+  //     {
+  //       Orbit& oc = modelspace.GetOrbit(c);
+  //       double jc = 0.5 * oc.j2;
+
+  //       for (int d : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
+  //       {
+  //         Orbit& od = modelspace.GetOrbit(d);
+  //         double jd = 0.5 * od.j2;
+
+  //         m3 += 0.5 * h(c, d) * (Lmat(c, a) * Rmat(d, b) + Rmat(c, a) * Lmat(d, b));
+  //       }
+  //     }
+  //     // Part 4
+  //     double m4 = 0.;
+
+  //     for (int c : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
+  //     {
+  //       Orbit& oc = modelspace.GetOrbit(c);
+  //       double jc = 0.5 * oc.j2;
+
+  //       for (int d : H.OneBodyChannels.at({ob.l, ob.j2, ob.tz2})) // changed
+  //       {
+  //         Orbit& od = modelspace.GetOrbit(d);
+  //         double jd = 0.5 * od.j2;
+
+  //         m4 -= 0.5 * (Lmat(c, a) * Rmat(c, d) + Rmat(c, a) * Lmat(c, d)) * h(d, b);
+  //       }
+  //     }
+
+  //     double me = m1 + m2 + m3 + m4;
+
+  //     SR.OneBody(a, b) = 0.5 * me / (2 * ja + 1);
+  //   }
+  // }
 
   // Filling the two-body part
   int nchan = modelspace.GetNumberTwoBodyChannels();
@@ -3715,9 +3828,6 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
 
     int nkets = tbc.GetNumberKets();
     int J     = tbc.J;
-
-    // int Jmin = std::abs(J - K);
-    // int Jmax = (J + K);
 
     for (int ibra = 0; ibra < nkets; ++ibra)
     {
@@ -3745,8 +3855,6 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
         double jc = oc.j2 * 0.5;
         double jd = od.j2 * 0.5;
 
-        //if(oa.tz2 + ob.tz2 != oc.tz2 + od.tz2) continue;
-
         ///////////////////////////// W1 /////////////////////////////
 
         double W1abcd = 0.;
@@ -3757,12 +3865,21 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& oe = modelspace.GetOrbit(e);
           double je = 0.5 * oe.j2;
 
+          double meL1 = Lmat(e, c);
+          double meR1 = Rmat(e, c);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int f : LL.OneBodyChannels.at({od.l, od.j2, od.tz2}))
           {
             Orbit& of = modelspace.GetOrbit(f);
             double jf = 0.5 * of.j2;
 
-            double abcd = 0.5 * V.GetTBME_J(J, a, b, e, f) * (Lmat(e, c) * Rmat(f, d) + Rmat(e, c) * Lmat(f, d));
+            double meL2 = Lmat(f, d);
+            double meR2 = Rmat(f, d);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
+            double abcd = 0.5 * V.GetTBME_J(J, a, b, e, f) * (meL1 * meR2 + meR1 * meL2);
+            if(abs(abcd) < prec) continue;
 
             int Jmin = std::max(std::abs(od.j2 - oe.j2) / 2, std::abs(J - K));
             int Jmax = std::min((od.j2 + oe.j2) / 2, J + K);
@@ -3778,12 +3895,21 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& oe = modelspace.GetOrbit(e);
           double je = 0.5 * oe.j2;
 
+          double meL1 = Lmat(e, d);
+          double meR1 = Rmat(e, d);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int f : LL.OneBodyChannels.at({oc.l, oc.j2, oc.tz2}))
           {
             Orbit& of = modelspace.GetOrbit(f);
             double jf = 0.5 * of.j2;
 
-            double abdc = 0.5 * V.GetTBME_J(J, a, b, e, f) * (Rmat(e, d) * Lmat(f, c) + Lmat(e, d) * Rmat(f, c));
+            double meL2 = Lmat(f, c);
+            double meR2 = Rmat(f, c);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
+            double abdc = 0.5 * V.GetTBME_J(J, a, b, e, f) * (meR1 * meL2 + meL1 * meR2);
+            if(abs(abdc) < prec) continue;
 
             int Jmin = std::max(std::abs(oc.j2 - oe.j2) / 2, std::abs(J - K));
             int Jmax = std::min((oc.j2 + oe.j2) / 2, J + K);
@@ -3806,12 +3932,21 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& of = modelspace.GetOrbit(f);
           double jf = 0.5 * of.j2;
 
+          double meL1 = Lmat(d, f);
+          double meR1 = Rmat(d, f);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int e : LL.OneBodyChannels.at({of.l, of.j2, of.tz2}))
           {
             Orbit& oe = modelspace.GetOrbit(e);
             double je = 0.5 * oe.j2;
 
-            double abcd = 0.5 * V.GetTBME_J(J, a, b, c, e) * (Lmat(e, f) * Rmat(d, f) + Rmat(e, f) * Lmat(d, f));
+            double meL2 = Lmat(e, f);
+            double meR2 = Rmat(e, f);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
+            double abcd = 0.5 * V.GetTBME_J(J, a, b, c, e) * (meL2 * meR1 + meR2 * meL1);
+            if(abs(abcd) < prec) continue;
 
             int Jmin = std::max(std::abs(oc.j2 - of.j2) / 2, std::abs(J - K));
             int Jmax = std::min((oc.j2 + of.j2) / 2, J + K);
@@ -3827,12 +3962,21 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& of = modelspace.GetOrbit(f);
           double jf = 0.5 * of.j2;
 
+          double meL1 = Lmat(c, f);
+          double meR1 = Rmat(c, f);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int e : LL.OneBodyChannels.at({of.l, of.j2, of.tz2}))
           {
             Orbit& oe = modelspace.GetOrbit(e);
             double je = 0.5 * oe.j2;
 
-            double abdc = 0.5 * V.GetTBME_J(J, a, b, d, e) * (Rmat(e, f) * Lmat(c, f) + Lmat(e, f) * Rmat(c, f));
+            double meL2 = Lmat(e, f);
+            double meR2 = Rmat(e, f);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
+            double abdc = 0.5 * V.GetTBME_J(J, a, b, d, e) * (meR2 * meL1 + meL2 * meR1);
+            if(abs(abdc) < prec) continue;
 
             int Jmin = std::max(std::abs(od.j2 - of.j2) / 2, std::abs(J - K));
             int Jmax = std::min((od.j2 + of.j2) / 2, J + K);
@@ -3857,16 +4001,24 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& of = modelspace.GetOrbit(f);
           double jf = 0.5 * of.j2;
 
+          double meL1 = Lmat(f, c);
+          double meR1 = Rmat(f, c);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int e : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
           {
             Orbit& oe = modelspace.GetOrbit(e);
             double je = 0.5 * oe.j2;
 
+            double meL2 = Lmat(e, a);
+            double meR2 = Rmat(e, a);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
             int Jmin = std::max(std::abs(ob.j2 - oe.j2), std::abs(od.j2 - of.j2)) / 2;
             int Jmax = std::min((ob.j2 + oe.j2), (od.j2 + of.j2)) / 2;
 
             for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
-              W3abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, b, e, d, f) * (Lmat(e, a) * Rmat(f, c) + Rmat(e, a) * Lmat(f, c));
+              W3abcd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, b, e, d, f) * (meL2 * meR1 + meR2 * meL1);
           }
         }
 
@@ -3875,16 +4027,24 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& of = modelspace.GetOrbit(f);
           double jf = 0.5 * of.j2;
 
+          double meL1 = Lmat(f, d);
+          double meR1 = Rmat(f, d);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int e : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
           {
             Orbit& oe = modelspace.GetOrbit(e);
             double je = 0.5 * oe.j2;
 
+            double meL2 = Lmat(e, a);
+            double meR2 = Rmat(e, a);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
             int Jmin = std::max(std::abs(ob.j2 - oe.j2), std::abs(oc.j2 - of.j2)) / 2;
             int Jmax = std::min((ob.j2 + oe.j2), (oc.j2 + of.j2)) / 2;
 
             for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
-              W3abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, b, e, c, f) * (Lmat(e, a) * Rmat(f, d) + Rmat(e, a) * Lmat(f, d));
+              W3abdc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, jb, ja) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, b, e, c, f) * (meL2 * meR1 + meR2 * meL1);
           }
         }
 
@@ -3893,16 +4053,24 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& of = modelspace.GetOrbit(f);
           double jf = 0.5 * of.j2;
 
+          double meL1 = Lmat(f, c);
+          double meR1 = Rmat(f, c);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int e : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
           {
             Orbit& oe = modelspace.GetOrbit(e);
             double je = 0.5 * oe.j2;
 
+            double meL2 = Lmat(e, b);
+            double meR2 = Rmat(e, b);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
             int Jmin = std::max(std::abs(oa.j2 - oe.j2), std::abs(od.j2 - of.j2)) / 2;
             int Jmax = std::min((oa.j2 + oe.j2), (od.j2 + of.j2)) / 2;
 
             for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
-              W3bacd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, a, e, d, f) * (Lmat(e, b) * Rmat(f, c) + Rmat(e, b) * Lmat(f, c));
+              W3bacd += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jd, jc) * V.GetTBME_J(JJ, a, e, d, f) * (meL2 * meR1 + meR2 * meL1);
           }
         }
 
@@ -3911,16 +4079,24 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& of = modelspace.GetOrbit(f);
           double jf = 0.5 * of.j2;
 
+          double meL1 = Lmat(f, d);
+          double meR1 = Rmat(f, d);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int e : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
           {
             Orbit& oe = modelspace.GetOrbit(e);
             double je = 0.5 * oe.j2;
 
+            double meL2 = Lmat(e, b);
+            double meR2 = Rmat(e, b);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
             int Jmin = std::max(std::abs(oa.j2 - oe.j2), std::abs(oc.j2 - of.j2)) / 2;
             int Jmax = std::min((oa.j2 + oe.j2), (oc.j2 + of.j2)) / 2;
 
             for (int JJ = Jmin; JJ <= std::min(Jmax, modelspace.TwoBodyJmax); ++JJ)
-              W3badc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, a, e, c, f) * (Lmat(e, b) * Rmat(f, d) + Rmat(e, b) * Lmat(f, d));
+              W3badc += (2 * JJ + 1) * modelspace.GetSixJ(J, K, JJ, je, ja, jb) * modelspace.GetSixJ(J, K, JJ, jf, jc, jd) * V.GetTBME_J(JJ, a, e, c, f) * (meL2 * meR1 + meR2 * meL1);
           }
         }
 
@@ -3936,12 +4112,21 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& oe = modelspace.GetOrbit(e);
           double je = 0.5 * oe.j2;
 
+          double meL1 = Lmat(e, a);
+          double meR1 = Rmat(e, a);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int f : LL.OneBodyChannels.at({ob.l, ob.j2, ob.tz2}))
           {
             Orbit& of = modelspace.GetOrbit(f);
             double jf = 0.5 * of.j2;
 
-            double abcd = 0.5 * V.GetTBME_J(J, c, d, e, f) * (Lmat(e, a) * Rmat(f, b) + Rmat(e, a) * Lmat(f, b));
+            double meL2 = Lmat(f, b);
+            double meR2 = Rmat(f, b);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
+            double abcd = 0.5 * V.GetTBME_J(J, c, d, e, f) * (meL1 * meR2 + meR1 * meL2);
+            if(abs(abcd) < prec) continue;
 
             int Jmin = std::max(std::abs(ob.j2 - oe.j2) / 2, std::abs(J - K));
             int Jmax = std::min((ob.j2 + oe.j2) / 2, J + K);
@@ -3957,12 +4142,21 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& oe = modelspace.GetOrbit(e);
           double je = 0.5 * oe.j2;
 
+          double meL1 = Lmat(e, b);
+          double meR1 = Rmat(e, b);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int f : LL.OneBodyChannels.at({oa.l, oa.j2, oa.tz2}))
           {
             Orbit& of = modelspace.GetOrbit(f);
             double jf = 0.5 * of.j2;
 
-            double abdc = 0.5 * V.GetTBME_J(J, c, d, e, f) * (Rmat(e, b) * Lmat(f, a) + Lmat(e, b) * Rmat(f, a));
+            double meL2 = Lmat(f, a);
+            double meR2 = Rmat(f, a);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
+            double abdc = 0.5 * V.GetTBME_J(J, c, d, e, f) * (meR1 * meL2 + meL1 * meR2);
+            if(abs(abdc) < prec) continue;
 
             int Jmin = std::max(std::abs(oa.j2 - oe.j2) / 2, std::abs(J - K));
             int Jmax = std::min((oa.j2 + oe.j2) / 2, J + K);
@@ -3985,12 +4179,21 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& of = modelspace.GetOrbit(f);
           double jf = 0.5 * of.j2;
 
+          double meL1 = Lmat(b, f);
+          double meR1 = Rmat(b, f);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int e : LL.OneBodyChannels.at({of.l, of.j2, of.tz2}))
           {
             Orbit& oe = modelspace.GetOrbit(e);
             double je = 0.5 * oe.j2;
 
-            double abcd = 0.5 * V.GetTBME_J(J, c, d, a, e) * (Lmat(e, f) * Rmat(b, f) + Rmat(e, f) * Lmat(b, f));
+            double meL2 = Lmat(e, f);
+            double meR2 = Rmat(e, f);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
+            double abcd = 0.5 * V.GetTBME_J(J, c, d, a, e) * (meL2 * meR1 + meR2 * meL1);
+            if(abs(abcd) < prec) continue;
 
             int Jmin = std::max(std::abs(oa.j2 - of.j2) / 2, std::abs(J - K));
             int Jmax = std::min((oa.j2 + of.j2) / 2, J + K);
@@ -4006,12 +4209,21 @@ Operator Mix1(ModelSpace& modelspace, const Operator& H, const Operator& LL, con
           Orbit& of = modelspace.GetOrbit(f);
           double jf = 0.5 * of.j2;
 
+          double meL1 = Lmat(a, f);
+          double meR1 = Rmat(a, f);
+          if(abs(meL1) < prec && abs(meR1) < prec) continue;
+
           for (int e : LL.OneBodyChannels.at({of.l, of.j2, of.tz2}))
           {
             Orbit& oe = modelspace.GetOrbit(e);
             double je = 0.5 * oe.j2;
 
-            double abdc = 0.5 * V.GetTBME_J(J, c, d, b, e) * (Rmat(e, f) * Lmat(a, f) + Lmat(e, f) * Rmat(a, f));
+            double meL2 = Lmat(e, f);
+            double meR2 = Rmat(e, f);
+            if(abs(meL2) < prec && abs(meR2) < prec) continue;
+
+            double abdc = 0.5 * V.GetTBME_J(J, c, d, b, e) * (meR2 * meL1 + meL2 * meR1);
+            if(abs(abdc) < prec) continue;
 
             int Jmin = std::max(std::abs(ob.j2 - of.j2) / 2, std::abs(J - K));
             int Jmax = std::min((ob.j2 + of.j2) / 2, J + K);
@@ -4376,6 +4588,89 @@ double RadialIntegral_Bessel(int na, int la, int nb, int lb, int L, double q, Mo
       double x_i = GaussLaguerre::gauss_laguerre_points_200[i][0];
       double w_i = GaussLaguerre::gauss_laguerre_points_200[i][1];
       double f_i = Norm * gsl_sf_laguerre_n(na, la + 0.5, x_i) * gsl_sf_laguerre_n(nb, lb + 0.5, x_i) * pow(x_i, 0.5 * (la + lb + 1)) * gsl_sf_bessel_jl(L, pow(x_i, 0.5) * q * bosc);
+
+      I += w_i * f_i;
+    }
+  } 
+  return I;
+}
+
+// Radial component of the Transverse-Electric multipole operator (in units of e)
+
+double RadialIntegral_TE(int na, int la, double ja, int nb, int lb, int tz2, int L, double q, ModelSpace &modelspace)
+{
+  double gs = tz2 < 0 ? PROTON_SPIN_G : NEUTRON_SPIN_G;
+
+  double LS = 0.5 * (ja * (ja + 1.) - double(la) * (double(la) + 1.) - 0.75);
+  //double LL = double(la) * (double(la) + 1.);
+
+  double mu = 0.5 * HBARC / M_NUCLEON;
+
+  double hw   = modelspace.GetHbarOmega();
+  double bosc = HBARC / sqrt(M_NUCLEON * hw);
+
+  long double I = 0.;
+
+  bool Simpson = false; // use for very small q
+
+  if (Simpson)  // Using Simpson quadrature
+  {
+      size_t npoints = 301;  // Should be a multiple of 3 plus 1 for correct interval division
+
+      std::vector<double> RGRID(npoints);
+      std::vector<double> FUNCTION(npoints);
+      std::vector<double> INTEGRAND(npoints);
+
+      double dr = 8.0 / double(npoints - 1);
+
+      for (size_t i = 0; i < npoints; i++)
+      {
+          RGRID[i] = i * dr;
+
+          // Here is the setting of the function to integrate
+
+          FUNCTION[i] = mu * q * HBARC * gs * LS * gsl_sf_bessel_jl(L, q * bosc * RGRID[i]); // both for proton and neutrons anyway
+
+          if(tz2 < 0) // only protons
+            FUNCTION[i] += (1 + 2. * mu * q) * (double(L + 1) * gsl_sf_bessel_jl(L, q * bosc * RGRID[i]) - q * bosc *RGRID[i] * gsl_sf_bessel_jl(L + 1, q * bosc * RGRID[i]));// + mu * q * HBARC * LL * gsl_sf_bessel_jl(L, q * bosc * RGRID[i]);
+
+          INTEGRAND[i] = HO_gr(nb, lb, RGRID[i]) * RGRID[i] * RGRID[i] * FUNCTION[i] * HO_gr(na, la, RGRID[i]);
+      }
+
+      // Apply Simpson's 3/8 rule
+      I = INTEGRAND[0] + INTEGRAND[npoints - 1];
+
+      for (size_t i = 1; i < npoints - 1; i++)
+      {
+          if (i % 3 == 0)
+              I += 2 * INTEGRAND[i];  // Coefficient 2 for multiples of 3
+          else
+              I += 3 * INTEGRAND[i];  // Coefficient 3 for others
+      }
+
+      I *= 3.0 / 8.0 * dr;  // Final multiplication factor
+  }
+  else // Using Gauss-Laguerre quadrature
+  {
+    double Norm = sqrt(tgamma(na + 1) * tgamma(nb + 1) / tgamma(na + la + 1.5) / tgamma(nb + lb + 1.5));
+
+    int npoints = 200; // current options for npoints are 0-50, 100, and 200.
+
+    for (int i = 0; i < npoints; i++)
+    {
+      //double x_i = GaussLaguerre::gauss_laguerre_points[npoints][i][0]; // From 0 to 50 points
+      //double w_i = GaussLaguerre::gauss_laguerre_points[npoints][i][1]; // From 0 to 50 points
+      double x_i = GaussLaguerre::gauss_laguerre_points_200[i][0];
+      double w_i = GaussLaguerre::gauss_laguerre_points_200[i][1];
+
+      double R = pow(x_i, 0.5);
+
+      double funct = mu * q * HBARC * gs * LS * gsl_sf_bessel_jl(L, q * bosc * R);
+
+      if(tz2 < 0) // only protons
+        funct += (1 + 2. * mu * q) * (double(L + 1) * gsl_sf_bessel_jl(L, q * bosc * R) - q * bosc * R * gsl_sf_bessel_jl(L + 1, q * bosc * R));// + mu * q * HBARC * LL * gsl_sf_bessel_jl(L, q * bosc * R);
+
+      double f_i = Norm * gsl_sf_laguerre_n(na, la + 0.5, x_i) * gsl_sf_laguerre_n(nb, lb + 0.5, x_i) * pow(x_i, 0.5 * (la + lb + 1)) * funct;
 
       I += w_i * f_i;
     }
@@ -7410,14 +7705,18 @@ Operator L_Op_pn(ModelSpace &modelspace, std::string pn) {
 
   }
 
-  void printKernel(std::ostream& out, double qL, double qR, double mom0_0, double mom1_0, double mom0_s, double mom1_s)
+  void printKernel(std::ostream& out, double qL, double qR, double mom0_0, double mom1_0, double momT1_0, double momT3_0, double mom0_s, double mom1_s, double momT1_s, double momT3_s)
   {
     out << std::setw(10) << "qL"
         << std::setw(10) << "qR"
         << std::setw(16) << "mom0_HF"
         << std::setw(16) << "mom1_HF"
+        << std::setw(16) << "momT1_HF"
+        << std::setw(16) << "momT3_HF"
         << std::setw(16) << "mom0_imsrg"
-        << std::setw(16) << "mom1_imsrg" << std::endl;
+        << std::setw(16) << "mom1_imsrg"
+        << std::setw(16) << "momT1_imsrg"
+        << std::setw(16) << "momT3_imsrg" << std::endl;
 
     out << std::fixed << std::setprecision(3);
     out << std::setw(10) << qL
@@ -7427,8 +7726,12 @@ Operator L_Op_pn(ModelSpace &modelspace, std::string pn) {
     out << std::fixed << std::scientific;  // Use scientific notation
     out << std::setw(16) << mom0_0
         << std::setw(16) << mom1_0
+        << std::setw(16) << momT1_0
+        << std::setw(16) << momT3_0
         << std::setw(16) << mom0_s
-        << std::setw(16) << mom1_s << std::endl;
+        << std::setw(16) << mom1_s
+        << std::setw(16) << momT1_s
+        << std::setw(16) << momT3_s << std::endl;
   }
 
 
