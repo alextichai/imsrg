@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 
 ##########################################################################
-##  write_H.py
+##  goUniversal.py
+##
+##  A python script to run or submit jobs for the common use cases
+##  of the IMSRG++ code. We check whether there is a pbs or slurm
+##  scheduler, assign the relevant input parameters, set names
+##  for the output files, and run or submit.
+##  						-Ragnar Stroberg
+##  						TRIUMF Nov 2016
 ######################################################################
 
 from os import path,environ,mkdir,remove
@@ -17,13 +24,13 @@ elif call('type '+'srun', shell=True, stdout=PIPE, stderr=PIPE) == 0: BATCHSYS =
 
 ### The code uses OpenMP and benefits from up to at least 24 threads
 NTHREADS=24
-
 exe = '/home/porro/imsrg/src/imsrg++'
 
 ### Flag to swith between submitting to the scheduler or running in the current shell
 batch_mode=True
 if 'terminal' in argv[1:]: batch_mode=False
 
+### Don't forget to change this. I don't want emails about your calculations...
 mail_address = 'andrea.porro@tu-darmstadt.de'
 
 ### This comes in handy if you want to loop over Z
@@ -37,27 +44,22 @@ ELEM = ['n','H','He','Li','Be','B','C','N',
 ARGS  =  {}
 
 ### Maximum value of s, and maximum step size ds
-ARGS['smax']  = '500' # For writing purposes (PGCM) we don't want to evolve the Hamiltonian
+ARGS['smax']  = '500'
 ARGS['dsmax'] = '0.5'
 
 ### Norm of Omega at which we split off and start a new transformation
 ARGS['omega_norm_max'] = '0.25'
 
 ### Name of a directory to write Omega operators so they don't need to be stored in memory. If not given, they'll just be stored in memory.
-#RGS['scratch'] = 'SCRATCH' 
-#ARGS['scratch'] = '/home/porro/omega_test/'    
+#ARGS['scratch'] = 'SCRATCH'    
 
 ### Generator for core decoupling, can be atan, white, imaginary-time.  (atan is default)
 #ARGS['core_generator'] = 'imaginary-time' 
 ### Generator for valence deoupling, can be shell-model, shell-model-atan, shell-model-npnh, shell-model-imaginary-time (shell-model-atan is default)
 #ARGS['valence_generator'] = 'shell-model-imaginary-time' 
 
-### Solution method
+### Solution method: magnus, brueckner, flow, HF, MP3
 ARGS['method'] = 'magnus'
-#ARGS['method'] = 'brueckner'
-#ARGS['method'] = 'flow'
-#ARGS['method'] = 'HF'
-#ARGS['method'] = 'MP3'
 
 ### Tolerance for ODE solver if using flow solution method
 #ARGS['ode_tolerance'] = '1e-5'
@@ -106,83 +108,69 @@ time srun %s
 if not path.exists('imsrg_log'): mkdir('imsrg_log')
 
 ### Loop over multiple jobs to submit
-for A in [100]:
-  Z = 50
+for A in [42]:
+  Z = 20
   for reference in ['%s%d'%(ELEM[Z],A)]:
     ARGS['reference'] = reference
-    print('Reference = ', reference)
-    for e in [4,6,8,10,12,14]:
+    print('Z = ', Z)
+    
+    for e in [4]:
       for hw in [16]:
-        ARGS['emax']  = '%d' % e
 
+        ARGS['emax']  = '%d'%e
         e3max = 24 #16  24
-        e3max = min(e3max, 3 * e)
 
-        ARGS['emax']  = str(e)
-        ARGS['e2max'] = str(2 * e)
+        ARGS['e3max'] = str(min(e3max, 3 * e))
 
-        twobody = False # Set to True for calculations WITHOUT 3b forces
-
-        if twobody == False:
-          ARGS['e3max'] = str(e3max)
+        #ARGS['basis'] = 'oscillator'
 
         ### Model space parameters used for reading Darmstadt-style interaction files
         ARGS['file2e1max'] = '18 file2e2max=36 file2lmax=18'
-        # ARGS['file3e1max'] = '18 file3e2max=36 file3e3max=24'
-        # ARGS['file2e1max'] = '16 file2e2max=32 file2lmax=16'
-        ARGS['file3e1max'] = '16 file3e2max=32 file3e3max=24'
-        # ARGS['file3e1max'] = '16 file3e2max=32 file3e3max=28'
-        # ARGS['file2e1max'] = '%i file2e2max=%i file2lmax=%i' % (e, 2 * e, e)
+        ARGS['file3e1max'] = '18 file3e2max=36 file3e3max=24'
 
         # MATRIX ELEMENTS DELTA N2LO_GO
-        ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_DN2LOGO394_bare_hw%i_emax18_e2max36.me2j.gz'%(hw)    # 2B
-        ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_DNNLOgo_3NFJmax15_IS_hw%i_ms16_32_24.stream.bin'%(hw)      # 3B, hw = 16 MeV
-        # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_half_ThBME_DNNLOgo_3NFJmax15_IS_hw%i_ms16_32_28.stream.bin'%(hw) # 3B, hw = 10 MeV, 12 MeV
-        # ARGS['no2b_precision'] = 'half'
+        # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_DN2LOGO394_bare_hw%i_emax18_e2max36.me2j.gz'%(hw)    # 2B
+        # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_DNNLOgo_3NFJmax15_IS_hw%i_ms16_32_24.stream.bin'%(hw)      # 3B, hw = 16 MeV
+        #ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_half_ThBME_DNNLOgo_3NFJmax15_IS_hw%i_ms16_32_28.stream.bin'%(hw) # 3B, hw = 10 MeV, 12 MeV
+        #ARGS['no2b_precision'] = 'half'
         
         # MATRIX ELEMENTS EM1.8/2.0
-        # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N3LO_EM500_srg1.8_hw%i_emax18_e2max36.me2j.gz'%(hw) # 2B
-        # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_EM1.8_2.0_3NFJmax15_IS_hw%i_ms18_36_24.stream.bin' % (hw) # 3B, hw = 16 MeV
-        # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_EM1.8_2.0_3NFJmax15_IS_hw%i_ms16_32_24.stream.bin' %(hw) # 3B, hw = 12, 20 MeV
+        ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N3LO_EM500_srg1.8_hw%i_emax18_e2max36.me2j.gz'%(hw)
+        ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_EM1.8_2.0_3NFJmax15_IS_hw%i_ms18_36_24.stream.bin'%(hw)
 
-        # MATRIX ELEMENTS EM7.5
-        # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N3LO_EM500_srg1.8_hw%i_emax18_e2max36.me2j.gz'   % (hw) # 2B
-        # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_3NFJmax15_1.8_2.0_EM7.5_IS_hw%i_ms18_36_24.stream.bin' % (hw) # 3B
+        #ARGS['2bme'] = '/Users/alexandertichai/Work/Matrixelements/ME2J/chi2b_srg0800_eMax12_hwHO020.me2j.gz'
+        #ARGS['3bme'] = 'input/me3j/chi2b3b400cD-02cE0098_hwconv036_srg0625ho40J_eMax14_EMax14_hwHO0%d.me3j.gz'%(hw)
+        #ARGS['LECs'] = 'srg0625'
+        #ARGS['3bme'] = ''
 
-        # MATRIX ELEMENTS NNLOsat
-        # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N2LO_sat_bare_hw%i_emax18_e2max36.me2j.gz' % (hw) # 2B, hw = 14, 16 MeV
-        # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_N2LOsat_3NFJmax15_IS_hw%i_ms18_36_24.stream.bin' % (hw) # 3B, hw = 14, 16 MeV
-        # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N2LO_sat_bare_hw%i_emax16_e2max32.me2j.gz' % (hw) # 2B, hw = 12 MeV
-        # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_N2LOsat_3NFJmax15_IS_hw%i_ms16_32_24.stream.bin' % (hw) # 3B, hw = 12 MeV
-        
-        # MATRIX ELEMENTS N2LO_opt
-        # ARGS['2bme'] = '/home/porro/me/me2j/TwBME-HO_NN-only_N2LO_opt_bare_hw%i_emax%i_e2max%i.me2j.gz' % (hw, e, 2 * e)
-
-        # intlabel = 'EM_1.8_2.0'
-        intlabel = 'DN2LO_GO_394'
+        intlabel = 'EM_1.8_2.0'
+        # intlabel = 'DN2LO_GO_394'
         # intlabel = 'EM_7.5'
         # intlabel = 'NNLO_sat'
-        # intlabel = 'N2LO_opt'
 
         ARGS['LECs'] = ''
         ARGS['3bme_type'] = 'no2b' # 'full'
-        
-        ARGS['write_Hamiltonian'] = 'true'
 
-        ARGS['write_omega_me'] = 'true'
+        # ARGS['moments'] = 'true'
 
-        ARGS['moments'] = 'true'
-
-        # ARGS['Operators'] = 'Rm2, Rp2' # which other operators to coevolve and transform
+        # ARGS['write_Hamiltonian'] = 'false'
 
         ARGS['hw']   = '%d'%hw
         ARGS['A']    = '%d'%A
 
-        ARGS['valence_space'] = reference
-        # ARGS['valence_space'] = '0hw-shell'
+        ### Choice of the valence space
+        # ARGS['valence_space'] = reference
+        ARGS['valence_space'] = '0hw-shell'
         # ARGS['valence_space'] = 'Cr%d'%A
-        # ARGS['core_generator'] = 'imaginary-time'
-        # ARGS['valence_generator'] = 'shell-model-imaginary-time'
+
+        ARGS['def_params_vs'] = 'true'
+        
+        # ARGS['method'] = method
+
+        # ARGS['Operators'] = ''    # Operators to consistenly transform, separated by commas.
+        # ARGS['Operators'] = 'Rp2'
+        # ARGS['Operators'] = 'Rm2lab' # which other operators to coevolve and transform
+        # ARGS['Operators'] = 'E2,M1'
 
         ### Make an estimate of how much time to request. Only used for slurm at the moment.
         time_request = '10-00:00:00'
@@ -192,19 +180,11 @@ for A in [100]:
         #elif e < 12 : time_request = '12:00:00'
         #elif e < 14 : time_request = '24:00:00'
 
-        #jobname  = '%s_%s_%s_%s_e%s_E%s_s%s_hw%s_A%s' %(ARGS['valence_space'], ARGS['LECs'],ARGS['method'],ARGS['reference'],ARGS['emax'],ARGS['e3max'],ARGS['smax'],ARGS['hw'],ARGS['A'])
-        # jobname  = '%s_%s_%s_e%s_E%s_s%s_hw%s' %(ARGS['valence_space'],ARGS['method'],intlabel,ARGS['emax'],ARGS['e3max'],ARGS['smax'],ARGS['hw'])
-        jobname  = '%s_%s_%s_e%s_s%s_hw%s' %(ARGS['valence_space'],ARGS['method'],intlabel,ARGS['emax'],ARGS['smax'],ARGS['hw'])
+        jobname  = '%s_%s_%s_%s_e%s_E%s_s%s_hw%s_A%s' %(ARGS['valence_space'], ARGS['LECs'],ARGS['method'],ARGS['reference'],ARGS['emax'],ARGS['e3max'],ARGS['smax'],ARGS['hw'],ARGS['A'])
         logname = jobname + datetime.fromtimestamp(time()).strftime('_%y%m%d%H%M.log')
 
-        ### Make a directory for the output (Hamiltonian), if it doesn't already exist
-        out_dir = '/home/porro/me/imsrg/%s' % (ARGS['valence_space'])
+        out_dir = '/home/porro/me/vs_imsrg/%s' % (ARGS['reference'])
         if not path.exists(out_dir): mkdir(out_dir)
-
-        ### Make a directory for the output (Omega), if it doesn't already exist
-        if (ARGS['write_omega_me'] == 'true'):        
-          omega_dir = '/home/porro/Omega/%s' % (ARGS['valence_space'])
-          if not path.exists(omega_dir): mkdir(omega_dir)
 
         ### Some optional parameters that we probably want in the output name if we're using them
         if 'lmax3' in ARGS:  jobname  += '_l%d'%(ARGS['lmax3'])
@@ -212,28 +192,11 @@ for A in [100]:
         if 'core_generator' in ARGS: jobname += '_' + ARGS['core_generator']
         if 'BetaCM' in ARGS: jobname += '_' + ARGS['BetaCM']
         ARGS['flowfile'] = 'output/BCH_' + jobname + '.dat'
+        ARGS['intfile']  = '/data_share11/ME_IMSRG/' + jobname #
 
-        if twobody == True:
-          intfile = out_dir + '/%s_hw%s_eMax%02d' % (intlabel, ARGS['hw'], int(ARGS['emax']))
-        else:
-          intfile = out_dir + '/%s_hw%s_eMax%02d_E3Max%s' % (intlabel, ARGS['hw'], int(ARGS['emax']), ARGS['e3max'])
-        
-        ARGS['intfile'] = intfile
-
-        if 'BetaCM' in ARGS: ARGS['intfile'] += '_' + ARGS['BetaCM']
-
-        if (ARGS['write_omega_me'] == 'true'):
-          if twobody == True:
-            omefile = omega_dir + '/%s_hw%s_eMax%02d_s%s' % (intlabel, ARGS['hw'], int(ARGS['emax']), ARGS['smax'])
-          else:
-            omefile = omega_dir + '/%s_hw%s_eMax%02d_E3Max%s_s%s' % (intlabel, ARGS['hw'], int(ARGS['emax']), ARGS['e3max'], ARGS['smax'])
-          ARGS['omefile'] = omefile
-          if 'BetaCM' in ARGS: ARGS['omefile'] += '_' + ARGS['BetaCM']
+        ARGS['vs_out'] = out_dir + '/%s_%s_hw%s_eMax%02d_E3Max%s_s%s' % (ARGS['valence_space'], intlabel, ARGS['hw'], int(ARGS['emax']), ARGS['e3max'],ARGS['smax'])
 
         cmd = ' '.join([exe] + ['%s=%s'%(x,ARGS[x]) for x in ARGS])
-
-        # if path.exists(intfile) and path.exists(kername):
-            #   continue
 
         ### Submit the job if we're running in batch mode, otherwise just run in the current shell
         if batch_mode==True:
@@ -250,3 +213,4 @@ for A in [100]:
           sleep(0.1)
         else:
           call(cmd.split())  # Run in the terminal, rather than submitting
+

@@ -116,55 +116,73 @@ time srun %s
 if not path.exists('imsrg_log'): mkdir('imsrg_log')
 
 ### Loop over multiple jobs to submit
-for lda in [0.]: 
-#for lda in [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.010]:
+for lda in [0.001, 0.002, 0.003, 0.004, 0.005]: #, 0.006, 0.007, 0.008, 0.009, 0.010]:
  ARGS['polarisability'] = lda # LOOP HERE FOR POLARISABILITY
- for A in [4]:
-  Z = 2 #A//2
+ for A in [100]:
+  Z = 50
   for reference in ['%s%d'%(ELEM[Z],A)]:
    ARGS['reference'] = reference
-   print('Z = ', Z)
+   print('Reference = ', reference)
    if lda != 0.:
     print('lda pol = ', lda)
-   #for e in [4, 6, 8, 10]:
-   for e in [4]:
-    for hw in [25]:
+   for e in [4, 6, 8, 10, 12]:
+  #  for e in [4]:
+    for hw in [16]:
+      ARGS['emax']  = '%d' % e
 
-      ARGS['emax']  = '%d'%e
-      # ARGS['e3max'] = '16' #16  24
+      e3max = 24 #16  24
+      e3max = min(e3max, 3 * e)
 
-      #ARGS['basis'] = 'oscillator'
+      ARGS['emax']  = str(e)
+      ARGS['e2max'] = str(2 * e)
+
+      twobody = False # Set to True for calculations WITHOUT 3b forces
+
+      if twobody == False:
+        ARGS['e3max'] = str(e3max)
 
       ### Model space parameters used for reading Darmstadt-style interaction files
-      # ARGS['file2e1max'] = '18 file2e2max=36 file2lmax=18'
-      ARGS['file2e1max'] = '4 file2e2max=8 file2lmax=4'
-      #ARGS['file2e1max'] = '4 file2e2max=8 file2lmax=4'
-      # ARGS['file3e1max'] = '18 file3e2max=32 file3e3max=24'
+      ARGS['file2e1max'] = '18 file2e2max=36 file2lmax=18'
+      ARGS['file3e1max'] = '18 file3e2max=36 file3e3max=24'
+      # ARGS['file2e1max'] = '16 file2e2max=32 file2lmax=16'
+      # ARGS['file3e1max'] = '16 file3e2max=32 file3e3max=24'
+      # ARGS['file3e1max'] = '16 file3e2max=32 file3e3max=28'
+      # ARGS['file2e1max'] = '%i file2e2max=%i file2lmax=%i' % (e, 2 * e, e)
 
       # MATRIX ELEMENTS DELTA N2LO_GO
       # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_DN2LOGO394_bare_hw%i_emax18_e2max36.me2j.gz'%(hw)    # 2B
       # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_DNNLOgo_3NFJmax15_IS_hw%i_ms16_32_24.stream.bin'%(hw)      # 3B, hw = 16 MeV
-      #ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_half_ThBME_DNNLOgo_3NFJmax15_IS_hw%i_ms16_32_28.stream.bin'%(hw) # 3B, hw = 10 MeV, 12 MeV
-      #ARGS['no2b_precision'] = 'half'
+      # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_half_ThBME_DNNLOgo_3NFJmax15_IS_hw%i_ms16_32_28.stream.bin'%(hw) # 3B, hw = 10 MeV, 12 MeV
+      # ARGS['no2b_precision'] = 'half'
       
       # MATRIX ELEMENTS EM1.8/2.0
-      # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N3LO_EM500_srg1.8_hw%i_emax18_e2max36.me2j.gz'%(hw)
-      # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_EM1.8_2.0_3NFJmax15_IS_hw%i_ms18_36_24.stream.bin'%(hw)
+      # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N3LO_EM500_srg1.8_hw%i_emax18_e2max36.me2j.gz'%(hw) # 2B
+      # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_EM1.8_2.0_3NFJmax15_IS_hw%i_ms18_36_24.stream.bin' % (hw) # 3B, hw = 16 MeV
+      # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_EM1.8_2.0_3NFJmax15_IS_hw%i_ms16_32_24.stream.bin' %(hw) # 3B, hw = 12, 20 MeV
 
-      # MATRIX ELEMENTS N2LO_opt
-      ARGS['2bme'] = '/home/porro/me/me2j/TwBME-HO_NN-only_N2LO_opt_bare_hw25_emax4_e2max8.me2j.gz'
+      # MATRIX ELEMENTS EM7.5
+      # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N3LO_EM500_srg1.8_hw%i_emax18_e2max36.me2j.gz'   % (hw) # 2B
+      # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_3NFJmax15_1.8_2.0_EM7.5_IS_hw%i_ms18_36_24.stream.bin' % (hw) # 3B
+
+      # MATRIX ELEMENTS NNLOsat
+      ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N2LO_sat_bare_hw%i_emax18_e2max36.me2j.gz' % (hw) # 2B, hw = 14, 16 MeV
+      ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_N2LOsat_3NFJmax15_IS_hw%i_ms18_36_24.stream.bin' % (hw) # 3B, hw = 14, 16 MeV
+      # ARGS['2bme'] = '/data_share11/takayuki/me2j/TwBME-HO_NN-only_N2LO_sat_bare_hw%i_emax16_e2max32.me2j.gz' % (hw) # 2B, hw = 12 MeV
+      # ARGS['3bme'] = '/data_share11/takayuki/me3j/NO2B_ThBME_N2LOsat_3NFJmax15_IS_hw%i_ms16_32_24.stream.bin' % (hw) # 3B, hw = 12 MeV
       
+      # MATRIX ELEMENTS N2LO_opt
+      # ARGS['2bme'] = '/home/porro/me/me2j/TwBME-HO_NN-only_N2LO_opt_bare_hw%i_emax%i_e2max%i.me2j.gz' % (hw, e, 2 * e)
 
-
-      #ARGS['2bme'] = '/Users/alexandertichai/Work/Matrixelements/ME2J/chi2b_srg0800_eMax12_hwHO020.me2j.gz'
-      #ARGS['3bme'] = 'input/me3j/chi2b3b400cD-02cE0098_hwconv036_srg0625ho40J_eMax14_EMax14_hwHO0%d.me3j.gz'%(hw)
-      #ARGS['LECs'] = 'srg0625'
-      #ARGS['3bme'] = ''
+      # intlabel = 'EM_1.8_2.0'
+      # intlabel = 'DN2LO_GO_394'
+      # intlabel = 'EM_7.5'
+      intlabel = 'NNLO_sat'
+      # intlabel = 'N2LO_opt'
 
       ARGS['LECs'] = ''
       ARGS['3bme_type'] = 'no2b' # 'full'
-
-      ARGS['moments'] = 'false'
+      
+      ARGS['moments'] = 'true'
 
       ARGS['write_Hamiltonian'] = 'false'
 
@@ -172,25 +190,9 @@ for lda in [0.]:
       ARGS['A']    = '%d'%A
 
       ARGS['valence_space'] = reference
-      # ARGS['valence_space'] = '0hw-shell'
-      # ARGS['valence_space'] = 'Cr%d'%A
-      # ARGS['core_generator'] = 'imaginary-time'
-      # ARGS['valence_generator'] = 'shell-model-imaginary-time'
-      
-      # ARGS['method'] = method
-
-      # ARGS['Operators'] = ''    # Operators to consistenly transform, separated by commas.
-      # ARGS['Operators'] = 'Rp2'
-      # ARGS['Operators'] = 'Rm2lab' # which other operators to coevolve and transform
-      # ARGS['Operators'] = 'E2,M1'
 
       ### Make an estimate of how much time to request. Only used for slurm at the moment.
       time_request = '10-00:00:00'
-      #if   e <  5 : time_request = '00:10:00'
-      #elif e <  8 : time_request = '01:00:00'
-      #elif e < 10 : time_request = '04:00:00'
-      #elif e < 12 : time_request = '12:00:00'
-      #elif e < 14 : time_request = '24:00:00'
 
       # jobname  = '%s_%s_%s_%s_e%s_E%s_s%s_hw%s_A%s' %(ARGS['valence_space'], ARGS['LECs'],ARGS['method'],ARGS['reference'],ARGS['emax'],ARGS['e3max'],ARGS['smax'],ARGS['hw'],ARGS['A'])
       jobname  = '%s_%s_%s_%s_e%s_s%s_hw%s_A%s' %(ARGS['valence_space'], ARGS['LECs'],ARGS['method'],ARGS['reference'],ARGS['emax'],ARGS['smax'],ARGS['hw'],ARGS['A'])

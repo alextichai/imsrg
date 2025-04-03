@@ -9,6 +9,7 @@ from sys import argv
 from subprocess import call,PIPE
 from time import time,sleep
 from datetime import datetime
+from collections import namedtuple
 import glob
 import re
 
@@ -110,13 +111,14 @@ time srun %s
 if not path.exists('imsrg_log'): mkdir('imsrg_log')
 
 ### Loop over multiple jobs to submit
-for A in [40]:
-  Z = 20 #A//2
+# for beta in [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.25,2.5,2.75]:
+for A in [4]:
+  Z = 2
   for reference in ['%s%d'%(ELEM[Z],A)]:
     ARGS['reference'] = reference
     print('Reference = ', reference)
-    for e in [4,6,8,10]:
-      for hw in [16]:
+    for e in [4]:
+      for hw in [25]:
         ARGS['emax']  = '%d' % e
 
         e3max = 24 #16  24
@@ -126,28 +128,46 @@ for A in [40]:
 
         ARGS['emax']  = str(e)
         ARGS['e2max'] = str(2 * e)
-        ARGS['e3max'] = str(e3max)
 
-        ### Model space parameters used for reading Darmstadt-style interaction files
-        #ARGS['file2e1max'] = '18 file2e2max=36 file2lmax=18'
-        #ARGS['file2e1max'] = '4 file2e2max=8 file2lmax=4'
-        #ARGS['file3e1max'] = '16 file3e2max=32 file3e3max=24'
+        twobody = True # Set to True for calculations WITHOUT 3b forces
+
+        if twobody == False:
+          ARGS['e3max'] = str(e3max)
         
-        intlabel = 'EM_7.5'
+        # intlabel = 'EM_7.5'
         # intlabel = 'EM_1.8_2.0'
         # intlabel = 'DN2LO_GO_394'
+        # intlabel = 'NNLO_sat'
+        intlabel = 'N2LO_opt'
 
         ARGS['fmt2'] = 'me2jp'
+
+        # ARGS['BetaCM'] = '%f' %beta
 
         ARGS['file2e1max'] = ARGS['emax'] 
         ARGS['file2e2max'] = ARGS['e2max']
         ARGS['file2lmax']  = ARGS['emax']
 
         # Pre-contracted matrix elements
-        ARGS['1bme'] = '/home/porro/me/imsrg/%s/%s_hw%i_eMax%02d_E3Max%02d.me1j.gz' % (reference, intlabel, hw, e, e3max) # 1B
-        ARGS['2bme'] = '/home/porro/me/imsrg/%s/%s_hw%i_eMax%02d_E3Max%02d.me2jp.gz'% (reference, intlabel, hw, e, e3max) # 2B
+        if twobody == True:
+          ARGS['1bme'] = '/home/porro/me/imsrg/%s/%s_hw%i_eMax%02d' % (reference, intlabel, hw, e) # 1B
+          ARGS['2bme'] = '/home/porro/me/imsrg/%s/%s_hw%i_eMax%02d' % (reference, intlabel, hw, e) # 2B
+        else:
+          ARGS['1bme'] = '/home/porro/me/imsrg/%s/%s_hw%i_eMax%02d_E3Max%02d' % (reference, intlabel, hw, e, e3max) # 1B
+          ARGS['2bme'] = '/home/porro/me/imsrg/%s/%s_hw%i_eMax%02d_E3Max%02d' % (reference, intlabel, hw, e, e3max) # 2B
 
-        ARGS['omefile'] = '/home/porro/Omega/%s/%s_hw%i_eMax%02d_E3Max%02d_s%s' % (reference, intlabel, hw, e, e3max, smax_Omega)
+        if twobody == True:
+          ARGS['omefile'] = '/home/porro/Omega/%s/%s_hw%i_eMax%02d_s%s' % (reference, intlabel, hw, e, smax_Omega)
+        else:
+          ARGS['omefile'] = '/home/porro/Omega/%s/%s_hw%i_eMax%02d_E3Max%02d_s%s' % (reference, intlabel, hw, e, e3max, smax_Omega)
+
+        if 'BetaCM' in ARGS: 
+          ARGS['1bme']    += '_' + ARGS['BetaCM']
+          ARGS['2bme']    += '_' + ARGS['BetaCM']
+          ARGS['omefile'] += '_' + ARGS['BetaCM']
+
+        ARGS['1bme'] += '.me1j.gz'
+        ARGS['2bme'] += '.me2jp.gz'
 
         ARGS['hw']   = '%d'%hw
         ARGS['A']    = '%d'%A
@@ -157,8 +177,10 @@ for A in [40]:
         # Select the desired response here ############
         L = 1
 
+        probe = 'EM' # Alternatives: 'isoscalar', 'isovector', 'EM'
+
         ARGS['L_MixMom']   = L
-        ARGS['isospin_ch'] = 'isovector'
+        # ARGS['isospin_ch'] = 'isoscalar'
 
         ###############################################
 
@@ -166,12 +188,15 @@ for A in [40]:
 
         nmagn = []
         for f in files:
-            match = re.search(r's500_(\d+)', f)
-            if match:
-                nmagn.append(int(match.group(1)))  # Only add if a match is found
+          if twobody == True:
+            match = re.search(r's500_(\d)', f)
+          else:
+            match = re.search(r's500_(\d)_(\d)', f)
+          if match:
+              nmagn.append(int(match.group(1)))  # Only add if a match is found
 
         if nmagn:
-            N = len(nmagn)
+          N = len(nmagn)
 
         input(f"{N} omegas found")
 
@@ -192,50 +217,107 @@ for A in [40]:
 
         # Loop over qs
 
-        qmin = 0.3
-        qmax = 3.3
+        qmin = 0.00
+        qmax = 3.00
 
-        dq = 0.3
+        dq = 0.25
 
-        N = int((qmax - qmin) / dq)
+        N = int((qmax - qmin) / dq) + 1
 
-        qs = []
+        ops = []
 
-        qs.append(0.)     # Add full q = 0 limit 
-        # qs.append(0.001)  # and something close to check (no prefactor problem to match the long wavelength limit)
+        Operator = namedtuple("Operator", ["lda", "q"])
 
-        for i in range(N):
-          qi = qmin + i * dq
-          qs.append(qi)
+        if probe == 'EM':
+          ops.append(Operator("0E", -2)) # Isovector operator at q = 0
+          ops.append(Operator("0E", -1)) # Isoscalar operator at q = 0
+          ops.append(Operator("0E",  0)) # Excitation operator at q = 0
+          
+          if L == 0:
+            for i in range(N):
+              qi = qmin + i * dq
+              ops.append(Operator("C", qi))   # Only Coulomb component for the monopole
+          else:
+            for i in range(N):
+              qi = qmin + i * dq
+              ops.append(Operator("C", qi))   # Coulomb component
+              ops.append(Operator("TE", qi))  # Transverse Electric component
+        
+        elif probe == 'isoscalar':
+          # ops.append(Operator("IS", 0.01))
+          # ops.append(Operator("IS", 0.05))
+          # ops.append(Operator("IS", 0.10))
+          # ops.append(Operator("IS", 0.15))
+          
+          # for i in range(N):
+          #   qi = qmin + i * dq
+          #   ops.append(Operator("IS", qi))   # Only Coulomb component for the monopole
+          for i in range(N):
+            qi = qmin + i * dq
+            ops.append(Operator("PS", qi))
 
-        Nker = int(len(qs) * (len(qs) + 1) / 2)
+        elif probe == 'isovector':
+          for i in range(N):
+            qi = qmin + i * dq
+            ops.append(Operator("IV", qi))
+
+        # qs = []
+
+        # qs.append(0.)     # Add full q = 0 limit
+
+        # qs.append(98)     # Add offset m = (100 - N) to the electric multipole operator
+        # qs.append(96)     # 
+        # qs.append(94)     # 
+        # qs.append(92)     # 
+        # qs.append(90)     # 
+
+        ### qs.append(0.001)  # and something close to check (no prefactor problem to match the long wavelength limit)
+
+        # for i in range(N):
+        #   qi = qmin + i * dq
+        #   qs.append(qi)
+
+        Nker = int(len(ops) * (len(ops) + 1) / 2)
 
         input (f"{Nker} kernels are going to be evaluated, do you want to continue ?")
 
         # add check on existing kernel
 
-        for qL in qs:
-          for qR in qs:
-            if (qR > qL):
+        for ll, opL in enumerate(ops):
+          for rr, opR in enumerate(ops):
+            qL = opL.q
+            qR = opR.q
+            fL = opL.lda
+            fR = opR.lda
+
+            if (rr > ll):
             #if (qR != qL):
               continue
-             
+            
             ARGS['qL'] = qL
             ARGS['qR'] = qR
+            ARGS['fL'] = fL
+            ARGS['fR'] = fR
 
-            #jobname  = '%s_%s_%s_%s_e%s_E%s_s%s_hw%s_A%s' %(ARGS['valence_space'], ARGS['LECs'],ARGS['method'],ARGS['reference'],ARGS['emax'],ARGS['e3max'],ARGS['smax'],ARGS['hw'],ARGS['A'])
-            jobname  = '%s_kernel_%s_e%s_E%s_s%s_hw%s' %(ARGS['valence_space'],intlabel,ARGS['emax'],ARGS['e3max'],ARGS['smax'],ARGS['hw'])
+            if twobody == True:
+              jobname  = '%s_kernel_%s_e%s_s%s_hw%s' %(ARGS['valence_space'],intlabel,ARGS['emax'],ARGS['smax'],ARGS['hw'])
+            else:
+              jobname  = '%s_kernel_%s_e%s_E%s_s%s_hw%s' %(ARGS['valence_space'],intlabel,ARGS['emax'],ARGS['e3max'],ARGS['smax'],ARGS['hw'])
             logname = jobname + datetime.fromtimestamp(time()).strftime('_%y%m%d%H%M.log')
 
             ### Make a directory for the output (kernels), if it doesn't already exist
-            kernel_dir = '/home/porro/kernels_imsrg/%s_%s_hw%s_eMax%02d_E3Max%s_s%s' % (ARGS['valence_space'], intlabel, ARGS['hw'], int(ARGS['emax']), ARGS['e3max'], smax_prev)
+            if twobody == True:
+              kernel_dir = '/home/porro/kernels_imsrg/%s_%s_hw%s_eMax%02d_s%s' % (ARGS['valence_space'], intlabel, ARGS['hw'], int(ARGS['emax']), smax_prev)
+            else:
+              kernel_dir = '/home/porro/kernels_imsrg/%s_%s_hw%s_eMax%02d_E3Max%s_s%s' % (ARGS['valence_space'], intlabel, ARGS['hw'], int(ARGS['emax']), ARGS['e3max'], smax_prev)
             if not path.exists(kernel_dir): mkdir(kernel_dir)
 
             ARGS['kerdir'] = kernel_dir
 
-            kername = '%s/L=%i_%s_%.3f_%.3f.dat' % (kernel_dir, L, ARGS['isospin_ch'], qL, qR)
-            #if path.exists(kername):
-            #  continue
+            # kername = '%s/L=%i_%s_%s_%.3f_%s_%.3f.dat' % (kernel_dir, L, ARGS['isospin_ch'], fL, qL, fR, qR)
+            kername = '%s/L=%i_%s_%.3f_%s_%.3f.dat' % (kernel_dir, L, fL, qL, fR, qR)
+            # if path.exists(kername):
+            #   continue
 
             #ARGS['intfile']  = '/data_share11/ME_IMSRG/' + jobname
             #ARGS['intfile'] = out_dir   + '/%s_hw%s_eMax%02d_E3Max%s'     % (intlabel, ARGS['hw'], int(ARGS['emax']), ARGS['e3max'])
